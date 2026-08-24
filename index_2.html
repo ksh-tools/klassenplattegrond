@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Klassenplattegronden</title>
+<style>
+:root{
+  --papier:#f1f5fa;
+  --kaart:#ffffff;
+  --inkt:#0f172a;
+  --tekst:#1e293b;
+  --grijs:#64748b;
+  --zacht:#94a3b8;
+  --lijn:#e6ebf3;
+  --lijn-sterk:#d7dfeb;
+  --blauw:#2563eb;
+  --blauw-zacht:#eff5ff;
+  --oranje:#f59e0b;
+  --oranje-diep:#ea8c07;
+  --groen:#16a34a;
+  --violet:#7c3aed;
+  --schaduw:0 1px 2px rgba(15,23,42,.04), 0 10px 24px -12px rgba(15,23,42,.18);
+  --rond:18px;
+  --foto:76px;
+  --naam:17px;
+  --sans:"Inter","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--sans);color:var(--tekst);background:var(--papier);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--blauw);outline-offset:2px}
+svg{flex:none}
+.wrap{max-width:1560px;margin:0 auto;padding:20px 24px 56px}
+
+/* ---------- kop ---------- */
+.kop{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:3px solid var(--blauw)}
+.merkje{width:52px;height:52px;border-radius:14px;background:linear-gradient(150deg,#3b82f6,#2563eb);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 18px -8px rgba(37,99,235,.8)}
+.titelblok{display:flex;flex-direction:column;gap:2px;min-width:0}
+.titelrij{display:flex;align-items:center;gap:8px}
+.keuzehoes{position:relative;display:flex;align-items:center}
+.klasknop{display:inline-flex;align-items:center;gap:6px;border:1px solid transparent;background:transparent;font-size:31px;font-weight:800;letter-spacing:-1px;color:var(--inkt);padding:2px 10px 2px 8px;border-radius:12px}
+.klasknop:hover{background:#fff;border-color:var(--lijn)}
+.klasknop .pijl{color:var(--zacht);display:flex;transition:transform .15s}
+.klasknop[aria-expanded="true"] .pijl{transform:rotate(180deg)}
+.klaslijst{position:absolute;top:calc(100% + 8px);left:0;z-index:40;min-width:250px;max-height:60vh;overflow:auto;background:var(--kaart);border:1px solid var(--lijn-sterk);border-radius:16px;box-shadow:0 18px 40px -16px rgba(15,23,42,.45);padding:7px;display:flex;flex-direction:column;gap:3px}
+.klaslijst[hidden]{display:none}
+.klaslijst button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;border:1px solid transparent;background:transparent;border-radius:11px;padding:9px 12px;font-size:16px;font-weight:700;letter-spacing:-.2px;color:var(--tekst)}
+.klaslijst button .vink{width:16px;color:var(--blauw);display:flex;flex:none}
+.klaslijst button .vink svg{opacity:0}
+.klaslijst button:hover{background:var(--blauw-zacht);color:var(--inkt)}
+.klaslijst button[aria-selected="true"]{background:var(--blauw-zacht);color:var(--blauw)}
+.klaslijst button[aria-selected="true"] .vink svg{opacity:1}
+.klaslijst .aantal{margin-left:auto;font-size:13px;font-weight:600;color:var(--zacht)}
+.mini{width:36px;height:36px;border-radius:11px;border:1px solid var(--lijn);background:var(--kaart);color:var(--grijs);display:inline-flex;align-items:center;justify-content:center;box-shadow:var(--schaduw)}
+.mini:hover{color:var(--blauw);border-color:var(--blauw)}
+.mini.gevaar:hover{color:#dc2626;border-color:#fca5a5}
+.opstelling{font-size:12px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--zacht);padding-left:9px}
+.kop-rechts{margin-left:auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}
+.koppelstatus{font-size:13px;color:var(--zacht);display:flex;align-items:center;gap:8px}
+.koppelstatus.actief{color:var(--blauw);font-weight:600}
+.koppelstatus button{border:1px solid var(--blauw);background:var(--blauw-zacht);color:var(--blauw);border-radius:8px;padding:3px 10px;font-size:12.5px;font-weight:700}
+#datum{border:1px solid var(--lijn);background:var(--kaart);border-radius:12px;padding:9px 14px;font-weight:700;color:var(--tekst);box-shadow:var(--schaduw);white-space:nowrap}
+
+/* ---------- werkbalk ---------- */
+.balk{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:18px 0 0}
+.knop{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--lijn);background:var(--kaart);border-radius:13px;padding:10px 16px;font-size:14.5px;font-weight:700;color:var(--tekst);box-shadow:var(--schaduw);transition:transform .1s,border-color .12s,background .12s}
+.knop:hover{border-color:var(--lijn-sterk);transform:translateY(-1px)}
+.knop svg{color:var(--blauw)}
+.knop.primair{background:linear-gradient(135deg,var(--oranje),var(--oranje-diep));border-color:transparent;color:#fff;box-shadow:0 10px 20px -10px rgba(234,140,7,.9)}
+.knop.primair svg{color:#fff}
+.knop.donker{background:var(--inkt);border-color:var(--inkt);color:#fff}
+.knop.donker svg{color:#7dd3fc}
+.knop.stil{color:var(--grijs);box-shadow:none;background:#fbfdff}
+.knop.stil svg{color:var(--zacht)}
+.knop.groen svg{color:var(--groen)}
+.knop.violet svg{color:var(--violet)}
+.knop[disabled]{opacity:.45;cursor:default;transform:none}
+.knop[hidden]{display:none}
+.scheiding{width:1px;height:26px;background:var(--lijn-sterk);margin:0 2px}
+
+/* ---------- lokaal ---------- */
+.lokaal{
+  margin-top:18px;aspect-ratio:16/9;display:flex;flex-direction:column;
+  background:
+    linear-gradient(rgba(203,213,225,.32) 1px,transparent 1px) 0 0/100% 48px,
+    linear-gradient(90deg,rgba(203,213,225,.32) 1px,transparent 1px) 0 0/48px 100%,
+    var(--kaart);
+  border:1px solid var(--lijn);border-radius:var(--rond);box-shadow:var(--schaduw);
+  padding:22px 26px 26px;
+}
+.bord{flex:none;align-self:center;width:min(60%,900px);display:flex;align-items:center;justify-content:center;gap:12px;background:var(--inkt);color:#fff;border-radius:12px;padding:11px;font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;font-weight:700}
+.bord svg{color:#7dd3fc}
+.rijen{flex:1;min-height:0;display:grid;gap:clamp(12px,2.4vw,34px);padding-top:20px}
+.rij{display:flex;flex-direction:column;min-height:0}
+.rij-label{flex:none;display:flex;align-items:center;justify-content:center;gap:7px;font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--zacht);font-weight:700;padding-bottom:10px}
+.tafels{flex:1;display:grid;gap:10px;min-height:0}
+.tafel-groep{min-height:0;display:flex;flex-direction:column;border:1px solid #d3dcea;border-radius:14px;padding:4px 6px 6px;background:#e3eaf4}
+.tafel-label{flex:none;text-align:center;font-size:10.5px;color:#5a6a80;font-weight:700;letter-spacing:.02em;padding-bottom:3px}
+.tafel{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:7px;min-height:0}
+
+/* ---------- stoel ---------- */
+.stoel{position:relative;min-height:0;overflow:hidden;container-type:size;border:1px solid var(--lijn);border-radius:12px;background:var(--kaart);padding:6px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;box-shadow:0 1px 2px rgba(15,23,42,.05);transition:box-shadow .12s,border-color .12s,transform .1s}
+.stoel.leeg{border:2px dashed var(--lijn-sterk);background:transparent;box-shadow:none;color:var(--zacht)}
+.stoel.leeg::after{content:"leeg";font-size:11px;letter-spacing:.1em;font-weight:600}
+.stoel.bezet{cursor:grab}
+.stoel.bezet:hover{border-color:#bfdbfe;box-shadow:0 8px 18px -10px rgba(15,23,42,.45);transform:translateY(-1px)}
+.stoel.geselecteerd{border:2px solid var(--blauw);box-shadow:0 0 0 4px var(--blauw-zacht)}
+.stoel.beurt{border:2px solid var(--oranje);box-shadow:0 0 0 5px rgba(245,158,11,.22)}
+.stoel.afwezig{opacity:.45}
+.stoel.afwezig .naam{text-decoration:line-through}
+.stoel.sleepdoel{border-color:var(--blauw);background:var(--blauw-zacht)}
+.stoel.sleept{opacity:.3}
+.foto{width:min(var(--foto),52cqh);height:min(var(--foto),52cqh);border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:calc(min(var(--foto),52cqh)*.38);font-weight:800;letter-spacing:-.02em;overflow:hidden;background:var(--blauw-zacht);color:var(--blauw)}
+.foto img{width:100%;height:100%;object-fit:cover;display:block}
+.stoel.afwezig .foto{filter:grayscale(1)}
+.naam{font-size:min(var(--naam),21cqh);font-weight:600;line-height:1.15;color:var(--inkt);overflow-wrap:break-word;word-break:normal;-webkit-hyphens:auto;hyphens:auto;max-width:100%}
+.merk{position:absolute;top:5px;right:7px;font-size:9.5px;font-weight:700;color:var(--oranje);text-transform:uppercase;letter-spacing:.08em}
+
+/* ---------- docentweergave: bord onder, tafel 1 onderaan ---------- */
+.lokaal[data-weergave="docent"]{flex-direction:column-reverse}
+.lokaal[data-weergave="docent"] .rijen{padding-top:0;padding-bottom:20px}
+.lokaal[data-weergave="docent"] .rij{flex-direction:column-reverse}
+.lokaal[data-weergave="docent"] .rij-label{padding-bottom:0;padding-top:10px}
+
+/* ---------- tegelstijlen ---------- */
+/* 1. kaart: cirkel boven, naam eronder (standaard, hierboven gedefinieerd) */
+
+/* 2. portret: grote foto in een lijstje, naam op een lichte strook eronder */
+.lokaal[data-stijl="portret"] .stoel{flex-direction:row;justify-content:flex-start;gap:11px;padding:5px 10px 5px 5px;text-align:left;border-radius:13px}
+.lokaal[data-stijl="portret"] .foto{position:static;width:auto;height:100%;aspect-ratio:4/5;border-radius:9px;font-size:min(30cqh,34px)}
+.lokaal[data-stijl="portret"] .foto img{border-radius:9px;object-position:center 18%}
+.lokaal[data-stijl="portret"] .naam{flex:1;text-align:left;font-size:min(var(--naam),22cqh)}
+.lokaal[data-stijl="portret"] .stoel.leeg{justify-content:center}
+
+/* 3. naamkaart: geen foto, voornaam boven en achternaam eronder */
+.lokaal[data-stijl="naamkaart"] .foto{display:none}
+.lokaal[data-stijl="naamkaart"] .stoel{justify-content:center;padding:8px 10px;gap:0}
+.lokaal[data-stijl="naamkaart"] .naam{line-height:1.2}
+.lokaal[data-stijl="naamkaart"] .voornaam{display:block;font-size:min(calc(var(--naam) * 1.2),34cqh);font-weight:700}
+.lokaal[data-stijl="naamkaart"] .achternaam{display:block;font-size:min(var(--naam),26cqh);font-weight:600;color:var(--grijs);margin-top:1px}
+
+.stijlkiezer{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:16px;background:#f1f5f9;border:1px solid var(--lijn);border-radius:12px;padding:4px}
+.stijlkiezer button{border:1px solid transparent;background:transparent;border-radius:9px;padding:7px 4px;font-size:13px;font-weight:700;color:var(--grijs)}
+.stijlkiezer button:hover{color:var(--inkt)}
+.stijlkiezer button.actief{background:var(--kaart);border-color:var(--lijn);color:var(--blauw);box-shadow:0 1px 2px rgba(15,23,42,.08)}
+
+/* ---------- panelen ---------- */
+.onder{display:grid;grid-template-columns:1.1fr 1fr 1.05fr;gap:18px;margin-top:20px}
+.paneel{background:var(--kaart);border:1px solid var(--lijn);border-radius:var(--rond);padding:18px 20px;box-shadow:var(--schaduw);display:flex;flex-direction:column}
+.paneel h2{display:flex;align-items:center;gap:9px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--grijs);margin:0 0 14px;font-weight:800}
+.paneel h2 svg{color:var(--blauw)}
+.badge{margin-left:2px;background:var(--blauw-zacht);color:var(--blauw);border-radius:20px;padding:1px 9px;font-size:12px;letter-spacing:0;font-weight:800}
+.wacht{display:flex;flex-wrap:wrap;gap:8px;min-height:46px;align-content:flex-start}
+.wacht .leeg-tekst{width:100%;background:#f8fafc;border:1px solid var(--lijn);border-radius:12px;padding:12px 14px;color:var(--zacht);font-size:14px}
+.chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--lijn);border-radius:22px;padding:4px 13px 4px 4px;font-size:14px;font-weight:600;background:#f8fafc;cursor:grab}
+.chip .foto{width:28px;height:28px;font-size:11px}
+.chip:hover{border-color:var(--blauw);background:var(--blauw-zacht)}
+.leeg-tekst{color:var(--zacht);font-size:13.5px}
+.toevoegen{display:flex;gap:9px;margin-top:14px}
+.toevoegen input{flex:1;min-width:0;border:1px solid var(--lijn);border-radius:12px;padding:10px 13px;background:#f8fafc}
+.toevoegen input:focus{background:#fff}
+.tip{margin:auto 0 0;padding-top:14px;border-top:1px solid var(--lijn);color:var(--zacht);font-size:13px}
+#plakvak{display:none;width:100%;margin-top:10px;border:1px solid var(--lijn);border-radius:12px;padding:10px 12px;min-height:96px;background:#f8fafc;resize:vertical}
+#plakvak.zichtbaar{display:block}
+
+.beurt-vak{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:4px}
+.beurt-rond{width:66px;height:66px;border-radius:50%;background:#f1f5f9;color:var(--zacht);display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.beurt-rond.raak{background:rgba(245,158,11,.16);color:var(--oranje-diep)}
+.beurt-naam{font-size:23px;font-weight:800;letter-spacing:-.4px;color:var(--inkt);line-height:1.2}
+.beurt-plek{font-size:14px;color:var(--zacht)}
+#btn-beurt-2{width:100%;justify-content:center;margin-top:18px;font-size:16px;padding:13px}
+.beurt-extra{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.beurt-extra .knop{padding:7px 12px;font-size:13.5px}
+.voortgang{font-size:13px;color:var(--zacht);margin-top:10px}
+.voortgang b{color:var(--tekst)}
+
+.velden{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.veld label{display:block;font-size:12.5px;font-weight:700;color:var(--grijs);margin-bottom:5px}
+.veld input{width:100%;border:1px solid var(--lijn);border-radius:11px;padding:9px 12px;background:#f8fafc;font-weight:700}
+.schuifrij{margin-top:16px}
+.schuifkop{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;color:var(--grijs)}
+.schuifkop span{color:var(--blauw)}
+#fotoschaal{width:100%;margin-top:8px;accent-color:var(--blauw)}
+.fotoregel{display:flex;align-items:center;gap:8px;margin:auto 0 0;padding-top:14px;border-top:1px solid var(--lijn);color:var(--zacht);font-size:13px}
+
+/* ---------- acties ---------- */
+.acties{display:none;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px;padding:12px 16px;border:1px solid #bfdbfe;background:var(--blauw-zacht);border-radius:14px}
+.acties.zichtbaar{display:flex}
+.acties strong{margin-right:4px;color:var(--inkt)}
+
+/* ---------- op het bord ---------- */
+body.presentatie{background:#0b1220;--foto:112px;--naam:25px}
+body.presentatie .wrap{max-width:none;padding:14px 18px;height:100vh;display:flex;flex-direction:column}
+body.presentatie .kop,body.presentatie .onder,body.presentatie .acties{display:none}
+body.presentatie .balk{margin:0 0 12px;justify-content:flex-end}
+body.presentatie .balk .knop:not(#btn-presentatie):not(#btn-beurt){display:none}
+body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
+
+@media (max-width:1100px){
+  .onder{grid-template-columns:1fr}
+  .lokaal{aspect-ratio:auto}
+  :root{--foto:48px;--naam:14px}
+  .kop-rechts{margin-left:0;width:100%;justify-content:flex-start}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+@page{size:A4 landscape;margin:8mm}
+@media print{
+  html,body{background:#fff;height:auto}
+  .balk,.onder,.acties,.koppelstatus,.mini,.stijlkiezer{display:none!important}
+  .wrap{max-width:none;padding:0;height:auto}
+
+  /* kop compact op één regel */
+  .kop{padding-bottom:2mm;border-bottom-width:1.2mm;flex-wrap:nowrap;gap:3mm}
+  .merkje{width:9mm;height:9mm;border-radius:2.5mm;box-shadow:none}
+  .merkje svg{width:5mm;height:5mm}
+  .klasknop{font-size:7mm;padding:0;border:none;background:transparent}
+  .klaslijst{display:none!important}
+  .klasknop .pijl{display:none}
+  .opstelling{font-size:2.9mm;padding-left:0}
+  .kop-rechts{margin-left:auto;width:auto;justify-content:flex-end}
+  #datum{border:none;box-shadow:none;background:transparent;padding:0;font-size:3.6mm}
+
+  /* lokaal vult precies één liggende pagina */
+  .lokaal{border:none;box-shadow:none;background:#fff;margin-top:2mm;padding:3mm 0 0;aspect-ratio:auto;height:170mm;overflow:hidden}
+  .bord{width:70%;padding:2mm;font-size:2.9mm;border-radius:2mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .rijen{gap:5mm;padding-top:4mm}
+  .lokaal[data-weergave="docent"] .rijen{padding-top:0;padding-bottom:4mm}
+  .rij{break-inside:avoid}
+  .rij-label{font-size:2.9mm;padding-bottom:2mm}
+  .tafels{grid-template-rows:none;grid-auto-rows:auto;gap:2.4mm}
+  .tafel-groep{padding:1mm 1.4mm 1.4mm;border-radius:2.6mm;background:#e7edf6;border-color:#cbd6e6;break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .tafel-label{font-size:2.4mm;padding-bottom:0.8mm}
+  .tafel{gap:1.4mm}
+
+  /* tegels op vaste millimeters, zodat container-eenheden niets vervormen */
+  .stoel{min-height:0;padding:1.4mm;gap:1.2mm;border-radius:2.4mm;box-shadow:none;break-inside:avoid}
+  .foto{width:10mm!important;height:10mm!important;font-size:3.6mm!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .naam{font-size:3mm!important;line-height:1.15}
+  .merk{font-size:2.2mm}
+
+  .lokaal[data-stijl="portret"] .stoel{padding:1mm 2mm 1mm 1mm;gap:2mm}
+  .lokaal[data-stijl="portret"] .foto{width:auto!important;height:100%!important;aspect-ratio:4/5;font-size:4mm!important;border-radius:1.6mm}
+  .lokaal[data-stijl="portret"] .foto img{border-radius:1.6mm}
+  .lokaal[data-stijl="naamkaart"] .voornaam{font-size:3.4mm!important}
+  .lokaal[data-stijl="naamkaart"] .achternaam{font-size:2.9mm!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="kop">
+    <div class="merkje" data-icon="cap" data-maat="26"></div>
+    <div class="titelblok">
+      <div class="titelrij">
+        <span class="keuzehoes">
+          <button type="button" class="klasknop" id="klasknop" aria-haspopup="listbox" aria-expanded="false">
+            <span id="klasknop-tekst">Klas</span>
+            <span class="pijl" data-icon="chevron" data-maat="20"></span>
+          </button>
+          <div class="klaslijst" id="klaslijst" role="listbox" aria-label="Kies een klas" hidden></div>
+          <select id="klaskeuze" aria-label="Klas" hidden></select>
+        </span>
+        <button class="mini" id="btn-klas-nieuw" data-icon="plus" title="Nieuwe klas toevoegen" aria-label="Nieuwe klas toevoegen"></button>
+        <button class="mini gevaar" id="btn-klas-weg" data-icon="trash" title="Deze klas verwijderen" aria-label="Deze klas verwijderen"></button>
+      </div>
+      <span class="opstelling" id="opstelling"></span>
+    </div>
+    <div class="kop-rechts">
+      <span class="koppelstatus" id="koppelstatus"></span>
+      <span id="datum"></span>
+    </div>
+  </header>
+
+  <div class="balk">
+    <button class="knop primair" id="btn-beurt" data-icon="dice">Beurt trekken</button>
+    <button class="knop donker" id="btn-presentatie" data-icon="monitor">Op het bord</button>
+    <button class="knop" id="btn-shuffle" data-icon="shuffle">Willekeurig indelen</button>
+    <button class="knop violet" id="btn-spiegel" data-icon="omdraaien">Docentweergave</button>
+    <span class="scheiding"></span>
+    <button class="knop groen" id="btn-fotos" data-icon="imageplus">Foto's toevoegen</button>
+    <button class="knop stil" id="btn-fotos-weg" data-icon="imageoff">Foto's wissen</button>
+    <span class="scheiding"></span>
+    <button class="knop" id="btn-koppel" data-icon="save">Automatisch opslaan</button>
+    <button class="knop stil" id="btn-ontkoppel" data-icon="unlink" hidden>Ontkoppelen</button>
+    <button class="knop" id="btn-opslaan" data-icon="download">Opslaan als JSON</button>
+    <button class="knop" id="btn-laden" data-icon="upload">Bestand openen</button>
+    <button class="knop groen" id="btn-magister" data-icon="userplus">Klas uit Magister</button>
+    <button class="knop" id="btn-print" data-icon="printer">Afdrukken</button>
+    <span class="scheiding"></span>
+    <button class="knop stil" id="btn-terug" data-icon="undo">Ongedaan maken</button>
+    <button class="knop stil" id="btn-leeg" data-icon="eraser">Plekken leegmaken</button>
+    <input type="file" id="bestand" accept="application/json" hidden>
+    <input type="file" id="magisterbestand" accept="application/pdf" hidden>
+    <input type="file" id="fotobestanden" accept="image/*" multiple hidden>
+    <input type="file" id="enkelefoto" accept="image/*" hidden>
+  </div>
+
+  <div class="acties" id="acties" role="region" aria-label="Acties voor geselecteerde leerling">
+    <strong id="acties-naam"></strong>
+    <button class="knop" data-actie="foto" data-icon="imageplus">Foto kiezen</button>
+    <button class="knop" data-actie="afwezig" data-icon="user">Afwezig melden</button>
+    <button class="knop" data-actie="hernoem" data-icon="pen">Naam wijzigen</button>
+    <button class="knop" data-actie="wacht" data-icon="userplus">Naar wachtrij</button>
+    <button class="knop stil" data-actie="sluit" data-icon="kruis">Sluiten</button>
+  </div>
+
+  <section class="lokaal" id="lokaal" data-stijl="kaart" aria-label="Plattegrond van het lokaal">
+    <div class="bord"><span data-icon="monitor" data-maat="18"></span> Bord &middot; voorkant lokaal</div>
+    <div class="rijen" id="rijen"></div>
+  </section>
+
+  <div class="onder">
+    <div class="paneel">
+      <h2><span data-icon="userplus" data-maat="18"></span> Wachtrij <span class="badge" id="wacht-badge">0</span></h2>
+      <div class="wacht" id="wacht"></div>
+      <div class="toevoegen">
+        <input id="nieuwe-naam" placeholder="Naam van een leerling" aria-label="Nieuwe leerling">
+        <button class="knop donker" id="btn-toevoegen" data-icon="plus">Toevoegen</button>
+        <button class="knop stil" id="btn-plakken" data-icon="lijst">Lijst</button>
+      </div>
+      <textarea id="plakvak" placeholder="Plak hier een namenlijst, een naam per regel. Bestaande leerlingen in deze klas blijven staan." aria-label="Namenlijst plakken"></textarea>
+      <div id="plakknoppen" style="display:none;margin-top:10px">
+        <button class="knop donker" id="btn-plak-verwerk" data-icon="plus">Namen toevoegen</button>
+        <button class="knop stil" id="btn-plak-annuleer" data-icon="kruis">Annuleren</button>
+      </div>
+      <p class="tip">Tip: sleep een leerling naar een stoel of sleep twee stoelen over elkaar om te wisselen.</p>
+    </div>
+
+    <div class="paneel">
+      <h2><span data-icon="sparkles" data-maat="18"></span> Willekeurige beurt</h2>
+      <div class="beurt-vak">
+        <div class="beurt-rond" id="beurt-rond" data-icon="dice" data-maat="28"></div>
+        <div class="beurt-naam" id="beurt-naam">Nog niemand aan de beurt</div>
+        <div class="beurt-plek" id="beurt-plek">Druk op de knop om te loten</div>
+        <button class="knop primair" id="btn-beurt-2" data-icon="dice">Beurt trekken</button>
+        <div class="beurt-extra">
+          <button class="knop stil" id="btn-beurt-wis" data-icon="kruis" hidden>Beurt opheffen</button>
+          <button class="knop stil" id="btn-ronde-nieuw" data-icon="undo" hidden>Nieuwe ronde</button>
+        </div>
+        <div class="voortgang" id="voortgang"></div>
+      </div>
+    </div>
+
+    <div class="paneel">
+      <h2><span data-icon="sliders" data-maat="18"></span> Deze klas</h2>
+      <div class="velden" style="margin-top:0">
+        <div class="veld"><label for="aantal-rijen">Rijen (1 - 6)</label><input type="number" id="aantal-rijen" min="1" max="6" step="1"></div>
+        <div class="veld"><label for="aantal-diep">Tafels / rij (2 - 10)</label><input type="number" id="aantal-diep" min="2" max="10" step="1"></div>
+      </div>
+      <div class="stijlkiezer" id="stijlkiezer" role="group" aria-label="Tegelstijl">
+        <button type="button" data-stijl="kaart" class="actief">Kaart</button>
+        <button type="button" data-stijl="portret">Portret</button>
+        <button type="button" data-stijl="naamkaart">Naamkaart</button>
+      </div>
+      <div class="schuifrij">
+        <div class="schuifkop"><label for="fotoschaal">Grootte foto / naam</label><span id="grootte-waarde">76px</span></div>
+        <input type="range" id="fotoschaal" min="0" max="132" step="4" value="76" aria-label="Grootte van foto en naam">
+      </div>
+      <p class="fotoregel"><span data-icon="imageplus" data-maat="16"></span><span id="foto-status"></span></p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+const ICONEN = {
+  cap:'<path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/>',
+  chevron:'<path d="m6 9 6 6 6-6"/>',
+  vink:'<path d="m5 12 5 5L20 7"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  trash:'<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>',
+  dice:'<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/>',
+  monitor:'<rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/>',
+  shuffle:'<path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>',
+  columns:'<rect x="3" y="4" width="7" height="16" rx="2"/><rect x="14" y="4" width="7" height="16" rx="2"/>',
+  omdraaien:'<path d="M4 8h16M8 4 4 8l4 4"/><path d="M20 16H4M16 12l4 4-4 4"/>',
+  imageplus:'<path d="M21 13V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"/><circle cx="9" cy="10" r="2"/><path d="m4 17 4-4 4 3.5M18 15v6M15 18h6"/>',
+  imageoff:'<path d="M21 15V6a2 2 0 0 0-2-2H8M3 7v11a2 2 0 0 0 2 2h13"/><path d="m4 18 5-5 4 3.5M3 3l18 18"/>',
+  save:'<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/>',
+  unlink:'<path d="M9 17H7A5 5 0 0 1 7 7h2M15 7h2a5 5 0 0 1 4.5 7.2M3 3l18 18"/>',
+  download:'<path d="M12 3v12M7 11l5 5 5-5M4 21h16"/>',
+  upload:'<path d="M12 21V9M7 13l5-5 5 5M4 3h16"/>',
+  printer:'<path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 15h12v6H6z"/>',
+  undo:'<path d="M3 8h11a5 5 0 0 1 0 10H8"/><path d="m7 4-4 4 4 4"/>',
+  eraser:'<path d="m4 15 7-7 6 6-7 7H6l-2-2v-4Z"/><path d="M11 20h9"/>',
+  userplus:'<path d="M15 20v-1a5 5 0 0 0-5-5H7a5 5 0 0 0-5 5v1"/><circle cx="8.5" cy="7" r="3.5"/><path d="M19 8v6M16 11h6"/>',
+  user:'<path d="M19 21v-1a6 6 0 0 0-6-6h-2a6 6 0 0 0-6 6v1"/><circle cx="12" cy="7" r="4"/>',
+  pen:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+  kruis:'<path d="M18 6 6 18M6 6l12 12"/>',
+  lijst:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+  sparkles:'<path d="m12 3 1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3Z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15Z"/>',
+  sliders:'<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h10M18 18h2"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="16" cy="18" r="2"/>',
+  raster:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18"/>'
+};
+function svg(naam, maat){
+  return '<svg width="' + (maat||18) + '" height="' + (maat||18) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICONEN[naam]||"") + '</svg>';
+}
+function zetIconen(wortel){
+  (wortel || document).querySelectorAll("[data-icon]").forEach(el => {
+    if (el.dataset.klaar) return;
+    el.dataset.klaar = "1";
+    el.insertAdjacentHTML("afterbegin", svg(el.dataset.icon, Number(el.dataset.maat) || 18));
+  });
+}
+zetIconen();
+
+const AVATARKLEUREN = [
+  ["#fef3c7","#b45309"], ["#ccfbf1","#0f766e"], ["#dbeafe","#1d4ed8"], ["#e0e7ff","#4338ca"],
+  ["#dcfce7","#15803d"], ["#fae8ff","#a21caf"], ["#ffe4e6","#be123c"], ["#cffafe","#0e7490"],
+  ["#ede9fe","#6d28d9"], ["#ffedd5","#c2410c"]
+];
+function kleurVoor(tekst){
+  let h = 0;
+  for (let i = 0; i < tekst.length; i++) h = (h * 31 + tekst.charCodeAt(i)) >>> 0;
+  return AVATARKLEUREN[h % AVATARKLEUREN.length];
+}
+
+const KLASDATA = {};
+const NOG_LEEG = ["KLAS 1"];
+
+let volgnummer = 1;
+const nieuweLeerling = (naam, foto) => ({ id:"l" + (volgnummer++), naam:String(naam).trim(), afwezig:false, foto:foto || null });
+
+function maakKlas(lijst){
+  const aantal = lijst.length;
+  const rijen = 3;
+  const diep = Math.max(5, Math.ceil(aantal / (rijen * 2)));
+  const k = { rijen, diep, leerlingen:{}, plekken:new Array(rijen*diep*2).fill(null), wachtrij:[], docent:false, beurt:null, gehad:[] };
+  lijst.forEach((l, n) => {
+    const leerling = nieuweLeerling(l.naam, l.foto);
+    k.leerlingen[leerling.id] = leerling;
+    if (n < k.plekken.length) k.plekken[n] = leerling.id; else k.wachtrij.push(leerling.id);
+  });
+  return k;
+}
+
+const klassen = {};
+Object.keys(KLASDATA).forEach(naam => klassen[naam] = maakKlas(KLASDATA[naam]));
+NOG_LEEG.forEach(naam => { if (!klassen[naam]) klassen[naam] = maakKlas([]); });
+
+const volgorde = ["HV1A","M3D","M3E","M4A","M4B","H4E"].filter(n => klassen[n])
+  .concat(Object.keys(klassen).filter(n => !["HV1A","M3D","M3E","M4A","M4B","H4E"].includes(n)));
+
+let huidig = volgorde.find(n => Object.keys(klassen[n].leerlingen).length) || volgorde[0];
+let selectie = null;
+let vorigeStaat = null;
+
+const k = () => klassen[huidig];
+const plaatsen = () => k().rijen * k().diep * 2;
+const idx = (rij, tafel, kant) => ((rij * k().diep) + tafel) * 2 + kant;
+
+function bewaarStap(){
+  markeer();
+  vorigeStaat = { klas: huidig, data: JSON.stringify({ leerlingen:k().leerlingen, plekken:k().plekken, wachtrij:k().wachtrij, rijen:k().rijen, diep:k().diep }) };
+  document.getElementById("btn-terug").disabled = false;
+}
+
+/* ---------- helpers ---------- */
+function initialen(naam){
+  const d = naam.split(/\s+/).filter(Boolean);
+  return ((d[0] ? d[0][0] : "?") + (d.length > 1 ? d[d.length-1][0] : "")).toUpperCase();
+}
+function plekLabel(i){
+  const rij = Math.floor(i / (k().diep * 2)) + 1;
+  const tafel = Math.floor((i % (k().diep * 2)) / 2) + 1;
+  return "rij " + rij + ", tafel " + tafel + " (" + (i % 2 === 0 ? "links" : "rechts") + ")";
+}
+const aanwezigen = () => k().plekken.map((id, i) => ({ id, i })).filter(p => p.id && !k().leerlingen[p.id].afwezig);
+
+function fotoVak(l){
+  const el = document.createElement("div");
+  el.className = "foto";
+  if (l.foto){
+    const img = document.createElement("img");
+    img.src = l.foto; img.alt = "";
+    el.appendChild(img);
+  } else {
+    const kleur = kleurVoor(l.naam);
+    el.style.background = kleur[0];
+    el.style.color = kleur[1];
+    el.textContent = initialen(l.naam);
+  }
+  return el;
+}
+
+/* ---------- tekenen ---------- */
+const rijenEl = document.getElementById("rijen");
+const lokaalEl = document.getElementById("lokaal");
+
+function teken(){
+  const kl = k();
+  rijenEl.style.gridTemplateColumns = "repeat(" + kl.rijen + ",1fr)";
+  rijenEl.innerHTML = "";
+  const toonFoto = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--foto"), 10) > 0;
+
+  const rijVolgorde = Array.from({length: kl.rijen}, (_, r) => kl.docent ? kl.rijen - 1 - r : r);
+  rijVolgorde.forEach(rij => {
+    const kolom = document.createElement("div");
+    kolom.className = "rij";
+    const label = document.createElement("div");
+    label.className = "rij-label";
+    label.innerHTML = svg("raster", 14) + "<span>Rij " + (rij + 1) + "</span>";
+    kolom.appendChild(label);
+
+    const tafelsEl = document.createElement("div");
+    tafelsEl.className = "tafels";
+    tafelsEl.style.gridTemplateRows = "repeat(" + kl.diep + ",1fr)";
+    const tafelVolgorde = Array.from({length: kl.diep}, (_, t) => kl.docent ? kl.diep - 1 - t : t);
+    tafelVolgorde.forEach(tafel => {
+      const groep = document.createElement("div");
+      groep.className = "tafel-groep";
+      const groepLabel = document.createElement("div");
+      groepLabel.className = "tafel-label";
+      groepLabel.textContent = "Tafel " + (tafel + 1);
+      const tafelEl = document.createElement("div");
+      tafelEl.className = "tafel";
+      (kl.docent ? [1,0] : [0,1]).forEach(kant => tafelEl.appendChild(maakStoel(idx(rij, tafel, kant), toonFoto)));
+      groep.append(groepLabel, tafelEl);
+      tafelsEl.appendChild(groep);
+    });
+    kolom.appendChild(tafelsEl);
+    rijenEl.appendChild(kolom);
+  });
+
+  document.getElementById("klasknop-tekst").textContent = keuzeLabel(huidig);
+  document.getElementById("btn-beurt-wis").hidden = !kl.beurt;
+  document.getElementById("btn-ronde-nieuw").hidden = !kl.gehad.length;
+  lokaalEl.dataset.weergave = kl.docent ? "docent" : "leerling";
+  const spiegelKnop = document.getElementById("btn-spiegel");
+  spiegelKnop.lastChild.textContent = kl.docent ? " Standaardweergave" : " Docentweergave";
+  document.getElementById("opstelling").textContent =
+    kl.rijen + " rijen \u00d7 " + kl.diep + " tafels (" + plaatsen() + " plekken)";
+  document.getElementById("aantal-rijen").value = kl.rijen;
+  document.getElementById("aantal-diep").value = kl.diep;
+  tekenWachtrij();
+  tekenTellers();
+  tekenActies();
+}
+
+function maakStoel(i, toonFoto){
+  const kl = k();
+  const id = kl.plekken[i];
+  const el = document.createElement("div");
+  el.className = "stoel " + (id ? "bezet" : "leeg");
+  el.dataset.plek = i;
+  el.tabIndex = 0;
+
+  if (id){
+    const l = kl.leerlingen[id];
+    if (l.afwezig) el.classList.add("afwezig");
+    if (selectie && selectie.type === "plek" && selectie.waarde === i) el.classList.add("geselecteerd");
+    if (kl.beurt === id) el.classList.add("beurt");
+    el.draggable = true;
+    el.setAttribute("aria-label", l.naam + ", " + plekLabel(i) + (l.afwezig ? ", afwezig" : ""));
+    if (toonFoto) el.appendChild(fotoVak(l));
+    const nm = document.createElement("div");
+    nm.className = "naam";
+    const stukken = l.naam.trim().split(/\s+/);
+    const voor = document.createElement("span");
+    voor.className = "voornaam";
+    voor.textContent = stukken[0] || l.naam;
+    nm.appendChild(voor);
+    if (stukken.length > 1){
+      nm.appendChild(document.createTextNode(" "));
+      const achter = document.createElement("span");
+      achter.className = "achternaam";
+      achter.textContent = stukken.slice(1).join(" ");
+      nm.appendChild(achter);
+    }
+    el.appendChild(nm);
+    if (l.afwezig){
+      const merk = document.createElement("span");
+      merk.className = "merk"; merk.textContent = "afw.";
+      el.appendChild(merk);
+    }
+  } else el.setAttribute("aria-label", "Vrije plek, " + plekLabel(i));
+  return el;
+}
+
+function tekenWachtrij(){
+  const vak = document.getElementById("wacht");
+  vak.innerHTML = "";
+  if (!k().wachtrij.length){
+    const p = document.createElement("span");
+    p.className = "leeg-tekst";
+    p.textContent = Object.keys(k().leerlingen).length ? "Iedereen heeft een plek in het lokaal." : "Nog geen leerlingen in deze klas. Plak hieronder een namenlijst.";
+    vak.appendChild(p);
+    return;
+  }
+  k().wachtrij.forEach(id => {
+    const l = k().leerlingen[id];
+    const chip = document.createElement("span");
+    chip.className = "chip";
+    chip.draggable = true;
+    chip.dataset.wacht = id;
+    chip.tabIndex = 0;
+    chip.appendChild(fotoVak(l));
+    chip.appendChild(document.createTextNode(l.naam));
+    vak.appendChild(chip);
+  });
+}
+
+function tekenTellers(){
+  const kl = k();
+  const totaal = Object.keys(kl.leerlingen).length;
+  const metFoto = Object.values(kl.leerlingen).filter(l => l.foto).length;
+  document.getElementById("wacht-badge").textContent = kl.wachtrij.length;
+  document.getElementById("foto-status").textContent = totaal
+    ? metFoto + " van " + totaal + " met foto"
+    : "Nog geen leerlingen in deze klas";
+}
+
+function tekenActies(){
+  const balk = document.getElementById("acties");
+  if (!selectie || selectie.type !== "plek" || !k().plekken[selectie.waarde]){
+    balk.classList.remove("zichtbaar");
+    return;
+  }
+  const l = k().leerlingen[k().plekken[selectie.waarde]];
+  document.getElementById("acties-naam").textContent = l.naam;
+  balk.querySelector('[data-actie="afwezig"]').textContent = l.afwezig ? "Aanwezig melden" : "Afwezig melden";
+  balk.querySelector('[data-actie="foto"]').textContent = l.foto ? "Foto vervangen" : "Foto kiezen";
+  balk.classList.add("zichtbaar");
+}
+
+/* ---------- klas kiezen ---------- */
+const keuze = document.getElementById("klaskeuze");
+volgorde.forEach(naam => {
+  const o = document.createElement("option");
+  o.value = naam;
+  o.textContent = keuzeLabel(naam);
+  keuze.appendChild(o);
+});
+keuze.value = huidig;
+
+const klasKnop = document.getElementById("klasknop");
+const klasLijst = document.getElementById("klaslijst");
+function bouwKlasLijst(){
+  klasLijst.innerHTML = "";
+  Array.from(keuze.options).forEach(o => {
+    const n = Object.keys(klassen[o.value].leerlingen).length;
+    const b = document.createElement("button");
+    b.type = "button";
+    b.setAttribute("role", "option");
+    b.setAttribute("aria-selected", o.value === huidig ? "true" : "false");
+    b.innerHTML = '<span class="vink">' + svg("vink", 16) + '</span><span>' + o.value +
+                  '</span><span class="aantal">' + (n ? n + " ll" : "leeg") + '</span>';
+    b.addEventListener("click", () => {
+      sluitKlasLijst();
+      if (o.value === huidig) return;
+      keuze.value = o.value;
+      keuze.dispatchEvent(new Event("change"));
+    });
+    klasLijst.appendChild(b);
+  });
+}
+function openKlasLijst(){
+  bouwKlasLijst();
+  klasLijst.hidden = false;
+  klasKnop.setAttribute("aria-expanded", "true");
+}
+function sluitKlasLijst(){
+  klasLijst.hidden = true;
+  klasKnop.setAttribute("aria-expanded", "false");
+}
+klasKnop.addEventListener("click", e => {
+  e.stopPropagation();
+  klasLijst.hidden ? openKlasLijst() : sluitKlasLijst();
+});
+document.addEventListener("click", e => {
+  if (!klasLijst.hidden && !klasLijst.contains(e.target)) sluitKlasLijst();
+});
+
+keuze.addEventListener("change", () => {
+  huidig = keuze.value;
+  selectie = null;
+  wisBeurt();
+  teken();
+});
+
+/* ---------- klikken ---------- */
+rijenEl.addEventListener("click", e => {
+  const stoel = e.target.closest(".stoel");
+  if (!stoel) return;
+  const i = Number(stoel.dataset.plek);
+  const kl = k();
+
+  if (selectie && selectie.type === "wacht"){
+    if (!kl.plekken[i]){
+      bewaarStap();
+      kl.plekken[i] = selectie.waarde;
+      kl.wachtrij = kl.wachtrij.filter(id => id !== selectie.waarde);
+      selectie = null;
+    } else selectie = { type:"plek", waarde:i };
+  } else if (selectie && selectie.type === "plek" && selectie.waarde !== i){
+    bewaarStap();
+    const a = kl.plekken[selectie.waarde];
+    kl.plekken[selectie.waarde] = kl.plekken[i];
+    kl.plekken[i] = a;
+    selectie = null;
+  } else if (selectie && selectie.type === "plek" && selectie.waarde === i){
+    selectie = null;
+  } else if (kl.plekken[i]){
+    if (kl.beurt === kl.plekken[i]) wisBeurt();
+    selectie = { type:"plek", waarde:i };
+  }
+  teken();
+});
+
+rijenEl.addEventListener("keydown", e => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  const stoel = e.target.closest(".stoel");
+  if (!stoel) return;
+  e.preventDefault();
+  stoel.click();
+});
+
+document.getElementById("wacht").addEventListener("click", e => {
+  const chip = e.target.closest(".chip");
+  if (!chip) return;
+  const id = chip.dataset.wacht;
+  selectie = (selectie && selectie.type === "wacht" && selectie.waarde === id) ? null : { type:"wacht", waarde:id };
+  teken();
+});
+
+/* ---------- slepen ---------- */
+let sleepBron = null;
+document.addEventListener("dragstart", e => {
+  const stoel = e.target.closest(".stoel.bezet");
+  const chip = e.target.closest(".chip");
+  if (stoel){
+    sleepBron = { type:"plek", waarde:Number(stoel.dataset.plek) };
+    stoel.classList.add("sleept");
+  } else if (chip){
+    sleepBron = { type:"wacht", waarde:chip.dataset.wacht };
+  } else return;
+  e.dataTransfer.effectAllowed = "move";
+  e.dataTransfer.setData("text/plain", "verplaats");
+});
+document.addEventListener("dragend", () => {
+  sleepBron = null;
+  document.querySelectorAll(".sleept,.sleepdoel").forEach(el => el.classList.remove("sleept","sleepdoel"));
+});
+rijenEl.addEventListener("dragover", e => {
+  if (!sleepBron) return;
+  const stoel = e.target.closest(".stoel");
+  if (!stoel) return;
+  e.preventDefault();
+  document.querySelectorAll(".sleepdoel").forEach(el => el.classList.remove("sleepdoel"));
+  stoel.classList.add("sleepdoel");
+});
+rijenEl.addEventListener("drop", e => {
+  if (!sleepBron) return;
+  const stoel = e.target.closest(".stoel");
+  if (!stoel) return;
+  e.preventDefault();
+  const kl = k(), doel = Number(stoel.dataset.plek);
+  bewaarStap();
+  if (sleepBron.type === "wacht"){
+    const verdrongen = kl.plekken[doel];
+    kl.plekken[doel] = sleepBron.waarde;
+    kl.wachtrij = kl.wachtrij.filter(id => id !== sleepBron.waarde);
+    if (verdrongen) kl.wachtrij.push(verdrongen);
+  } else {
+    const bron = sleepBron.waarde, tijdelijk = kl.plekken[bron];
+    kl.plekken[bron] = kl.plekken[doel];
+    kl.plekken[doel] = tijdelijk;
+  }
+  selectie = null; sleepBron = null;
+  teken();
+});
+const wachtVak = document.getElementById("wacht");
+wachtVak.addEventListener("dragover", e => { if (sleepBron && sleepBron.type === "plek") e.preventDefault(); });
+wachtVak.addEventListener("drop", e => {
+  if (!sleepBron || sleepBron.type !== "plek") return;
+  e.preventDefault();
+  bewaarStap();
+  const kl = k(), id = kl.plekken[sleepBron.waarde];
+  if (id){ kl.plekken[sleepBron.waarde] = null; kl.wachtrij.push(id); }
+  selectie = null; sleepBron = null;
+  teken();
+});
+
+/* ---------- foto's ---------- */
+function verkleinFoto(file, maat){
+  return new Promise((klaar, mis) => {
+    const lezer = new FileReader();
+    lezer.onerror = () => mis(new Error("lezen mislukt"));
+    lezer.onload = () => {
+      const img = new Image();
+      img.onerror = () => mis(new Error("geen afbeelding"));
+      img.onload = () => {
+        const zijde = Math.min(img.width, img.height);
+        const c = document.createElement("canvas");
+        c.width = c.height = maat;
+        c.getContext("2d").drawImage(img, (img.width-zijde)/2, (img.height-zijde)*0.15, zijde, zijde, 0, 0, maat, maat);
+        klaar(c.toDataURL("image/jpeg", 0.72));
+      };
+      img.src = lezer.result;
+    };
+    lezer.readAsDataURL(file);
+  });
+}
+const kaal = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z]/g,"");
+const TUSSEN = ["van","de","der","den","het","el","ter","te","in","op","y"];
+function zoekLeerlingBijBestand(bestandsnaam){
+  const doel = kaal(bestandsnaam.replace(/\.[a-z0-9]+$/i,""));
+  const treffers = Object.values(k().leerlingen).map(l => {
+    const delen = l.naam.split(/\s+/).filter(w => !TUSSEN.includes(w.toLowerCase()));
+    return { l, score: delen.filter(d => d.length > 2 && doel.includes(kaal(d))).length, nodig: delen.length };
+  }).filter(t => t.score >= Math.min(2, t.nodig));
+  treffers.sort((a,b) => b.score - a.score);
+  if (!treffers.length) return null;
+  if (treffers[1] && treffers[1].score === treffers[0].score) return null;
+  return treffers[0].l;
+}
+document.getElementById("btn-fotos").addEventListener("click", () => document.getElementById("fotobestanden").click());
+document.getElementById("fotobestanden").addEventListener("change", async e => {
+  const files = Array.from(e.target.files || []);
+  if (!files.length) return;
+  let gelukt = 0; const mislukt = [];
+  for (const file of files){
+    const leerling = zoekLeerlingBijBestand(file.name);
+    if (!leerling){ mislukt.push(file.name); continue; }
+    try { leerling.foto = await verkleinFoto(file, 150); gelukt++; } catch { mislukt.push(file.name); }
+  }
+  markeer();
+  teken();
+  e.target.value = "";
+  if (mislukt.length) alert(gelukt + " foto's gekoppeld in " + huidig + ". Niet gekoppeld: " + mislukt.join(", ") + "\n\nZet de naam van de leerling in de bestandsnaam, of kies een foto via een stoel.");
+});
+document.getElementById("btn-fotos-weg").addEventListener("click", () => {
+  if (!confirm("Alle foto's van " + huidig + " verwijderen?")) return;
+  Object.values(k().leerlingen).forEach(l => l.foto = null);
+  markeer();
+  teken();
+});
+let fotoDoelId = null;
+document.getElementById("enkelefoto").addEventListener("change", async e => {
+  const file = e.target.files[0];
+  if (file && fotoDoelId && k().leerlingen[fotoDoelId]){
+    try { k().leerlingen[fotoDoelId].foto = await verkleinFoto(file, 150); }
+    catch { alert("Dit bestand kon niet als afbeelding worden gelezen."); }
+    markeer();
+    teken();
+  }
+  e.target.value = ""; fotoDoelId = null;
+});
+document.getElementById("fotoschaal").addEventListener("input", e => {
+  const waarde = Number(e.target.value);
+  document.documentElement.style.setProperty("--foto", waarde + "px");
+  document.documentElement.style.setProperty("--naam", Math.max(11, Math.round(11 + waarde * 0.08)) + "px");
+  document.getElementById("grootte-waarde").textContent = waarde ? waarde + "px" : "geen foto's";
+  teken();
+});
+
+/* ---------- acties ---------- */
+document.getElementById("acties").addEventListener("click", e => {
+  const knop = e.target.closest("[data-actie]");
+  if (!knop || !selectie) return;
+  const kl = k(), i = selectie.waarde, id = kl.plekken[i];
+  if (!id) return;
+  const l = kl.leerlingen[id];
+  const actie = knop.dataset.actie;
+
+  if (actie === "afwezig"){
+    l.afwezig = !l.afwezig;
+    if (l.afwezig && kl.beurt === id) wisBeurt();
+  } else if (actie === "hernoem"){
+    const nieuw = prompt("Naam van deze leerling:", l.naam);
+    if (nieuw && nieuw.trim()) l.naam = nieuw.trim();
+  } else if (actie === "foto"){
+    fotoDoelId = id;
+    document.getElementById("enkelefoto").click();
+    return;
+  } else if (actie === "wacht"){
+    bewaarStap();
+    kl.plekken[i] = null;
+    kl.wachtrij.push(id);
+    selectie = null;
+  } else selectie = null;
+  markeer();
+  teken();
+});
+
+/* ---------- leerlingen toevoegen ---------- */
+document.getElementById("btn-toevoegen").addEventListener("click", voegToe);
+document.getElementById("nieuwe-naam").addEventListener("keydown", e => { if (e.key === "Enter") voegToe(); });
+function plaatsLeerling(l){
+  const kl = k();
+  kl.leerlingen[l.id] = l;
+  const vrij = kl.plekken.indexOf(null);
+  if (vrij === -1) kl.wachtrij.push(l.id); else kl.plekken[vrij] = l.id;
+}
+function voegToe(){
+  const veld = document.getElementById("nieuwe-naam");
+  const naam = veld.value.trim();
+  if (!naam){ veld.focus(); return; }
+  bewaarStap();
+  plaatsLeerling(nieuweLeerling(naam));
+  veld.value = ""; veld.focus();
+  vernieuwKeuzelijst();
+  teken();
+}
+const plakvak = document.getElementById("plakvak");
+const plakknoppen = document.getElementById("plakknoppen");
+document.getElementById("btn-plakken").addEventListener("click", () => {
+  plakvak.classList.toggle("zichtbaar");
+  plakknoppen.style.display = plakvak.classList.contains("zichtbaar") ? "block" : "none";
+  if (plakvak.classList.contains("zichtbaar")) plakvak.focus();
+});
+document.getElementById("btn-plak-annuleer").addEventListener("click", () => {
+  plakvak.value = ""; plakvak.classList.remove("zichtbaar"); plakknoppen.style.display = "none";
+});
+document.getElementById("btn-plak-verwerk").addEventListener("click", () => {
+  const namen = plakvak.value.split(/\r?\n/).map(r => r.replace(/^\s*\d+[.)]?\s*/, "").trim()).filter(Boolean);
+  if (!namen.length) return;
+  bewaarStap();
+  const kl = k();
+  const nodig = Object.keys(kl.leerlingen).length + namen.length;
+  if (nodig > plaatsen()) zetAfmeting(kl.rijen, Math.ceil(nodig / (kl.rijen * 2)));
+  namen.forEach(n => plaatsLeerling(nieuweLeerling(n)));
+  plakvak.value = ""; plakvak.classList.remove("zichtbaar"); plakknoppen.style.display = "none";
+  vernieuwKeuzelijst();
+  teken();
+});
+function keuzeLabel(naam){
+  const n = Object.keys(klassen[naam].leerlingen).length;
+  return naam + (n ? " (" + n + " ll)" : " (leeg)");
+}
+function vernieuwKeuzelijst(){
+  Array.from(keuze.options).forEach(o => { o.textContent = keuzeLabel(o.value); });
+}
+
+/* ---------- tegelstijl ---------- */
+function zetStijl(naam){
+  lokaalEl.dataset.stijl = naam;
+  document.querySelectorAll("#stijlkiezer button").forEach(b => b.classList.toggle("actief", b.dataset.stijl === naam));
+}
+document.getElementById("stijlkiezer").addEventListener("click", e => {
+  const knop = e.target.closest("button[data-stijl]");
+  if (!knop) return;
+  zetStijl(knop.dataset.stijl);
+  markeer();
+});
+
+/* ---------- klassen beheren ---------- */
+document.getElementById("btn-klas-nieuw").addEventListener("click", () => {
+  const naam = (prompt("Naam van de nieuwe klas:", "") || "").trim().toUpperCase();
+  if (!naam) return;
+  if (klassen[naam]){ alert("Die klas bestaat al."); return; }
+  klassen[naam] = maakKlas([]);
+  const o = document.createElement("option");
+  o.value = naam; o.textContent = keuzeLabel(naam);
+  keuze.appendChild(o);
+  keuze.value = naam;
+  huidig = naam;
+  selectie = null;
+  wisBeurt();
+  markeer();
+  teken();
+});
+document.getElementById("btn-klas-weg").addEventListener("click", () => {
+  if (Object.keys(klassen).length < 2){ alert("Dit is de laatste klas, die kan niet weg."); return; }
+  const aantal = Object.keys(k().leerlingen).length;
+  if (!confirm("Klas " + huidig + " verwijderen, inclusief " + aantal + " leerlingen en hun foto's?")) return;
+  delete klassen[huidig];
+  Array.from(keuze.options).forEach(o => { if (o.value === huidig) o.remove(); });
+  huidig = keuze.options[0].value;
+  keuze.value = huidig;
+  selectie = null;
+  wisBeurt();
+  markeer();
+  teken();
+});
+
+/* ---------- afmeting ---------- */
+function zetAfmeting(rijen, diep){
+  const kl = k();
+  const bezetters = kl.plekken.filter(Boolean);
+  const oude = kl.plekken.slice(), oudDiep = kl.diep;
+  kl.rijen = Math.max(1, Math.min(6, rijen));
+  kl.diep = Math.max(2, Math.min(10, diep));
+  kl.plekken = new Array(kl.rijen * kl.diep * 2).fill(null);
+  let overgebleven = [];
+  oude.forEach((id, i) => {
+    if (!id) return;
+    const rij = Math.floor(i / (oudDiep * 2)), tafel = Math.floor((i % (oudDiep * 2)) / 2), kant = i % 2;
+    if (rij < kl.rijen && tafel < kl.diep) kl.plekken[idx(rij, tafel, kant)] = id;
+    else overgebleven.push(id);
+  });
+  overgebleven.forEach(id => {
+    const vrij = kl.plekken.indexOf(null);
+    if (vrij === -1) kl.wachtrij.push(id); else kl.plekken[vrij] = id;
+  });
+  if (bezetters.length && !kl.plekken.filter(Boolean).length) kl.wachtrij = kl.wachtrij.concat(bezetters);
+  selectie = null;
+}
+document.getElementById("aantal-rijen").addEventListener("change", e => { bewaarStap(); zetAfmeting(Number(e.target.value), k().diep); teken(); });
+document.getElementById("aantal-diep").addEventListener("change", e => { bewaarStap(); zetAfmeting(k().rijen, Number(e.target.value)); teken(); });
+
+/* ---------- beurt ---------- */
+function toonVoortgang(){
+  const v = document.getElementById("voortgang");
+  if (!k()){ v.textContent = ""; return; }
+  const n = aanwezigen().length;
+  v.innerHTML = n ? "Ronde voortgang: <b>" + k().gehad.length + "</b> van <b>" + n + "</b> aanwezig" : "";
+}
+function wisBeurt(){
+  if (k()) k().beurt = null;
+  document.getElementById("beurt-naam").textContent = "Nog niemand aan de beurt";
+  document.getElementById("beurt-plek").textContent = "Druk op de knop om te loten";
+  document.getElementById("beurt-rond").classList.remove("raak");
+  toonVoortgang();
+}
+document.getElementById("btn-beurt-wis").addEventListener("click", () => { wisBeurt(); teken(); });
+document.getElementById("btn-ronde-nieuw").addEventListener("click", () => {
+  if (k()) k().gehad = [];
+  wisBeurt();
+  teken();
+});
+function trekBeurt(){
+  const kl = k(), kandidaten = aanwezigen();
+  if (!kandidaten.length){
+    document.getElementById("beurt-naam").textContent = "Niemand beschikbaar";
+    document.getElementById("beurt-plek").textContent = "Geen aanwezige leerlingen in " + huidig;
+    document.getElementById("voortgang").textContent = "";
+    return;
+  }
+  let over = kandidaten.filter(p => !kl.gehad.includes(p.id));
+  if (!over.length){ kl.gehad = []; over = kandidaten; }
+  const gekozen = over[Math.floor(Math.random() * over.length)];
+  kl.beurt = gekozen.id;
+  kl.gehad.push(gekozen.id);
+  document.getElementById("beurt-naam").textContent = kl.leerlingen[gekozen.id].naam;
+  document.getElementById("beurt-plek").textContent = plekLabel(gekozen.i);
+  document.getElementById("beurt-rond").classList.add("raak");
+  toonVoortgang();
+  teken();
+}
+document.getElementById("btn-beurt").addEventListener("click", trekBeurt);
+document.getElementById("btn-beurt-2").addEventListener("click", trekBeurt);
+
+/* ---------- werkbalk ---------- */
+document.getElementById("btn-presentatie").addEventListener("click", () => {
+  const aan = document.body.classList.toggle("presentatie");
+  document.getElementById("btn-presentatie").textContent = aan ? "Terug naar bewerken" : "Op het bord";
+  if (aan && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
+  if (!aan && document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+  teken();
+});
+document.getElementById("btn-shuffle").addEventListener("click", () => {
+  if (!confirm("Alle leerlingen van " + huidig + " willekeurig over de plekken verdelen?")) return;
+  bewaarStap();
+  const kl = k();
+  const allen = kl.plekken.filter(Boolean).concat(kl.wachtrij);
+  for (let i = allen.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [allen[i], allen[j]] = [allen[j], allen[i]];
+  }
+  kl.plekken = new Array(plaatsen()).fill(null);
+  kl.wachtrij = [];
+  allen.forEach((id, n) => { if (n < kl.plekken.length) kl.plekken[n] = id; else kl.wachtrij.push(id); });
+  selectie = null;
+  teken();
+});
+document.getElementById("btn-spiegel").addEventListener("click", () => {
+  k().docent = !k().docent;
+  teken();
+});
+document.getElementById("btn-leeg").addEventListener("click", () => {
+  if (!confirm("Alle leerlingen van " + huidig + " naar de wachtrij verplaatsen?")) return;
+  bewaarStap();
+  const kl = k();
+  kl.plekken.forEach(id => { if (id) kl.wachtrij.push(id); });
+  kl.plekken = new Array(plaatsen()).fill(null);
+  selectie = null;
+  wisBeurt();
+  teken();
+});
+document.getElementById("btn-terug").addEventListener("click", () => {
+  if (!vorigeStaat) return;
+  const doelKlas = vorigeStaat.klas, vorig = JSON.parse(vorigeStaat.data);
+  Object.assign(klassen[doelKlas], vorig);
+  huidig = doelKlas;
+  keuze.value = huidig;
+  vorigeStaat = null;
+  selectie = null;
+  document.getElementById("btn-terug").disabled = true;
+  vernieuwKeuzelijst();
+  teken();
+});
+document.getElementById("btn-terug").disabled = true;
+document.getElementById("btn-print").addEventListener("click", () => window.print());
+
+function bouwData(metFotos){
+  const uit = { versie:5, datum:new Date().toISOString().slice(0,10), stijl:lokaalEl.dataset.stijl, klassen:{} };
+  Object.entries(klassen).forEach(([naam, kl]) => {
+    const leerlingen = {};
+    Object.entries(kl.leerlingen).forEach(([id, l]) => leerlingen[id] = metFotos ? l : Object.assign({}, l, { foto:null }));
+    uit.klassen[naam] = { rijen:kl.rijen, diep:kl.diep, leerlingen, plekken:kl.plekken, wachtrij:kl.wachtrij };
+  });
+  return uit;
+}
+function laadData(data){
+  if (!data || !data.klassen) throw new Error("onvolledig");
+  Object.entries(data.klassen).forEach(([naam, kl]) => {
+    if (!klassen[naam]) return;
+    Object.values(kl.leerlingen).forEach(l => { if (!("foto" in l)) l.foto = null; });
+    Object.assign(klassen[naam], {
+      rijen:kl.rijen || 3, diep:kl.diep || 5,
+      leerlingen:kl.leerlingen, plekken:kl.plekken, wachtrij:kl.wachtrij || [],
+      beurt:null, gehad:[]
+    });
+  });
+  if (data.stijl) zetStijl(data.stijl);
+  volgnummer += 1000;
+  selectie = null;
+  wisBeurt();
+  vernieuwKeuzelijst();
+  teken();
+}
+document.getElementById("btn-opslaan").addEventListener("click", () => {
+  const heeftFotos = Object.values(klassen).some(kl => Object.values(kl.leerlingen).some(l => l.foto));
+  let metFotos = false;
+  if (heeftFotos) metFotos = confirm("Foto's meenemen in het bestand?\n\nOK = met foto's, het bestand bevat dan herkenbare beelden van leerlingen.\nAnnuleren = alleen namen en plekken.");
+  const uit = bouwData(metFotos);
+  gewijzigd = false;
+  const blob = new Blob([JSON.stringify(uit)], { type:"application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "plattegronden-" + uit.datum + ".json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+document.getElementById("btn-laden").addEventListener("click", () => document.getElementById("bestand").click());
+document.getElementById("bestand").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const lezer = new FileReader();
+  lezer.onload = () => {
+    try {
+      laadData(JSON.parse(lezer.result));
+      markeer();
+    } catch (err){
+      alert("Dit bestand bevat geen geldige plattegronden. Kies een JSON-bestand dat met deze pagina is opgeslagen.");
+    }
+    e.target.value = "";
+  };
+  lezer.readAsText(file);
+});
+
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+  sluitKlasLijst();
+  if (k() && k().beurt) wisBeurt();
+  if (document.body.classList.contains("presentatie")){
+    document.body.classList.remove("presentatie");
+    document.getElementById("btn-presentatie").textContent = "Op het bord";
+  }
+  selectie = null;
+  teken();
+});
+
+/* ---------- automatisch opslaan in een gekoppeld bestand ---------- */
+const KAN_KOPPELEN = typeof window.showSaveFilePicker === "function";
+const statusEl = document.getElementById("koppelstatus");
+const ontkoppelKnop = document.getElementById("btn-ontkoppel");
+let bestandHandle = null;
+let schrijfTimer = null;
+let bezigMetSchrijven = false;
+let gewijzigd = false;
+let klaarMetStarten = false;
+
+function tijdNu(){
+  const d = new Date();
+  return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
+}
+function zetStatus(tekst, actief, knopTekst, knopActie){
+  statusEl.textContent = tekst;
+  statusEl.classList.toggle("actief", !!actief);
+  if (knopTekst){
+    const b = document.createElement("button");
+    b.textContent = knopTekst;
+    b.addEventListener("click", knopActie);
+    statusEl.appendChild(b);
+  }
+  ontkoppelKnop.hidden = !bestandHandle;
+}
+
+/* de browser onthoudt alleen de verwijzing naar het bestand, geen namen of foto's */
+function db(){
+  return new Promise((res, rej) => {
+    const r = indexedDB.open("plattegrond-koppeling", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("handles");
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  });
+}
+async function handleOpslaan(h){
+  const d = await db();
+  await new Promise((res, rej) => {
+    const t = d.transaction("handles", "readwrite");
+    t.objectStore("handles").put(h, "bestand");
+    t.oncomplete = res; t.onerror = () => rej(t.error);
+  });
+}
+async function handleOphalen(){
+  const d = await db();
+  return new Promise((res, rej) => {
+    const t = d.transaction("handles", "readonly");
+    const v = t.objectStore("handles").get("bestand");
+    v.onsuccess = () => res(v.result || null); v.onerror = () => rej(v.error);
+  });
+}
+async function handleWissen(){
+  const d = await db();
+  await new Promise(res => {
+    const t = d.transaction("handles", "readwrite");
+    t.objectStore("handles").delete("bestand");
+    t.oncomplete = res;
+  });
+}
+
+async function toestemming(h){
+  const opties = { mode:"readwrite" };
+  if (await h.queryPermission(opties) === "granted") return true;
+  return await h.requestPermission(opties) === "granted";
+}
+
+async function schrijf(){
+  if (!bestandHandle || bezigMetSchrijven) return;
+  bezigMetSchrijven = true;
+  try {
+    if (!await toestemming(bestandHandle)){
+      zetStatus("Geen toestemming om te schrijven", false, "Opnieuw proberen", schrijf);
+      return;
+    }
+    const w = await bestandHandle.createWritable();
+    await w.write(JSON.stringify(bouwData(true)));
+    await w.close();
+    gewijzigd = false;
+    zetStatus(bestandHandle.name + " \u00b7 opgeslagen " + tijdNu(), true);
+  } catch (err){
+    zetStatus("Opslaan mislukt in " + bestandHandle.name, false, "Opnieuw proberen", schrijf);
+  } finally {
+    bezigMetSchrijven = false;
+  }
+}
+
+function markeer(){
+  if (!klaarMetStarten) return;
+  gewijzigd = true;
+  if (!bestandHandle) return;
+  zetStatus(bestandHandle.name + " \u00b7 opslaan\u2026", true);
+  clearTimeout(schrijfTimer);
+  schrijfTimer = setTimeout(schrijf, 600);
+}
+
+async function koppel(h, vraagInlezen){
+  bestandHandle = h;
+  if (vraagInlezen){
+    try {
+      const tekst = await (await h.getFile()).text();
+      if (tekst.trim()){
+        const data = JSON.parse(tekst);
+        if (data.klassen && confirm("Dit bestand bevat al een indeling.\n\nOK = die indeling inlezen.\nAnnuleren = het bestand overschrijven met wat nu op het scherm staat.")){
+          laadData(data);
+        }
+      }
+    } catch (err){ /* leeg of onleesbaar bestand: gewoon overschrijven */ }
+  }
+  await handleOpslaan(h).catch(() => {});
+  zetStatus(h.name + " \u00b7 gekoppeld", true);
+  await schrijf();
+}
+
+document.getElementById("btn-koppel").addEventListener("click", async () => {
+  if (!KAN_KOPPELEN){
+    alert("Automatisch opslaan werkt in Chrome en Edge. In deze browser kan het niet.\n\nGebruik hier \"Opslaan als bestand\" en \"Bestand openen\".");
+    return;
+  }
+  try {
+    const h = await window.showSaveFilePicker({
+      suggestedName: "plattegronden.json",
+      types: [{ description:"Plattegronden", accept:{ "application/json":[".json"] } }]
+    });
+    await koppel(h, true);
+  } catch (err){ /* geannuleerd */ }
+});
+
+ontkoppelKnop.addEventListener("click", async () => {
+  bestandHandle = null;
+  clearTimeout(schrijfTimer);
+  await handleWissen().catch(() => {});
+  zetStatus("", false);
+});
+
+window.addEventListener("beforeunload", e => {
+  if (gewijzigd && !bestandHandle){ e.preventDefault(); e.returnValue = ""; }
+});
+
+(async function herstelKoppeling(){
+  if (!KAN_KOPPELEN) {
+    return;
+  }
+  let h = null;
+  try { h = await handleOphalen(); } catch (err){ return; }
+  if (!h) return;
+  if (await h.queryPermission({ mode:"readwrite" }) === "granted"){
+    bestandHandle = h;
+    try { laadData(JSON.parse(await (await h.getFile()).text())); } catch (err){}
+    zetStatus(h.name + " \u00b7 gekoppeld", true);
+    ontkoppelKnop.hidden = false;
+  } else {
+    zetStatus("Gekoppeld aan " + h.name, false, "Verbinden", async () => {
+      if (!await toestemming(h)) return;
+      bestandHandle = h;
+      try { laadData(JSON.parse(await (await h.getFile()).text())); } catch (err){}
+      zetStatus(h.name + " \u00b7 gekoppeld", true);
+      ontkoppelKnop.hidden = false;
+    });
+  }
+})();
+
+const vandaag = new Date();
+document.getElementById("datum").textContent =
+  vandaag.toLocaleDateString("nl-NL", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
+teken();
+wisBeurt();
+zetIconen();
+setTimeout(() => { klaarMetStarten = true; }, 0);
+
+/* ---------- Magister-fotolijst inlezen ----------
+   Leest een Magister-uitdraai "Fotolijst" en haalt daar de klasnaam,
+   de leerlingnamen en de pasfoto's uit. Draait volledig in de browser:
+   het bestand wordt niet verstuurd. */
+
+async function pdfUitpakken(stroom){
+  // FlateDecode via de ingebouwde decompressie van de browser
+  const ds = new DecompressionStream("deflate");
+  const blob = new Blob([stroom]).stream().pipeThrough(ds);
+  return new Uint8Array(await new Response(blob).arrayBuffer());
+}
+
+function pdfObjecten(ruw){
+  // ruw = latin1-tekst, 1 teken per byte, zodat posities kloppen met de bytes
+  const objecten = {};
+  const zoeker = /(?:^|[^0-9])(\d+)\s+\d+\s+obj\b/g;
+  let m;
+  while ((m = zoeker.exec(ruw)) !== null){
+    const einde = ruw.indexOf("endobj", m.index);
+    objecten[parseInt(m[1], 10)] = { start: zoeker.lastIndex, einde: einde < 0 ? ruw.length : einde };
+  }
+  return objecten;
+}
+
+function streamVan(ruw, obj, objecten){
+  const deel = ruw.slice(obj.start, obj.einde);
+  const m = /stream\r?\n/.exec(deel);
+  if (!m) return null;
+  const kop = deel.slice(0, m.index);
+  const van = obj.start + m.index + m[0].length;
+  let tot = ruw.indexOf("endstream", van);
+  if (tot < 0) tot = obj.einde;
+
+  // De opgegeven lengte is betrouwbaarder dan zoeken naar "endstream":
+  // de regelovergang ervoor hoort niet bij de gegevens en laat het
+  // uitpakken mislukken.
+  const lm = /\/Length\s+(\d+)(?!\s+\d+\s+R)/.exec(kop);
+  if (lm){
+    const lengte = parseInt(lm[1], 10);
+    if (lengte > 0 && van + lengte <= tot + 4) tot = van + lengte;
+  } else {
+    const lr = /\/Length\s+(\d+)\s+\d+\s+R/.exec(kop);
+    if (lr && objecten && objecten[parseInt(lr[1], 10)]){
+      const o = objecten[parseInt(lr[1], 10)];
+      const n = /(\d+)/.exec(ruw.slice(o.start, o.einde));
+      if (n){
+        const lengte = parseInt(n[1], 10);
+        if (lengte > 0 && van + lengte <= tot + 4) tot = van + lengte;
+      }
+    }
+    while (tot > van && (ruw.charCodeAt(tot-1) === 10 || ruw.charCodeAt(tot-1) === 13)) tot--;
+  }
+  return { van, tot, kop };
+}
+
+function latin1(bytes){
+  let s = "";
+  const blok = 8192;
+  for (let i = 0; i < bytes.length; i += blok){
+    s += String.fromCharCode.apply(null, bytes.subarray(i, i + blok));
+  }
+  return s;
+}
+
+function bouwCmap(tekst){
+  const cmap = {};
+  let m;
+
+  // vorm 1: <code> <teken>
+  const losse = /beginbfchar([\s\S]*?)endbfchar/g;
+  while ((m = losse.exec(tekst)) !== null){
+    const paar = /<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]*)>/g;
+    let p;
+    while ((p = paar.exec(m[1])) !== null) cmap[parseInt(p[1], 16)] = hexNaarTekst(p[2]);
+  }
+
+  // vorm 2: <van> <tot> <eerste teken>   en
+  // vorm 3: <van> <tot> [<teken> <teken> ...]
+  const reeksen = /beginbfrange([\s\S]*?)endbfrange/g;
+  while ((m = reeksen.exec(tekst)) !== null){
+    const body = m[1];
+    const regel = /<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>\s*(\[([\s\S]*?)\]|<([0-9A-Fa-f]*)>)/g;
+    let r;
+    while ((r = regel.exec(body)) !== null){
+      const van = parseInt(r[1], 16), tot = parseInt(r[2], 16);
+      if (r[4] !== undefined){
+        const lijst = r[4].match(/<([0-9A-Fa-f]*)>/g) || [];
+        for (let i = 0; i <= tot - van && i < lijst.length; i++){
+          cmap[van + i] = hexNaarTekst(lijst[i].slice(1, -1));
+        }
+      } else {
+        const start = hexNaarTekst(r[5]);
+        const basis = start.charCodeAt(start.length - 1) || 0;
+        const voor = start.slice(0, -1);
+        for (let i = 0; i <= tot - van; i++){
+          cmap[van + i] = voor + String.fromCharCode(basis + i);
+        }
+      }
+    }
+  }
+  return cmap;
+}
+
+function hexNaarTekst(hex){
+  let s = "";
+  for (let i = 0; i + 3 < hex.length + 1; i += 4){
+    s += String.fromCharCode(parseInt(hex.substr(i, 4), 16));
+  }
+  return s;
+}
+
+function ontcijfer(hex, cmap){
+  let s = "";
+  for (let i = 0; i + 1 < hex.length; i += 4){
+    const code = parseInt(hex.substr(i, 4), 16);
+    s += (cmap[code] !== undefined) ? cmap[code] : "";
+  }
+  return s;
+}
+
+async function leesFotolijst(bestand){
+  const bytes = new Uint8Array(await bestand.arrayBuffer());
+  const ruw = latin1(bytes);
+  if (!ruw.startsWith("%PDF")) throw new Error("Dit is geen PDF-bestand.");
+  const objecten = pdfObjecten(ruw);
+
+  async function inhoud(nr){
+    const obj = objecten[nr];
+    if (!obj) return null;
+    const st = streamVan(ruw, obj, objecten);
+    if (!st) return null;
+    const rauw = bytes.subarray(st.van, st.tot);
+    if (/\/FlateDecode/.test(st.kop)){
+      try { return await pdfUitpakken(rauw); } catch(e){ return null; }
+    }
+    return rauw;
+  }
+
+  // lettertypetabel
+  let cmap = {};
+  for (const nr of Object.keys(objecten)){
+    const kop = ruw.slice(objecten[nr].start, objecten[nr].einde);
+    const m = /\/ToUnicode\s+(\d+)\s+0\s+R/.exec(kop);
+    if (m){
+      const data = await inhoud(parseInt(m[1], 10));
+      if (data) { cmap = bouwCmap(latin1(data)); break; }
+    }
+  }
+
+  // pagina's opzoeken
+  const paginas = [];
+  const pat = /\/Type\s*\/Page[^s]/g;
+  let pm;
+  while ((pm = pat.exec(ruw)) !== null){
+    // bijbehorend object zoeken
+    for (const nr of Object.keys(objecten)){
+      const o = objecten[nr];
+      if (pm.index > o.start && pm.index < o.einde){
+        const kop = ruw.slice(o.start, o.einde);
+        const c = /\/Contents\s+(\d+)\s+0\s+R/.exec(kop);
+        const r = /\/Resources\s+(\d+)\s+0\s+R/.exec(kop);
+        if (c) paginas.push({ inhoud: parseInt(c[1], 10), bronnen: r ? parseInt(r[1], 10) : null, kop });
+        break;
+      }
+    }
+  }
+  if (!paginas.length) throw new Error("Geen pagina's gevonden in dit PDF-bestand.");
+
+  const leerlingen = [];
+  let klas = null, lesperiode = null;
+
+  for (const pagina of paginas){
+    const data = await inhoud(pagina.inhoud);
+    if (!data) continue;
+    const cs = latin1(data);
+
+    // XObject-namen naar objectnummers
+    const plaatjes = {};
+    if (pagina.bronnen && objecten[pagina.bronnen]){
+      const br = ruw.slice(objecten[pagina.bronnen].start, objecten[pagina.bronnen].einde);
+      const xo = /\/XObject\s*<<([\s\S]*?)>>/.exec(br);
+      if (xo){
+        const pp = /\/([A-Za-z0-9]+)\s+(\d+)\s+0\s+R/g;
+        let x;
+        while ((x = pp.exec(xo[1])) !== null) plaatjes[x[1]] = parseInt(x[2], 10);
+      }
+    }
+
+    // hoogte van de pagina, om alles in één stelsel te krijgen (oorsprong linksboven)
+    const mb = /\/MediaBox\s*\[\s*[\d.-]+\s+[\d.-]+\s+([\d.-]+)\s+([\d.-]+)/.exec(pagina.kop);
+    const hoogte = mb ? parseFloat(mb[2]) : 841.89;
+
+    // afbeeldingen met plaats
+    const beelden = [];
+    const bp = /([\d.-]+)\s+0\s+0\s+([\d.-]+)\s+([\d.-]+)\s+([\d.-]+)\s+cm\s*\/([A-Za-z0-9]+)\s+Do/g;
+    let b;
+    while ((b = bp.exec(cs)) !== null){
+      const breed = parseFloat(b[1]), hoog = parseFloat(b[2]);
+      const x = parseFloat(b[3]), y = parseFloat(b[4]);
+      if (breed < 20 || Math.abs(hoog) < 20) continue;   // logo's overslaan
+      beelden.push({
+        naam: b[5],
+        midden: x + breed / 2,
+        onder: y + Math.max(0, Math.abs(hoog) + Math.min(0, hoog)),
+        boven: y
+      });
+    }
+
+    // tekst met plaats
+    const woorden = [];
+    const tp = /1\s+0\s+0\s+1\s+([\d.-]+)\s+([\d.-]+)\s+Tm([\s\S]{0,400}?)ET/g;
+    let t;
+    while ((t = tp.exec(cs)) !== null){
+      const x = parseFloat(t[1]);
+      const yPdf = parseFloat(t[2]);
+      let tekst = "";
+      const hp = /<([0-9A-Fa-f]+)>/g;
+      let h;
+      while ((h = hp.exec(t[3])) !== null) tekst += ontcijfer(h[1], cmap);
+      tekst = tekst.trim();
+      if (tekst) woorden.push({ tekst, x, top: hoogte - yPdf });
+    }
+
+    // kopregels: label en waarde staan soms in losse stukjes op dezelfde regel
+    function regelNa(label){
+      for (const w of woorden){
+        if (!new RegExp(label, "i").test(w.tekst)) continue;
+        const naDubbelePunt = w.tekst.split(":")[1];
+        if (naDubbelePunt && naDubbelePunt.trim()) return naDubbelePunt.trim();
+        const rest = woorden
+          .filter(v => Math.abs(v.top - w.top) < 4 && v.x > w.x)
+          .sort((a, c) => a.x - c.x)
+          .map(v => v.tekst).join(" ");
+        return rest.replace(/^:\s*/, "").replace(/\s+/g, " ").trim();
+      }
+      return null;
+    }
+    if (!klas) klas = regelNa("Klas/groep");
+    if (!lesperiode) lesperiode = regelNa("Lesperiode");
+
+    // naam onder elke foto zoeken
+    for (const beeld of beelden){
+      const bij = woorden.filter(w =>
+        w.top > beeld.onder - 4 && w.top < beeld.onder + 40 &&
+        Math.abs(w.x - beeld.midden) < 62
+      ).sort((a, c) => (Math.round(a.top / 6) - Math.round(c.top / 6)) || (a.x - c.x));
+      const naam = bij.map(w => w.tekst).join(" ").replace(/\s+/g, " ").trim();
+      if (!naam) continue;
+
+      let foto = null;
+      const nr = plaatjes[beeld.naam];
+      if (nr && objecten[nr]){
+        const kop = ruw.slice(objecten[nr].start, objecten[nr].einde);
+        if (/\/DCTDecode/.test(kop)){
+          const st = streamVan(ruw, objecten[nr], objecten);
+          if (st){
+            let bin = "";
+            const stuk = bytes.subarray(st.van, st.tot);
+            for (let i = 0; i < stuk.length; i += 8192){
+              bin += String.fromCharCode.apply(null, stuk.subarray(i, i + 8192));
+            }
+            foto = "data:image/jpeg;base64," + btoa(bin);
+          }
+        }
+      }
+      leerlingen.push({ naam, foto });
+    }
+  }
+
+  if (!leerlingen.length) throw new Error("Geen leerlingen herkend. Is dit een Magister-fotolijst?");
+  return { klas: klas || "", lesperiode: lesperiode || "", leerlingen };
+}
+
+document.getElementById("btn-magister").addEventListener("click", () => {
+  document.getElementById("magisterbestand").click();
+});
+document.getElementById("magisterbestand").addEventListener("change", async (e) => {
+  const bestand = e.target.files[0];
+  e.target.value = "";
+  if (!bestand) return;
+  const status = document.getElementById("foto-status");
+  const oud = status ? status.textContent : "";
+  if (status) status.textContent = "Fotolijst inlezen\u2026";
+  try {
+    const uitslag = await leesFotolijst(bestand);
+    const metFoto = uitslag.leerlingen.filter(l => l.foto).length;
+    let naam = (uitslag.klas || "").toUpperCase();
+    naam = (prompt(
+      "Gevonden: " + uitslag.leerlingen.length + " leerlingen, " + metFoto + " met pasfoto."
+      + (uitslag.lesperiode ? "\nLesperiode " + uitslag.lesperiode : "")
+      + "\n\nOnder welke naam wil je deze klas opslaan?", naam) || "").trim().toUpperCase();
+    if (!naam) { if (status) status.textContent = oud; return; }
+    if (klassen[naam] && !confirm("Klas " + naam + " bestaat al. Vervangen door deze lijst?")) {
+      if (status) status.textContent = oud; return;
+    }
+    const bestond = !!klassen[naam];
+    klassen[naam] = maakKlas(uitslag.leerlingen);
+    // lege startklas opruimen zodra er een echte klas is
+    Object.keys(klassen).forEach(n => {
+      if (n !== naam && n === "KLAS 1" && !Object.keys(klassen[n].leerlingen).length){
+        delete klassen[n];
+        Array.from(keuze.options).forEach(o => { if (o.value === n) o.remove(); });
+      }
+    });
+    if (!bestond){
+      const o = document.createElement("option");
+      o.value = naam; o.textContent = keuzeLabel(naam);
+      keuze.appendChild(o);
+    }
+    keuze.value = naam;
+    huidig = naam;
+    selectie = null;
+    wisBeurt();
+    markeer();
+    teken();
+    if (status) status.textContent = uitslag.leerlingen.length + " leerlingen ingelezen, " + metFoto + " met pasfoto.";
+  } catch (fout) {
+    if (status) status.textContent = oud;
+    alert("Inlezen mislukt: " + fout.message);
+  }
+});
+})();
+</script>
+</body>
+</html>
