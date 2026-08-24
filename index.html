@@ -80,6 +80,12 @@ svg{flex:none}
 .knop[disabled]{opacity:.45;cursor:default;transform:none}
 .knop[hidden]{display:none}
 .scheiding{width:1px;height:26px;background:var(--lijn-sterk);margin:0 2px}
+.meer-wikkel{position:relative}
+.meer-menu{position:absolute;top:calc(100% + 6px);right:0;z-index:40;min-width:250px;background:var(--kaart);border:1px solid var(--lijn);border-radius:12px;box-shadow:var(--schaduw);padding:6px;display:flex;flex-direction:column}
+.meer-menu[hidden]{display:none}
+.meer-item{display:block;width:100%;text-align:left;padding:9px 12px;border:0;border-radius:8px;background:none;color:var(--tekst);font-size:14px}
+.meer-item:hover{background:var(--blauw-zacht)}
+.meer-scheiding{height:1px;background:var(--lijn);margin:5px 8px}
 
 /* ---------- lokaal ---------- */
 .lokaal{
@@ -282,18 +288,23 @@ body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
     <button class="knop" id="btn-shuffle" data-icon="shuffle">Willekeurig indelen</button>
     <button class="knop violet" id="btn-spiegel" data-icon="omdraaien">Docentweergave</button>
     <span class="scheiding"></span>
-    <button class="knop groen" id="btn-fotos" data-icon="imageplus">Foto's toevoegen</button>
-    <button class="knop stil" id="btn-fotos-weg" data-icon="imageoff">Foto's wissen</button>
-    <span class="scheiding"></span>
-    <button class="knop" id="btn-koppel" data-icon="save">Automatisch opslaan</button>
-    <button class="knop stil" id="btn-ontkoppel" data-icon="unlink" hidden>Ontkoppelen</button>
-    <button class="knop" id="btn-opslaan" data-icon="download">Opslaan als JSON</button>
-    <button class="knop" id="btn-laden" data-icon="upload">Bestand openen</button>
     <button class="knop groen" id="btn-magister" data-icon="userplus">Klas uit Magister</button>
+    <button class="knop" id="btn-koppel" data-icon="save">Koppelen aan mijn bestand</button>
+    <button class="knop stil" id="btn-ontkoppel" data-icon="unlink" hidden>Ontkoppelen</button>
     <button class="knop" id="btn-print" data-icon="printer">Afdrukken</button>
     <span class="scheiding"></span>
     <button class="knop stil" id="btn-terug" data-icon="undo">Ongedaan maken</button>
     <button class="knop stil" id="btn-leeg" data-icon="eraser">Plekken leegmaken</button>
+    <div class="meer-wikkel">
+      <button class="knop stil" id="btn-meer" data-icon="dots" aria-haspopup="true" aria-expanded="false">Meer</button>
+      <div class="meer-menu" id="meer-menu" role="menu" hidden>
+        <button class="meer-item" id="btn-opslaan" role="menuitem">Reservekopie maken</button>
+        <button class="meer-item" id="btn-laden" role="menuitem">Reservekopie openen</button>
+        <div class="meer-scheiding"></div>
+        <button class="meer-item" id="btn-fotos" role="menuitem">Foto's uit bestanden toevoegen</button>
+        <button class="meer-item" id="btn-fotos-weg" role="menuitem">Alle foto's wissen</button>
+      </div>
+    </div>
     <input type="file" id="bestand" accept="application/json" hidden>
     <input type="file" id="magisterbestand" accept="application/pdf" hidden>
     <input type="file" id="fotobestanden" accept="image/*" multiple hidden>
@@ -373,6 +384,7 @@ body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
 const ICONEN = {
   cap:'<path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/>',
   chevron:'<path d="m6 9 6 6 6-6"/>',
+  dots:'<circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/>',
   vink:'<path d="m5 12 5 5L20 7"/>',
   plus:'<path d="M12 5v14M5 12h14"/>',
   trash:'<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>',
@@ -1284,7 +1296,7 @@ async function koppel(h, vraagInlezen){
 
 document.getElementById("btn-koppel").addEventListener("click", async () => {
   if (!KAN_KOPPELEN){
-    alert("Automatisch opslaan werkt in Chrome en Edge. In deze browser kan het niet.\n\nGebruik hier \"Opslaan als bestand\" en \"Bestand openen\".");
+    alert("Koppelen werkt in Chrome en Edge. In deze browser kan het niet.\n\nGebruik dan Meer \u203a Reservekopie maken en Reservekopie openen.");
     return;
   }
   try {
@@ -1610,6 +1622,25 @@ async function leesFotolijst(bestand){
   if (!leerlingen.length) throw new Error("Geen leerlingen herkend. Is dit een Magister-fotolijst?");
   return { klas: klas || "", lesperiode: lesperiode || "", leerlingen };
 }
+
+/* ---------- Meer-menu ---------- */
+const meerKnop = document.getElementById("btn-meer");
+const meerMenu = document.getElementById("meer-menu");
+function sluitMeer(){
+  meerMenu.hidden = true;
+  meerKnop.setAttribute("aria-expanded", "false");
+}
+meerKnop.addEventListener("click", (e) => {
+  e.stopPropagation();
+  const open = meerMenu.hidden;
+  meerMenu.hidden = !open;
+  meerKnop.setAttribute("aria-expanded", open ? "true" : "false");
+});
+meerMenu.addEventListener("click", () => sluitMeer());
+document.addEventListener("click", (e) => {
+  if (!meerMenu.hidden && !meerMenu.contains(e.target) && e.target !== meerKnop) sluitMeer();
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") sluitMeer(); });
 
 document.getElementById("btn-magister").addEventListener("click", () => {
   document.getElementById("magisterbestand").click();
