@@ -1858,9 +1858,12 @@ function bouwCmap(tekst){
     while ((r = regel.exec(body)) !== null){
       const van = parseInt(r[1], 16), tot = parseInt(r[2], 16);
       if (r[4] !== undefined){
-        const lijst = r[4].match(/<([0-9A-Fa-f]*)>/g) || [];
+        /* Een ingang mag meerdere tekens bevatten, bijvoorbeeld <0066 0069>
+           voor de ligatuur "fi". Zou je die overslaan, dan schuift de hele
+           lijst een plek op en komen alle namen erna verkeerd uit de PDF. */
+        const lijst = r[4].match(/<[0-9A-Fa-f\s]*>/g) || [];
         for (let i = 0; i <= tot - van && i < lijst.length; i++){
-          cmap[van + i] = hexNaarTekst(lijst[i].slice(1, -1));
+          cmap[van + i] = hexNaarTekst(lijst[i].slice(1, -1).replace(/\s+/g, ""));
         }
       } else {
         const start = hexNaarTekst(r[5]);
@@ -1883,11 +1886,18 @@ function hexNaarTekst(hex){
   return s;
 }
 
-function ontcijfer(hex, cmap){
+function ontcijfer(hex, cmap, reserve){
   let s = "";
   for (let i = 0; i + 1 < hex.length; i += 4){
     const code = parseInt(hex.substr(i, 4), 16);
-    s += (cmap[code] !== undefined) ? cmap[code] : "";
+    if (cmap && cmap[code] !== undefined){ s += cmap[code]; continue; }
+    /* onbekende code: alleen overnemen als precies één andere tabel hem kent,
+       anders liever niets dan een verkeerde letter */
+    if (reserve && reserve.length){
+      const kandidaten = [];
+      reserve.forEach(c => { if (c[code] !== undefined && !kandidaten.includes(c[code])) kandidaten.push(c[code]); });
+      if (kandidaten.length === 1) s += kandidaten[0];
+    }
   }
   return s;
 }
@@ -1910,16 +1920,20 @@ async function leesFotolijst(bestand){
     return rauw;
   }
 
-  // lettertypetabel
-  let cmap = {};
+  /* Vertaaltabellen: één per lettertype. Een uitdraai kan meerdere
+     lettertypen (of meerdere subsets) bevatten; met één tabel voor alles
+     komen de namen van het tweede lettertype er als onzin uit. */
+  const cmapPerObject = {};
   for (const nr of Object.keys(objecten)){
     const kop = ruw.slice(objecten[nr].start, objecten[nr].einde);
+    if (!/\/Type\s*\/Font/.test(kop) && !/\/ToUnicode/.test(kop)) continue;
     const m = /\/ToUnicode\s+(\d+)\s+0\s+R/.exec(kop);
-    if (m){
-      const data = await inhoud(parseInt(m[1], 10));
-      if (data) { cmap = bouwCmap(latin1(data)); break; }
-    }
+    if (!m) continue;
+    const data = await inhoud(parseInt(m[1], 10));
+    if (data) cmapPerObject[nr] = bouwCmap(latin1(data));
   }
+  const alleCmaps = Object.values(cmapPerObject);
+  const cmap = alleCmaps[0] || {};
 
   // pagina's opzoeken
   const paginas = [];
@@ -1950,8 +1964,11 @@ async function leesFotolijst(bestand){
 
     // XObject-namen naar objectnummers
     const plaatjes = {};
+    const bronnenKop = (pagina.bronnen && objecten[pagina.bronnen])
+      ? ruw.slice(objecten[pagina.bronnen].start, objecten[pagina.bronnen].einde)
+      : pagina.kop;
     if (pagina.bronnen && objecten[pagina.bronnen]){
-      const br = ruw.slice(objecten[pagina.bronnen].start, objecten[pagina.bronnen].einde);
+      const br = bronnenKop;
       const xo = /\/XObject\s*<<([\s\S]*?)>>/.exec(br);
       if (xo){
         const pp = /\/([A-Za-z0-9]+)\s+(\d+)\s+0\s+R/g;
@@ -1980,17 +1997,32 @@ async function leesFotolijst(bestand){
       });
     }
 
-    // tekst met plaats
+    // welke naam (/F1, /F2 ...) hoort bij welke vertaaltabel
+    const tabelVanNaam = {};
+    if (bronnenKop){
+      const fb = /\/Font\s*<<([\s\S]*?)>>/.exec(bronnenKop);
+      if (fb){
+        const par = /\/(\w+)\s+(\d+)\s+0\s+R/g;
+        let q;
+        while ((q = par.exec(fb[1])) !== null){
+          if (cmapPerObject[q[2]]) tabelVanNaam[q[1]] = cmapPerObject[q[2]];
+        }
+      }
+    }
+
+    // tekst met plaats; per tekstblok telt het daar gekozen lettertype
     const woorden = [];
     const tp = /1\s+0\s+0\s+1\s+([\d.-]+)\s+([\d.-]+)\s+Tm([\s\S]{0,400}?)ET/g;
     let t;
     while ((t = tp.exec(cs)) !== null){
       const x = parseFloat(t[1]);
       const yPdf = parseFloat(t[2]);
+      const fm = /\/(\w+)\s+[\d.]+\s+Tf/.exec(t[3]);
+      const tabel = (fm && tabelVanNaam[fm[1]]) ? tabelVanNaam[fm[1]] : cmap;
       let tekst = "";
       const hp = /<([0-9A-Fa-f]+)>/g;
       let h;
-      while ((h = hp.exec(t[3])) !== null) tekst += ontcijfer(h[1], cmap);
+      while ((h = hp.exec(t[3])) !== null) tekst += ontcijfer(h[1], tabel, alleCmaps);
       tekst = tekst.trim();
       if (tekst) woorden.push({ tekst, x, top: hoogte - yPdf });
     }
@@ -2023,7 +2055,11 @@ async function leesFotolijst(bestand){
         w.top > beeld.onder - 4 && w.top < beeld.onder + 40 &&
         Math.abs(w.x - beeld.midden) < 62
       ).sort((a, c) => (Math.round(a.top / 6) - Math.round(c.top / 6)) || (a.x - c.x));
-      const naam = bij.map(w => w.tekst).join(" ").replace(/\s+/g, " ").trim();
+      /* Namen als "Al-Lahibi" komen soms in twee stukken uit de PDF ("Al-" en
+         "Lahibi"). Na een koppelteken hoort geen spatie. */
+      const naam = bij.reduce((uit, w) =>
+        (!uit || /[-\u2010-\u2015]$/.test(uit)) ? uit + w.tekst : uit + " " + w.tekst, ""
+      ).replace(/\s+/g, " ").trim();
       if (!naam) continue;
 
       let foto = null;
