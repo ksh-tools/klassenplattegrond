@@ -148,6 +148,18 @@ svg{flex:none}
 .fotokaart .st{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--grijs);margin-top:3px}
 .fotokaart .vink{position:absolute;top:6px;right:8px;font-size:13px;color:var(--blauw);font-weight:900;display:none}
 .fotokaart.aan .vink{display:block}
+.startwaarschuwing{display:flex;align-items:center;gap:14px;margin:16px 0 0;padding:15px 18px;
+  border-radius:14px;background:#fff7ed;border:2px solid #f59e0b;box-shadow:0 4px 14px -8px rgba(180,83,9,.4)}
+.startwaarschuwing[hidden]{display:none}
+.startwaarschuwing.rood{background:#fef2f2;border-color:#dc2626}
+.sw-teken{color:#b45309;flex:none}
+.startwaarschuwing.rood .sw-teken{color:#b91c1c}
+.sw-tekst{flex:1;min-width:0}
+.sw-tekst b{display:block;font-size:15.5px;color:#7c2d12;margin-bottom:2px}
+.startwaarschuwing.rood .sw-tekst b{color:#7f1d1d}
+.sw-tekst p{margin:0;font-size:13.5px;color:#92400e;line-height:1.45}
+.startwaarschuwing.rood .sw-tekst p{color:#991b1b}
+.sw-weg{border:0;background:none;color:#b45309;font-size:15px;cursor:pointer;padding:2px 4px;flex:none;align-self:flex-start}
 .meer-menu[hidden]{display:none}
 .meer-item{display:block;width:100%;text-align:left;padding:9px 12px;border:0;border-radius:8px;background:none;color:var(--tekst);font-size:14px}
 .meer-item:hover{background:var(--blauw-zacht)}
@@ -439,6 +451,16 @@ body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
 </head>
 <body>
 <div class="wrap">
+  <div class="startwaarschuwing" id="startwaarschuwing" hidden>
+    <span class="sw-teken" data-icon="save" data-maat="22"></span>
+    <div class="sw-tekst">
+      <b id="sw-kop"></b>
+      <p id="sw-uitleg"></p>
+    </div>
+    <button class="knop primair" id="sw-knop"></button>
+    <button class="sw-weg" id="sw-weg" title="Verbergen" aria-label="Verbergen">&#10005;</button>
+  </div>
+
 
   <header class="kop">
     <div class="merkje" data-icon="cap" data-maat="26"></div>
@@ -1719,6 +1741,7 @@ async function koppel(h, vraagInlezen){
     } catch (err){ /* leeg of onleesbaar bestand: gewoon overschrijven */ }
   }
   await handleOpslaan(h).catch(() => {});
+  if (typeof verbergWaarschuwing === "function") verbergWaarschuwing();
   zetStatus(h.name + " \u00b7 gekoppeld", true);
   await schrijf();
 }
@@ -1742,32 +1765,74 @@ ontkoppelKnop.addEventListener("click", async () => {
   clearTimeout(schrijfTimer);
   await handleWissen().catch(() => {});
   zetStatus("", false);
+  if (typeof waarschuwGeenKoppeling === "function") waarschuwGeenKoppeling();
 });
 
 window.addEventListener("beforeunload", e => {
   if (gewijzigd && !bestandHandle){ e.preventDefault(); e.returnValue = ""; }
 });
 
+/* ---------- Waarschuwing bovenaan: zonder koppeling raakt werk kwijt ---------- */
+const swBalk = document.getElementById("startwaarschuwing");
+const swKnop = document.getElementById("sw-knop");
+function toonWaarschuwing(soort, bestandsnaam, actie){
+  swBalk.classList.toggle("rood", soort === "geen");
+  if (soort === "verbinden"){
+    document.getElementById("sw-kop").textContent = "Klik eerst op Verbinden";
+    document.getElementById("sw-uitleg").textContent =
+      "Je werkt met " + bestandsnaam + ", maar de browser moet opnieuw toestemming geven. "
+      + "Tot je verbindt wordt er niets opgeslagen en gaat alles wat je nu verandert verloren.";
+    swKnop.textContent = "Verbinden";
+  } else {
+    document.getElementById("sw-kop").textContent = "Je werk wordt niet bewaard";
+    document.getElementById("sw-uitleg").textContent =
+      "Er is nog geen bestand gekoppeld. Sluit je dit tabblad, dan is je indeling weg. "
+      + "Koppel eenmalig aan een bestand, bijvoorbeeld in je OneDrive.";
+    swKnop.textContent = "Koppelen aan mijn bestand";
+  }
+  swKnop.onclick = actie;
+  swBalk.hidden = false;
+}
+function verbergWaarschuwing(){ swBalk.hidden = true; }
+document.getElementById("sw-weg").addEventListener("click", verbergWaarschuwing);
+
+function waarschuwGeenKoppeling(){
+  if (bestandHandle) return;
+  toonWaarschuwing("geen", "", () => {
+    verbergWaarschuwing();
+    document.getElementById("btn-koppel").click();
+  });
+}
+
 (async function herstelKoppeling(){
-  if (!KAN_KOPPELEN) {
+  if (!KAN_KOPPELEN){
+    toonWaarschuwing("geen", "", () => {
+      verbergWaarschuwing();
+      document.getElementById("btn-koppel").click();
+    });
     return;
   }
   let h = null;
-  try { h = await handleOphalen(); } catch (err){ return; }
-  if (!h) return;
+  try { h = await handleOphalen(); } catch (err){ waarschuwGeenKoppeling(); return; }
+  if (!h){ waarschuwGeenKoppeling(); return; }
   if (await h.queryPermission({ mode:"readwrite" }) === "granted"){
     bestandHandle = h;
     try { laadData(JSON.parse(await (await h.getFile()).text())); } catch (err){}
     zetStatus(h.name + " \u00b7 gekoppeld", true);
     ontkoppelKnop.hidden = false;
+    verbergWaarschuwing();
   } else {
-    zetStatus("Gekoppeld aan " + h.name, false, "Verbinden", async () => {
+    const verbind = async () => {
       if (!await toestemming(h)) return;
       bestandHandle = h;
       try { laadData(JSON.parse(await (await h.getFile()).text())); } catch (err){}
       zetStatus(h.name + " \u00b7 gekoppeld", true);
       ontkoppelKnop.hidden = false;
-    });
+      verbergWaarschuwing();
+      teken();
+    };
+    zetStatus("Gekoppeld aan " + h.name, false, "Verbinden", verbind);
+    toonWaarschuwing("verbinden", h.name, verbind);
   }
 })();
 
