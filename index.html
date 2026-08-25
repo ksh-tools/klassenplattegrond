@@ -214,7 +214,45 @@ svg{flex:none}
 .lokaal[data-stijl="naamkaart"] .voornaam{display:block;font-size:min(calc(var(--naam) * 1.2),34cqh);font-weight:700}
 .lokaal[data-stijl="naamkaart"] .achternaam{display:block;font-size:min(var(--naam),26cqh);font-weight:600;color:var(--grijs);margin-top:1px}
 
-.stijlkiezer{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:16px;background:#f1f5f9;border:1px solid var(--lijn);border-radius:12px;padding:4px}
+/* ---------- weergave met aandachtspunten ---------- */
+.zorgmerken{position:absolute;top:4px;right:4px;display:flex;gap:3px;z-index:2;pointer-events:none}
+.zorgmerk{width:19px;height:19px;border-radius:6px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(15,23,42,.14)}
+.zorgmerk svg{width:12px;height:12px}
+.zorgmerk[data-z="dyslexie"]{background:#dbeafe;color:#1d4ed8}
+.zorgmerk[data-z="timeout"]{background:#fef3c7;color:#b45309}
+.zorgmerk[data-z="extratijd"]{background:#d1fae5;color:#047857}
+.zorgmerk[data-z="adhd"]{background:#fee2e2;color:#be123c}
+.zorgmerk[data-z="autisme"]{background:#ede9fe;color:#6d28d9}
+.zorgnotitie{width:100%;margin-top:auto;flex:none;font-size:11px;line-height:1.3;color:var(--grijs);
+  background:var(--papier);border:1px solid var(--lijn);border-radius:6px;padding:3px 5px;
+  text-align:left;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.zorgnotitie.leeg{color:var(--zacht);font-style:italic}
+.lokaal:not([data-stijl="zorg"]) .zorgnotitie{display:none}
+.lokaal[data-zorgmerken="uit"] .zorgmerken{display:none}
+.lokaal[data-stijl="zorg"] .stoel{padding:6px 7px 6px;justify-content:flex-start}
+.lokaal[data-stijl="zorg"] .foto{position:static;width:min(42px,26cqh);height:min(42px,26cqh);font-size:min(17cqh,15px);margin-bottom:2px}
+/* meer hoogte per kaartje, zodat de notitie erin past */
+.lokaal[data-stijl="zorg"]{aspect-ratio:auto}
+.lokaal[data-stijl="zorg"] .tafel{min-height:104px}
+body.presentatie .lokaal[data-stijl="zorg"]{aspect-ratio:auto}
+body.presentatie .lokaal[data-stijl="zorg"] .tafel{min-height:0}
+
+/* keuzelijst per leerling */
+.zorgkeuze{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:2px 0 12px}
+.zorgoptie{display:flex;align-items:center;gap:9px;padding:9px 11px;border:2px solid var(--lijn);
+  border-radius:11px;background:var(--kaart);cursor:pointer;text-align:left;font-size:13.5px;font-weight:600;color:var(--tekst)}
+.zorgoptie:hover{border-color:var(--lijn-sterk)}
+.zorgoptie.aan{border-color:var(--blauw);background:var(--blauw-zacht)}
+.zorgoptie .vlak{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex:none}
+.zorgoptie .vlak svg{width:16px;height:16px}
+.zorgoptie small{display:block;font-size:11.5px;font-weight:500;color:var(--grijs);margin-top:1px;line-height:1.3}
+.zorgvenster .venster{width:min(620px,100%)}
+.zorgnotitieveld{width:100%;min-height:76px;padding:10px 12px;border:1px solid var(--lijn-sterk);
+  border-radius:10px;font-size:13.5px;font-family:inherit;color:var(--tekst);resize:vertical;line-height:1.45}
+.zorgnotitieveld:focus{outline:2px solid var(--blauw);outline-offset:1px;border-color:var(--blauw)}
+.zorgwaarschuwing{margin-top:12px;padding:10px 13px;border-radius:10px;background:#fffbeb;
+  border-left:3px solid var(--oranje,#f59e0b);font-size:12.5px;color:#92400e;line-height:1.5}
+.stijlkiezer{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:16px;background:#f1f5f9;border:1px solid var(--lijn);border-radius:12px;padding:4px}
 .stijlkiezer button{border:1px solid transparent;background:transparent;border-radius:9px;padding:7px 4px;font-size:13px;font-weight:700;color:var(--grijs)}
 .stijlkiezer button:hover{color:var(--inkt)}
 .stijlkiezer button.actief{background:var(--kaart);border-color:var(--lijn);color:var(--blauw);box-shadow:0 1px 2px rgba(15,23,42,.08)}
@@ -377,6 +415,8 @@ body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
         <div class="meer-scheiding"></div>
         <button class="meer-item" id="btn-fotos" role="menuitem">Foto's uit bestanden toevoegen</button>
         <button class="meer-item" id="btn-fotos-weg" role="menuitem">Alle foto's wissen</button>
+        <div class="meer-scheiding"></div>
+        <button class="meer-item" id="btn-zorg-bord" role="menuitem">Aandachtspunten op het bord tonen</button>
       </div>
     </div>
     <input type="file" id="bestand" accept="application/json" hidden>
@@ -387,6 +427,7 @@ body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
 
   <div class="acties" id="acties" role="region" aria-label="Acties voor geselecteerde leerling">
     <strong id="acties-naam"></strong>
+    <button class="knop" data-actie="zorg" data-icon="notitie">Aandachtspunten</button>
     <button class="knop" data-actie="foto" data-icon="imageplus">Foto kiezen</button>
     <button class="knop" data-actie="afwezig" data-icon="user">Afwezig melden</button>
     <button class="knop" data-actie="hernoem" data-icon="pen">Naam wijzigen</button>
@@ -398,6 +439,34 @@ body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
     <div class="bord"><span data-icon="monitor" data-maat="18"></span> Bord &middot; voorkant lokaal</div>
     <div class="rijen" id="rijen"></div>
   </section>
+
+  <div class="overlay zorgvenster" id="zorg-overlay" hidden>
+    <div class="venster" role="dialog" aria-modal="true" aria-labelledby="zorg-titel">
+      <div class="venster-kop">
+        <h3 id="zorg-titel">Aandachtspunten</h3>
+        <p id="zorg-wie"></p>
+      </div>
+      <div class="venster-lijf">
+        <div class="zorgkeuze" id="zorg-keuze"></div>
+        <label class="veldlabel" for="zorg-notitie">Notitie onder het kaartje</label>
+        <textarea class="zorgnotitieveld" id="zorg-notitie" maxlength="180"
+          placeholder="Bijvoorbeeld: zit graag vooraan, kort instructie herhalen."></textarea>
+        <p class="veldhulp" id="zorg-tel"></p>
+        <div class="zorgwaarschuwing">
+          Dit zijn gevoelige gegevens. Ze blijven in jouw bestand op je eigen laptop. Zet er geen
+          diagnoses of medische details in, alleen wat je in de les nodig hebt. Op het digibord
+          worden de pictogrammen automatisch verborgen.
+        </div>
+      </div>
+      <div class="venster-voet">
+        <button class="knop stil" id="zorg-leeg">Alles wissen</button>
+        <span class="rechts">
+          <button class="knop stil" id="zorg-annuleer">Annuleren</button>
+          <button class="knop primair" id="zorg-ok">Opslaan</button>
+        </span>
+      </div>
+    </div>
+  </div>
 
   <div class="overlay" id="mag-overlay" hidden>
     <div class="venster" role="dialog" aria-modal="true" aria-labelledby="mag-titel">
@@ -517,6 +586,7 @@ body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
         <button type="button" data-stijl="kaart" class="actief">Kaart</button>
         <button type="button" data-stijl="portret">Portret</button>
         <button type="button" data-stijl="naamkaart">Naamkaart</button>
+        <button type="button" data-stijl="zorg">Aandachtspunten</button>
       </div>
       <div class="schuifrij">
         <div class="schuifkop"><label for="fotoschaal">Grootte foto / naam</label><span id="grootte-waarde">76px</span></div>
@@ -535,6 +605,12 @@ const ICONEN = {
   cap:'<path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/>',
   chevron:'<path d="m6 9 6 6 6-6"/>',
   dots:'<circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/>',
+  boek:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/><path d="M9 7h7M9 11h5"/>',
+  pauze:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M10 9v6M14 9v6"/>',
+  klok:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+  zon:'<circle cx="12" cy="12" r="3.2"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/>',
+  schild:'<path d="M12 3l7 3v5.5c0 4.3-2.9 7.7-7 9.5-4.1-1.8-7-5.2-7-9.5V6l7-3Z"/><circle cx="12" cy="11" r="1.8"/><path d="M12 12.8V15"/>',
+  notitie:'<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H16l4 4v10.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5Z"/><path d="M15 4v5h5"/><path d="M8 13h8M8 16.5h5"/>',
   vink:'<path d="m5 12 5 5L20 7"/>',
   plus:'<path d="M12 5v14M5 12h14"/>',
   trash:'<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>',
@@ -695,6 +771,7 @@ function teken(){
   document.getElementById("btn-beurt-wis").hidden = !kl.beurt;
   document.getElementById("btn-ronde-nieuw").hidden = !kl.gehad.length;
   lokaalEl.dataset.weergave = kl.docent ? "docent" : "leerling";
+  lokaalEl.dataset.zorgmerken = (document.body.classList.contains("presentatie") && !toonZorgOpBord) ? "uit" : "aan";
   const spiegelKnop = document.getElementById("btn-spiegel");
   spiegelKnop.lastChild.textContent = kl.docent ? " Standaardweergave" : " Docentweergave";
   document.getElementById("opstelling").textContent =
@@ -737,6 +814,9 @@ function maakStoel(i, toonFoto){
       nm.appendChild(achter);
     }
     el.appendChild(nm);
+    const merken = zorgMerkenVak(l);
+    if (merken) el.appendChild(merken);
+    el.appendChild(zorgNotitieVak(l));
     if (l.afwezig){
       const merk = document.createElement("span");
       merk.className = "merk"; merk.textContent = "afw.";
@@ -1041,6 +1121,9 @@ document.getElementById("acties").addEventListener("click", e => {
   } else if (actie === "hernoem"){
     const nieuw = prompt("Naam van deze leerling:", l.naam);
     if (nieuw && nieuw.trim()) l.naam = nieuw.trim();
+  } else if (actie === "zorg"){
+    toonZorgVenster(l);
+    return;
   } else if (actie === "foto"){
     fotoDoelId = id;
     document.getElementById("enkelefoto").click();
@@ -1271,11 +1354,15 @@ document.getElementById("btn-terug").addEventListener("click", () => {
 document.getElementById("btn-terug").disabled = true;
 document.getElementById("btn-print").addEventListener("click", () => window.print());
 
-function bouwData(metFotos){
+function bouwData(metFotos, metZorg){
   const uit = { versie:5, datum:new Date().toISOString().slice(0,10), stijl:lokaalEl.dataset.stijl, klassen:{} };
   Object.entries(klassen).forEach(([naam, kl]) => {
     const leerlingen = {};
-    Object.entries(kl.leerlingen).forEach(([id, l]) => leerlingen[id] = metFotos ? l : Object.assign({}, l, { foto:null }));
+    Object.entries(kl.leerlingen).forEach(([id, l]) => {
+      let uitL = metFotos ? Object.assign({}, l) : Object.assign({}, l, { foto:null });
+      if (!metZorg){ uitL.zorg = []; uitL.notitie = ""; }
+      leerlingen[id] = uitL;
+    });
     if (naam === huidig) legActieveVersieVast(kl); else zorgVoorVersies(kl);
     uit.klassen[naam] = { rijen:kl.rijen, diep:kl.diep, leerlingen, plekken:kl.plekken, wachtrij:kl.wachtrij,
                           versies:kl.versies, actief:kl.actief };
@@ -1320,7 +1407,10 @@ document.getElementById("btn-opslaan").addEventListener("click", () => {
   const heeftFotos = Object.values(klassen).some(kl => Object.values(kl.leerlingen).some(l => l.foto));
   let metFotos = false;
   if (heeftFotos) metFotos = confirm("Foto's meenemen in het bestand?\n\nOK = met foto's, het bestand bevat dan herkenbare beelden van leerlingen.\nAnnuleren = alleen namen en plekken.");
-  const uit = bouwData(metFotos);
+  const heeftZorg = Object.values(klassen).some(kl => Object.values(kl.leerlingen).some(l => (l.zorg && l.zorg.length) || l.notitie));
+  let metZorg = false;
+  if (heeftZorg) metZorg = confirm("Aandachtspunten en notities meenemen?\n\nDit zijn gevoelige gegevens over leerlingen.\n\nOK = meenemen, alleen doen als het bestand op een plek van school blijft.\nAnnuleren = weglaten (aanbevolen als je het bestand deelt).");
+  const uit = bouwData(metFotos, metZorg);
   gewijzigd = false;
   const blob = new Blob([JSON.stringify(uit)], { type:"application/json" });
   const a = document.createElement("a");
@@ -1973,6 +2063,126 @@ function zoekLeerlingOpNaam(kl, naam){
   });
   return treffer;
 }
+
+
+/* ---------- Aandachtspunten per leerling ----------
+   Gevoelige gegevens: ze staan in het bestand van de docent zelf en worden
+   op het digibord standaard verborgen, zodat de klas ze niet meeleest. */
+
+const ZORGSOORTEN = [
+  { id:"dyslexie",  naam:"Dyslexie",      icoon:"boek",   uitleg:"Ondersteuning bij lezen en spellen" },
+  { id:"timeout",   naam:"Time-outkaart", icoon:"pauze",  uitleg:"Mag de klas even verlaten" },
+  { id:"extratijd", naam:"Extra tijd",    icoon:"klok",   uitleg:"Aanvullende tijd bij toetsen" },
+  { id:"adhd",      naam:"ADHD / ADD",    icoon:"zon",    uitleg:"Hulp bij focus en taakplanning" },
+  { id:"autisme",   naam:"Autisme",       icoon:"schild", uitleg:"Structuur en voorspelbaarheid" }
+];
+const zorgSoort = (id) => ZORGSOORTEN.find(z => z.id === id);
+
+function zorgVan(l){
+  if (!Array.isArray(l.zorg)) l.zorg = [];
+  return l.zorg;
+}
+
+/* pictogrammen in de hoek van een kaartje */
+function zorgMerkenVak(l){
+  const lijst = zorgVan(l);
+  if (!lijst.length) return null;
+  const vak = document.createElement("div");
+  vak.className = "zorgmerken";
+  lijst.forEach(id => {
+    const z = zorgSoort(id);
+    if (!z) return;
+    const m = document.createElement("span");
+    m.className = "zorgmerk";
+    m.dataset.z = id;
+    m.title = z.naam;
+    m.innerHTML = svg(z.icoon, 12);
+    vak.appendChild(m);
+  });
+  return vak.children.length ? vak : null;
+}
+
+/* notitieregel onder het kaartje */
+function zorgNotitieVak(l){
+  const el = document.createElement("div");
+  el.className = "zorgnotitie" + (l.notitie ? "" : " leeg");
+  el.textContent = l.notitie || "geen notitie";
+  return el;
+}
+
+/* ---- venster ---- */
+let toonZorgOpBord = false;   // standaard uit: de klas hoeft dit niet mee te lezen
+const zorgOverlay = document.getElementById("zorg-overlay");
+let zorgLeerling = null, zorgTijdelijk = [];
+
+function toonZorgVenster(l){
+  zorgLeerling = l;
+  zorgTijdelijk = zorgVan(l).slice();
+  document.getElementById("zorg-wie").textContent = l.naam;
+  const vak = document.getElementById("zorg-keuze");
+  vak.innerHTML = "";
+  ZORGSOORTEN.forEach(z => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "zorgoptie" + (zorgTijdelijk.includes(z.id) ? " aan" : "");
+    b.dataset.z = z.id;
+    b.innerHTML = '<span class="vlak zorgmerk" data-z="' + z.id + '">' + svg(z.icoon, 16) + "</span>" +
+                  "<span><span></span><small>" + z.uitleg + "</small></span>";
+    b.querySelector("span span").textContent = z.naam;
+    b.addEventListener("click", () => {
+      const n = zorgTijdelijk.indexOf(z.id);
+      if (n === -1) zorgTijdelijk.push(z.id); else zorgTijdelijk.splice(n, 1);
+      b.classList.toggle("aan", n === -1);
+    });
+    vak.appendChild(b);
+  });
+  const veld = document.getElementById("zorg-notitie");
+  veld.value = l.notitie || "";
+  zorgTelBij();
+  zorgOverlay.hidden = false;
+  veld.focus();
+}
+function sluitZorgVenster(){ zorgOverlay.hidden = true; zorgLeerling = null; }
+function zorgTelBij(){
+  const n = document.getElementById("zorg-notitie").value.length;
+  document.getElementById("zorg-tel").textContent = n + " van 180 tekens";
+}
+document.getElementById("zorg-notitie").addEventListener("input", zorgTelBij);
+const zorgBordKnop = document.getElementById("btn-zorg-bord");
+function tekenZorgBordKnop(){
+  zorgBordKnop.textContent = toonZorgOpBord
+    ? "Aandachtspunten op het bord verbergen"
+    : "Aandachtspunten op het bord tonen";
+}
+zorgBordKnop.addEventListener("click", () => {
+  if (!toonZorgOpBord){
+    if (!confirm("Weet je het zeker?\n\nDe pictogrammen worden dan ook zichtbaar wanneer je de plattegrond op het digibord zet. De klas kan dan meelezen wie welk aandachtspunt heeft.")) return;
+  }
+  toonZorgOpBord = !toonZorgOpBord;
+  tekenZorgBordKnop();
+  teken();
+  zetStatus(toonZorgOpBord ? "Aandachtspunten ook op het bord" : "Aandachtspunten verborgen op het bord", true);
+});
+tekenZorgBordKnop();
+document.getElementById("zorg-annuleer").addEventListener("click", sluitZorgVenster);
+zorgOverlay.addEventListener("click", (e) => { if (e.target === zorgOverlay) sluitZorgVenster(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !zorgOverlay.hidden) sluitZorgVenster(); });
+document.getElementById("zorg-leeg").addEventListener("click", () => {
+  zorgTijdelijk = [];
+  document.getElementById("zorg-notitie").value = "";
+  document.querySelectorAll(".zorgoptie").forEach(b => b.classList.remove("aan"));
+  zorgTelBij();
+});
+document.getElementById("zorg-ok").addEventListener("click", () => {
+  if (!zorgLeerling) return;
+  bewaarStap();
+  zorgLeerling.zorg = zorgTijdelijk.slice();
+  zorgLeerling.notitie = document.getElementById("zorg-notitie").value.trim();
+  const naam = zorgLeerling.naam;
+  sluitZorgVenster();
+  teken(); schrijf();
+  zetStatus("Aandachtspunten van " + naam + " bijgewerkt", true);
+});
 
 /* ---------- Klas uit Magister: één venster met stappen ---------- */
 
