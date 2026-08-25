@@ -204,7 +204,11 @@ svg{flex:none}
 .lokaal[data-stijl="portret"] .stoel{flex-direction:row;justify-content:flex-start;gap:11px;padding:5px 10px 5px 5px;text-align:left;border-radius:13px}
 .lokaal[data-stijl="portret"] .foto{position:static;width:auto;height:100%;aspect-ratio:4/5;border-radius:9px;font-size:min(30cqh,34px)}
 .lokaal[data-stijl="portret"] .foto img{border-radius:9px;object-position:center 18%}
-.lokaal[data-stijl="portret"] .naam{flex:1;text-align:left;font-size:min(var(--naam),22cqh)}
+.lokaal[data-stijl="portret"] .naam{flex:1;text-align:left;font-size:min(var(--naam),22cqh);
+  -webkit-hyphens:none;hyphens:none;word-break:normal;line-height:1.18}
+.lokaal[data-stijl="portret"] .voornaam{display:block;font-weight:800}
+.lokaal[data-stijl="portret"] .achternaam{display:block;font-weight:500;color:var(--grijs);
+  font-size:min(calc(var(--naam) * .92),20cqh);margin-top:1px}
 .lokaal[data-stijl="portret"] .stoel.leeg{justify-content:center}
 
 /* 3. naamkaart: geen foto, voornaam boven en achternaam eronder */
@@ -425,6 +429,9 @@ body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
   .lokaal[data-stijl="portret"] .stoel{padding:1mm 2mm 1mm 1mm;gap:2mm}
   .lokaal[data-stijl="portret"] .foto{width:auto!important;height:100%!important;aspect-ratio:4/5;font-size:4mm!important;border-radius:1.6mm}
   .lokaal[data-stijl="portret"] .foto img{border-radius:1.6mm}
+  .lokaal[data-stijl="portret"] .voornaam{display:block;font-weight:800}
+  .lokaal[data-stijl="portret"] .achternaam{display:block;font-weight:500;color:#64748b;font-size:2.7mm!important}
+  .lokaal[data-stijl="portret"] .naam{-webkit-hyphens:none;hyphens:none;word-break:normal}
   .lokaal[data-stijl="naamkaart"] .voornaam{font-size:3.4mm!important}
   .lokaal[data-stijl="naamkaart"] .achternaam{font-size:2.9mm!important}
 }
