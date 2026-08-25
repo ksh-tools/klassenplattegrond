@@ -214,6 +214,55 @@ svg{flex:none}
 .lokaal[data-stijl="naamkaart"] .voornaam{display:block;font-size:min(calc(var(--naam) * 1.2),34cqh);font-weight:700}
 .lokaal[data-stijl="naamkaart"] .achternaam{display:block;font-size:min(var(--naam),26cqh);font-weight:600;color:var(--grijs);margin-top:1px}
 
+/* ---------- slim indelen, groepjes, namen leren ---------- */
+.regels{display:flex;flex-direction:column;gap:9px}
+.regel{display:flex;align-items:flex-start;gap:11px;padding:11px 13px;border:2px solid var(--lijn);border-radius:12px;background:var(--kaart);cursor:pointer;text-align:left}
+.regel:hover{border-color:var(--lijn-sterk)}
+.regel.aan{border-color:var(--blauw);background:var(--blauw-zacht)}
+.regel .vlak{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex:none}
+.regel .vlak svg{width:16px;height:16px}
+.regel b{display:block;font-size:13.5px;color:var(--inkt)}
+.regel small{display:block;font-size:12px;color:var(--grijs);margin-top:2px;line-height:1.4}
+.regel .telt{margin-left:auto;font-size:11.5px;font-weight:700;color:var(--grijs);white-space:nowrap;padding-top:2px}
+.paarrij{display:flex;gap:8px;align-items:center;margin-bottom:13px;flex-wrap:wrap}
+.paarrij .tekstveld{flex:1;min-width:150px}
+.enniet{font-size:13px;color:var(--grijs);font-weight:700}
+.paarlijst{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.paarlijst li{display:flex;align-items:center;gap:9px;padding:8px 11px;border:1px solid var(--lijn);border-radius:9px;background:var(--papier);font-size:13px}
+.paarlijst li .weg{margin-left:auto;border:0;background:none;color:#b91c1c;font-weight:800;cursor:pointer;font-size:14px;padding:0 4px}
+.paarlijst .leeg-tekst{color:var(--zacht);font-style:italic;font-size:13px}
+.groepinstel{display:flex;gap:11px;align-items:flex-end;margin-bottom:14px;flex-wrap:wrap}
+.groepinstel > div{display:flex;flex-direction:column}
+.groepinstel .veldlabel{margin-bottom:5px;white-space:nowrap}
+.wijzekiezer{display:flex;gap:4px;background:#f1f5f9;border:1px solid var(--lijn);border-radius:11px;padding:4px}
+.wijzekiezer button{border:1px solid transparent;background:transparent;border-radius:8px;padding:7px 13px;font-size:13px;font-weight:700;color:var(--grijs);cursor:pointer}
+.wijzekiezer button:hover{color:var(--inkt)}
+.wijzekiezer button.actief{background:var(--kaart);border-color:var(--lijn);color:var(--blauw);box-shadow:0 1px 2px rgba(15,23,42,.08)}
+.tekstveld.getal{width:88px}
+.groepen{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:11px}
+.groep{border:1px solid var(--lijn);border-radius:12px;padding:11px 13px;background:var(--papier);break-inside:avoid}
+.groep h4{margin:0 0 7px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--blauw)}
+.groep ul{list-style:none;margin:0;padding:0}
+.groep li{display:flex;align-items:center;gap:7px;font-size:13px;padding:2px 0}
+.groep li .bol{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;flex:none;overflow:hidden}
+.groep li .bol img{width:100%;height:100%;object-fit:cover}
+.leervenster .venster-lijf{min-height:330px;display:flex;align-items:center;justify-content:center}
+.leervak{text-align:center;width:100%}
+.leerfoto{width:168px;height:168px;border-radius:16px;object-fit:cover;margin:0 auto 16px;display:block;box-shadow:var(--schaduw)}
+.leerknoppen{display:grid;grid-template-columns:1fr 1fr;gap:9px;max-width:440px;margin:0 auto}
+.leerknop{padding:11px 13px;border:2px solid var(--lijn);border-radius:11px;background:var(--kaart);font-size:14px;font-weight:600;color:var(--tekst);cursor:pointer}
+.leerknop:hover:not(:disabled){border-color:var(--blauw)}
+.leerknop.goed{border-color:var(--groen);background:#dcfce7;color:#14532d}
+.leerknop.mis{border-color:#dc2626;background:#fee2e2;color:#7f1d1d}
+.leerklaar{font-size:16px;font-weight:700;color:var(--inkt);line-height:1.5}
+.leerklaar span{display:block;font-size:13.5px;font-weight:500;color:var(--grijs);margin-top:7px}
+@media print{
+  body.groep-print > *{display:none !important}
+  body.groep-print #groep-overlay{display:block !important;position:static;background:none;padding:0}
+  body.groep-print #groep-overlay .venster{box-shadow:none;max-height:none;width:100%}
+  body.groep-print #groep-overlay .venster-voet,
+  body.groep-print #groep-overlay .groepinstel{display:none !important}
+}
 /* ---------- weergave met aandachtspunten ---------- */
 .zorgmerken{position:absolute;top:4px;right:4px;display:flex;gap:3px;z-index:2;pointer-events:none}
 .zorgmerk{width:19px;height:19px;border-radius:6px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(15,23,42,.14)}
@@ -417,6 +466,12 @@ body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
         <button class="meer-item" id="btn-fotos-weg" role="menuitem">Alle foto's wissen</button>
         <div class="meer-scheiding"></div>
         <button class="meer-item" id="btn-zorg-bord" role="menuitem">Aandachtspunten op het bord tonen</button>
+        <div class="meer-scheiding"></div>
+        <button class="meer-item" id="btn-groepjes" role="menuitem">Groepjes maken…</button>
+        <button class="meer-item" id="btn-namen" role="menuitem">Namen leren</button>
+        <button class="meer-item" id="btn-nietsamen" role="menuitem">Wie niet naast elkaar…</button>
+        <div class="meer-scheiding"></div>
+        <button class="meer-item" id="btn-handleiding" role="menuitem">Handleiding openen (PDF)</button>
       </div>
     </div>
     <input type="file" id="bestand" accept="application/json" hidden>
@@ -439,6 +494,93 @@ body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
     <div class="bord"><span data-icon="monitor" data-maat="18"></span> Bord &middot; voorkant lokaal</div>
     <div class="rijen" id="rijen"></div>
   </section>
+
+  <div class="overlay" id="indeel-overlay" hidden>
+    <div class="venster" role="dialog" aria-modal="true" aria-labelledby="indeel-titel">
+      <div class="venster-kop">
+        <h3 id="indeel-titel">Indelen</h3>
+        <p>Kies waar de app rekening mee houdt bij het verdelen van de plekken.</p>
+      </div>
+      <div class="venster-lijf">
+        <div class="regels" id="indeel-regels"></div>
+        <p class="veldhulp" id="indeel-hulp"></p>
+      </div>
+      <div class="venster-voet">
+        <button class="knop stil" id="indeel-nietsamen">Wie niet naast elkaar…</button>
+        <span class="rechts">
+          <button class="knop stil" id="indeel-annuleer">Annuleren</button>
+          <button class="knop primair" id="indeel-ok">Indelen</button>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="samen-overlay" hidden>
+    <div class="venster" role="dialog" aria-modal="true" aria-labelledby="samen-titel">
+      <div class="venster-kop">
+        <h3 id="samen-titel">Wie niet naast elkaar</h3>
+        <p>Deze tweetallen worden bij het indelen en bij groepjes uit elkaar gehouden.</p>
+      </div>
+      <div class="venster-lijf">
+        <div class="paarrij">
+          <select id="samen-a" class="tekstveld"></select>
+          <span class="enniet">en</span>
+          <select id="samen-b" class="tekstveld"></select>
+          <button class="knop primair" id="samen-toevoeg">Toevoegen</button>
+        </div>
+        <ul class="paarlijst" id="samen-lijst"></ul>
+      </div>
+      <div class="venster-voet">
+        <span class="rechts"><button class="knop primair" id="samen-sluit">Klaar</button></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="groep-overlay" hidden>
+    <div class="venster" role="dialog" aria-modal="true" aria-labelledby="groep-titel">
+      <div class="venster-kop">
+        <h3 id="groep-titel">Groepjes maken</h3>
+        <p id="groep-uitleg">Kies hoe groot de groepjes moeten zijn.</p>
+      </div>
+      <div class="venster-lijf">
+        <div class="groepinstel">
+          <div class="wijzekiezer" id="groep-wijze" role="group" aria-label="Verdelen op">
+            <button type="button" data-wijze="maat" class="actief">Per groepje</button>
+            <button type="button" data-wijze="aantal">Aantal groepjes</button>
+          </div>
+          <div>
+            <label class="veldlabel" for="groep-maat" id="groep-maatlabel">Leerlingen per groepje</label>
+            <input type="number" id="groep-maat" class="tekstveld getal" min="2" max="12" value="3">
+          </div>
+          <button class="knop primair" id="groep-maak">Nieuwe verdeling</button>
+        </div>
+        <div class="groepen" id="groepen"></div>
+      </div>
+      <div class="venster-voet">
+        <button class="knop stil" id="groep-print">Afdrukken</button>
+        <span class="rechts"><button class="knop primair" id="groep-sluit">Sluiten</button></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="leer-overlay" hidden>
+    <div class="venster leervenster" role="dialog" aria-modal="true" aria-labelledby="leer-titel">
+      <div class="venster-kop">
+        <h3 id="leer-titel">Namen leren</h3>
+        <p id="leer-uitleg"></p>
+      </div>
+      <div class="venster-lijf">
+        <div class="leervak" id="leervak"></div>
+      </div>
+      <div class="venster-voet">
+        <span id="leer-score" class="teller"></span>
+        <span class="rechts">
+          <button class="knop stil" id="leer-opnieuw">Opnieuw beginnen</button>
+          <button class="knop primair" id="leer-sluit">Sluiten</button>
+        </span>
+      </div>
+    </div>
+  </div>
 
   <div class="overlay zorgvenster" id="zorg-overlay" hidden>
     <div class="venster" role="dialog" aria-modal="true" aria-labelledby="zorg-titel">
@@ -1308,21 +1450,6 @@ document.getElementById("btn-presentatie").addEventListener("click", () => {
   if (!aan && document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(()=>{});
   teken();
 });
-document.getElementById("btn-shuffle").addEventListener("click", () => {
-  if (!confirm("Alle leerlingen van " + huidig + " willekeurig over de plekken verdelen?")) return;
-  bewaarStap();
-  const kl = k();
-  const allen = kl.plekken.filter(Boolean).concat(kl.wachtrij);
-  for (let i = allen.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [allen[i], allen[j]] = [allen[j], allen[i]];
-  }
-  kl.plekken = new Array(plaatsen()).fill(null);
-  kl.wachtrij = [];
-  allen.forEach((id, n) => { if (n < kl.plekken.length) kl.plekken[n] = id; else kl.wachtrij.push(id); });
-  selectie = null;
-  teken();
-});
 document.getElementById("btn-spiegel").addEventListener("click", () => {
   k().docent = !k().docent;
   teken();
@@ -1365,7 +1492,8 @@ function bouwData(metFotos, metZorg){
     });
     if (naam === huidig) legActieveVersieVast(kl); else zorgVoorVersies(kl);
     uit.klassen[naam] = { rijen:kl.rijen, diep:kl.diep, leerlingen, plekken:kl.plekken, wachtrij:kl.wachtrij,
-                          versies:kl.versies, actief:kl.actief };
+                          versies:kl.versies, actief:kl.actief,
+                          nietSamen: metZorg ? (kl.nietSamen || []) : [] };
   });
   return uit;
 }
@@ -1377,7 +1505,7 @@ function laadData(data){
     Object.assign(klassen[naam], {
       rijen:kl.rijen || 3, diep:kl.diep || 5,
       leerlingen:kl.leerlingen, plekken:kl.plekken, wachtrij:kl.wachtrij || [],
-      beurt:null, gehad:[]
+      beurt:null, gehad:[], nietSamen: Array.isArray(kl.nietSamen) ? kl.nietSamen : []
     });
     if (Array.isArray(kl.versies) && kl.versies.length){
       klassen[naam].versies = kl.versies;
@@ -2450,6 +2578,414 @@ function magRondFotosAf(){
   teken(); schrijf();
   zetStatus(gekozen.length + " foto('s) bijgewerkt in " + doel, true);
 }
+
+
+/* ================= Slim indelen, groepjes maken, namen leren ================= */
+
+function nietSamenVan(kl){
+  if (!Array.isArray(kl.nietSamen)) kl.nietSamen = [];
+  /* opruimen: paren van leerlingen die niet meer bestaan */
+  kl.nietSamen = kl.nietSamen.filter(p => kl.leerlingen[p[0]] && kl.leerlingen[p[1]]);
+  return kl.nietSamen;
+}
+function heeftZorg(l, soort){ return Array.isArray(l.zorg) && l.zorg.includes(soort); }
+
+/* rij/tafel/kant uit een plekindex halen */
+function plekDelen(i){
+  const kl = k();
+  return { rij: Math.floor(i / (kl.diep * 2)), tafel: Math.floor((i % (kl.diep * 2)) / 2), kant: i % 2 };
+}
+const buurPlek = (i) => (i % 2 === 0) ? i + 1 : i - 1;
+
+/* ---------- 1. Slim indelen ---------- */
+
+const INDEELREGELS = [
+  { id:"vooraan",  icoon:"boek",  aan:true,
+    naam:"Dyslexie en extra tijd vooraan",
+    uitleg:"Dicht bij het bord, zodat lezen en meekijken makkelijker gaat.",
+    telt:(l) => heeftZorg(l,"dyslexie") || heeftZorg(l,"extratijd") },
+  { id:"bijdocent", icoon:"zon", aan:true,
+    naam:"ADHD / ADD dicht bij de docent",
+    uitleg:"Vooraan, waar je makkelijk even kunt bijsturen.",
+    telt:(l) => heeftZorg(l,"adhd") },
+  { id:"uitgang",  icoon:"pauze", aan:true,
+    naam:"Time-outkaart aan de rand",
+    uitleg:"Achteraan of aan de buitenkant, om ongemerkt weg te kunnen.",
+    telt:(l) => heeftZorg(l,"timeout") },
+  { id:"vast",     icoon:"schild", aan:true,
+    naam:"Autisme houdt zijn vaste plek",
+    uitleg:"Wordt niet verplaatst, zodat de plek voorspelbaar blijft.",
+    telt:(l) => heeftZorg(l,"autisme") },
+  { id:"uitelkaar", icoon:"notitie", aan:true,
+    naam:"Bepaalde tweetallen uit elkaar",
+    uitleg:"Wie je hebt opgegeven komt niet naast elkaar te zitten.",
+    telt:null }
+];
+const indeelOverlay = document.getElementById("indeel-overlay");
+let indeelAan = {};
+INDEELREGELS.forEach(r => indeelAan[r.id] = r.aan);
+
+function toonIndeelVenster(){
+  const kl = k();
+  const allen = kl.plekken.filter(Boolean).concat(kl.wachtrij).map(id => kl.leerlingen[id]).filter(Boolean);
+  const vak = document.getElementById("indeel-regels");
+  vak.innerHTML = "";
+  INDEELREGELS.forEach(r => {
+    const n = r.telt ? allen.filter(r.telt).length : nietSamenVan(kl).length;
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "regel" + (indeelAan[r.id] ? " aan" : "");
+    b.dataset.r = r.id;
+    b.innerHTML = '<span class="vlak zorgmerk" data-z="' +
+      ({vooraan:"dyslexie",bijdocent:"adhd",uitgang:"timeout",vast:"autisme",uitelkaar:"extratijd"}[r.id]) +
+      '">' + svg(r.icoon, 16) + '</span><span><b></b><small></small></span>' +
+      '<span class="telt">' + (r.telt ? n + " leerling" + (n === 1 ? "" : "en") : n + " tweetal" + (n === 1 ? "" : "len")) + "</span>";
+    b.querySelector("b").textContent = r.naam;
+    b.querySelector("small").textContent = r.uitleg;
+    b.addEventListener("click", () => {
+      indeelAan[r.id] = !indeelAan[r.id];
+      b.classList.toggle("aan", indeelAan[r.id]);
+    });
+    vak.appendChild(b);
+  });
+  document.getElementById("indeel-hulp").textContent =
+    allen.length + " leerlingen, " + plaatsen() + " plekken. Zet alles uit voor een gewone willekeurige verdeling.";
+  indeelOverlay.hidden = false;
+}
+function sluitIndeel(){ indeelOverlay.hidden = true; }
+document.getElementById("btn-shuffle").addEventListener("click", toonIndeelVenster);
+document.getElementById("indeel-annuleer").addEventListener("click", sluitIndeel);
+indeelOverlay.addEventListener("click", (e) => { if (e.target === indeelOverlay) sluitIndeel(); });
+document.getElementById("indeel-nietsamen").addEventListener("click", () => { sluitIndeel(); toonSamenVenster(); });
+
+function schud(a){
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+document.getElementById("indeel-ok").addEventListener("click", () => {
+  bewaarStap();
+  const kl = k();
+  const totaal = plaatsen();
+  const allen = kl.plekken.filter(Boolean).concat(kl.wachtrij);
+  const nieuw = new Array(totaal).fill(null);
+  const bezet = new Set();
+
+  /* vaste plekken eerst vastzetten */
+  if (indeelAan.vast){
+    kl.plekken.forEach((id, i) => {
+      if (id && heeftZorg(kl.leerlingen[id], "autisme") && i < totaal){
+        nieuw[i] = id; bezet.add(id);
+      }
+    });
+  }
+
+  /* plekken sorteren: laag = vooraan */
+  const vrij = [];
+  for (let i = 0; i < totaal; i++) if (!nieuw[i]) vrij.push(i);
+  const vooraanRij = vrij.slice().sort((a, b) => plekDelen(a).tafel - plekDelen(b).tafel || a - b);
+  const randRij = vrij.slice().sort((a, b) => {
+    const A = plekDelen(a), B = plekDelen(b);
+    const randA = (A.tafel === kl.diep - 1 ? 0 : 1) + ((A.rij === 0 && A.kant === 0) || (A.rij === kl.rijen - 1 && A.kant === 1) ? 0 : 1);
+    const randB = (B.tafel === kl.diep - 1 ? 0 : 1) + ((B.rij === 0 && B.kant === 0) || (B.rij === kl.rijen - 1 && B.kant === 1) ? 0 : 1);
+    return randA - randB || a - b;
+  });
+
+  const rest = schud(allen.filter(id => !bezet.has(id)));
+  const pak = (lijst, test) => {
+    const uit = [];
+    for (let n = rest.length - 1; n >= 0; n--){
+      if (test(kl.leerlingen[rest[n]])){ uit.push(rest[n]); rest.splice(n, 1); }
+    }
+    return schud(uit);
+  };
+  const zetNeer = (ids, volgorde) => ids.forEach(id => {
+    const plek = volgorde.find(i => nieuw[i] === null);
+    if (plek !== undefined){ nieuw[plek] = id; bezet.add(id); }
+  });
+
+  if (indeelAan.vooraan)   zetNeer(pak(vooraanRij, l => heeftZorg(l,"dyslexie") || heeftZorg(l,"extratijd")), vooraanRij);
+  if (indeelAan.bijdocent) zetNeer(pak(vooraanRij, l => heeftZorg(l,"adhd")), vooraanRij);
+  if (indeelAan.uitgang)   zetNeer(pak(randRij, l => heeftZorg(l,"timeout")), randRij);
+
+  /* de rest willekeurig over wat overblijft */
+  const over = [];
+  for (let i = 0; i < totaal; i++) if (!nieuw[i]) over.push(i);
+  schud(over);
+  const wacht = [];
+  rest.forEach(id => {
+    const plek = over.find(i => nieuw[i] === null);
+    if (plek !== undefined) nieuw[plek] = id; else wacht.push(id);
+  });
+
+  /* tweetallen uit elkaar halen door te ruilen */
+  let geruild = 0, restConflict = 0;
+  if (indeelAan.uitelkaar){
+    const paren = nietSamenVan(kl);
+    const botst = (arr, i) => {
+      const b = buurPlek(i);
+      if (b < 0 || b >= totaal || !arr[i] || !arr[b]) return false;
+      return paren.some(p => (p[0] === arr[i] && p[1] === arr[b]) || (p[1] === arr[i] && p[0] === arr[b]));
+    };
+    for (let ronde = 0; ronde < 3; ronde++){
+      for (let i = 0; i < totaal; i++){
+        if (!botst(nieuw, i)) continue;
+        const kandidaten = schud(Array.from({length: totaal}, (_, n) => n)
+          .filter(n => n !== i && n !== buurPlek(i)));
+        const gevonden = kandidaten.find(n => {
+          const kopie = nieuw.slice();
+          [kopie[i], kopie[n]] = [kopie[n], kopie[i]];
+          return !botst(kopie, i) && !botst(kopie, n) && !botst(kopie, buurPlek(i)) && !botst(kopie, buurPlek(n));
+        });
+        if (gevonden !== undefined){ [nieuw[i], nieuw[gevonden]] = [nieuw[gevonden], nieuw[i]]; geruild++; }
+      }
+    }
+    for (let i = 0; i < totaal; i += 2) if (botst(nieuw, i)) restConflict++;
+  }
+
+  kl.plekken = nieuw;
+  kl.wachtrij = wacht;
+  selectie = null;
+  sluitIndeel();
+  teken(); schrijf();
+  zetStatus(restConflict
+    ? "Ingedeeld, maar " + restConflict + " tweetal(len) konden niet uit elkaar"
+    : "Klas opnieuw ingedeeld", true);
+});
+
+/* ---------- Wie niet naast elkaar ---------- */
+const samenOverlay = document.getElementById("samen-overlay");
+function vulLeerlingKeuze(el){
+  const kl = k();
+  el.innerHTML = "";
+  Object.values(kl.leerlingen).sort((a, b) => a.naam.localeCompare(b.naam, "nl")).forEach(l => {
+    const o = document.createElement("option");
+    o.value = l.id; o.textContent = l.naam;
+    el.appendChild(o);
+  });
+}
+function tekenSamenLijst(){
+  const kl = k(), lijst = document.getElementById("samen-lijst");
+  const paren = nietSamenVan(kl);
+  lijst.innerHTML = "";
+  if (!paren.length){
+    const li = document.createElement("li");
+    li.className = "leeg-tekst";
+    li.textContent = "Nog geen tweetallen opgegeven.";
+    lijst.appendChild(li);
+    return;
+  }
+  paren.forEach((p, n) => {
+    const li = document.createElement("li");
+    const tekst = document.createElement("span");
+    tekst.textContent = kl.leerlingen[p[0]].naam + "  \u2194  " + kl.leerlingen[p[1]].naam;
+    const weg = document.createElement("button");
+    weg.className = "weg"; weg.textContent = "\u2715"; weg.title = "Verwijderen";
+    weg.addEventListener("click", () => { paren.splice(n, 1); tekenSamenLijst(); schrijf(); });
+    li.append(tekst, weg);
+    lijst.appendChild(li);
+  });
+}
+function toonSamenVenster(){
+  vulLeerlingKeuze(document.getElementById("samen-a"));
+  vulLeerlingKeuze(document.getElementById("samen-b"));
+  tekenSamenLijst();
+  samenOverlay.hidden = false;
+}
+document.getElementById("btn-nietsamen").addEventListener("click", toonSamenVenster);
+document.getElementById("samen-sluit").addEventListener("click", () => { samenOverlay.hidden = true; });
+samenOverlay.addEventListener("click", (e) => { if (e.target === samenOverlay) samenOverlay.hidden = true; });
+document.getElementById("samen-toevoeg").addEventListener("click", () => {
+  const a = document.getElementById("samen-a").value, b = document.getElementById("samen-b").value;
+  if (!a || !b || a === b) return;
+  const paren = nietSamenVan(k());
+  if (paren.some(p => (p[0] === a && p[1] === b) || (p[0] === b && p[1] === a))) return;
+  paren.push([a, b]);
+  tekenSamenLijst(); schrijf();
+});
+
+/* ---------- 2. Groepjes maken ---------- */
+const groepOverlay = document.getElementById("groep-overlay");
+var groepWijze;
+function maakGroepjes(){
+  const kl = k();
+  const ids = schud(aanwezigen().map(p => p.id));
+  const getal = Math.max(1, parseInt(document.getElementById("groep-maat").value, 10) || 3);
+  const aantal = groepWijze === "aantal"
+    ? Math.max(1, Math.min(getal, ids.length))
+    : Math.max(1, Math.round(ids.length / Math.max(2, getal)));
+  const groepen = Array.from({length: aantal}, () => []);
+  ids.forEach((id, n) => groepen[n % aantal].push(id));
+
+  /* tweetallen uit elkaar: ruilen tussen groepen */
+  const paren = nietSamenVan(kl);
+  const botst = (g) => paren.some(p => g.includes(p[0]) && g.includes(p[1]));
+  for (let ronde = 0; ronde < 4; ronde++){
+    groepen.forEach((g, gi) => {
+      if (!botst(g)) return;
+      const paar = paren.find(p => g.includes(p[0]) && g.includes(p[1]));
+      const eruit = paar[1];
+      for (const [hi, h] of groepen.entries()){
+        if (hi === gi) continue;
+        const kandidaat = h.find(id => {
+          const nieuwG = g.filter(x => x !== eruit).concat(id);
+          const nieuwH = h.filter(x => x !== id).concat(eruit);
+          return !botst(nieuwG) && !botst(nieuwH);
+        });
+        if (kandidaat){
+          g[g.indexOf(eruit)] = kandidaat;
+          h[h.indexOf(kandidaat)] = eruit;
+          break;
+        }
+      }
+    });
+  }
+  const rest = groepen.filter(botst).length;
+  const vak = document.getElementById("groepen");
+  vak.innerHTML = "";
+  groepen.forEach((g, n) => {
+    const d = document.createElement("div");
+    d.className = "groep";
+    const h = document.createElement("h4");
+    h.textContent = "Groep " + (n + 1) + " \u00b7 " + g.length;
+    const ul = document.createElement("ul");
+    g.forEach(id => {
+      const l = kl.leerlingen[id];
+      const li = document.createElement("li");
+      const bol = document.createElement("span");
+      bol.className = "bol";
+      if (l.foto){
+        const img = document.createElement("img"); img.src = l.foto; img.alt = "";
+        bol.appendChild(img);
+      } else {
+        const kleur = kleurVoor(l.naam);
+        bol.style.background = kleur[0]; bol.style.color = kleur[1];
+        bol.textContent = initialen(l.naam);
+      }
+      const nm = document.createElement("span");
+      nm.textContent = l.naam;
+      li.append(bol, nm);
+      ul.appendChild(li);
+    });
+    d.append(h, ul);
+    vak.appendChild(d);
+  });
+  document.getElementById("groep-uitleg").textContent =
+    ids.length + " aanwezige leerlingen in " + groepen.length + " groepjes"
+    + (rest ? " \u00b7 " + rest + " groepje(s) met een tweetal dat eigenlijk uit elkaar moet" : "");
+}
+document.getElementById("btn-groepjes").addEventListener("click", () => {
+  if (!aanwezigen().length){ alert("Er zijn geen aanwezige leerlingen in deze klas."); return; }
+  groepOverlay.hidden = false;
+  maakGroepjes();
+});
+groepWijze = "maat";
+document.querySelectorAll("#groep-wijze button").forEach(b => b.addEventListener("click", () => {
+  groepWijze = b.dataset.wijze;
+  document.querySelectorAll("#groep-wijze button").forEach(x => x.classList.toggle("actief", x === b));
+  const veld = document.getElementById("groep-maat");
+  const label = document.getElementById("groep-maatlabel");
+  if (groepWijze === "aantal"){
+    label.textContent = "Aantal groepjes";
+    veld.min = 1; veld.max = 20; veld.value = Math.max(2, Math.round(aanwezigen().length / 3));
+  } else {
+    label.textContent = "Leerlingen per groepje";
+    veld.min = 2; veld.max = 12; veld.value = 3;
+  }
+  maakGroepjes();
+}));
+document.getElementById("groep-maak").addEventListener("click", maakGroepjes);
+document.getElementById("groep-sluit").addEventListener("click", () => { groepOverlay.hidden = true; });
+groepOverlay.addEventListener("click", (e) => { if (e.target === groepOverlay) groepOverlay.hidden = true; });
+document.getElementById("groep-print").addEventListener("click", () => {
+  document.body.classList.add("groep-print");
+  window.print();
+  setTimeout(() => document.body.classList.remove("groep-print"), 800);
+});
+
+/* ---------- 3. Namen leren ---------- */
+const leerOverlay = document.getElementById("leer-overlay");
+let leerRij = [], leerNu = 0, leerGoed = 0, leerFout = 0;
+
+function startLeren(){
+  const kl = k();
+  leerRij = schud(Object.values(kl.leerlingen).filter(l => l.foto));
+  leerNu = 0; leerGoed = 0; leerFout = 0;
+  if (leerRij.length < 2){
+    alert("Namen leren werkt met pasfoto's. Lees eerst een klas met foto's in via Klas uit Magister.");
+    return false;
+  }
+  leerOverlay.hidden = false;
+  volgendeVraag();
+  return true;
+}
+function tekenLeerScore(){
+  document.getElementById("leer-score").textContent =
+    leerGoed + " goed \u00b7 " + leerFout + " mis \u00b7 vraag " + Math.min(leerNu + 1, leerRij.length) + " van " + leerRij.length;
+}
+function volgendeVraag(){
+  const vak = document.getElementById("leervak");
+  if (leerNu >= leerRij.length){
+    const pct = Math.round(leerGoed / leerRij.length * 100);
+    vak.innerHTML = '<div class="leerklaar"></div>';
+    vak.firstChild.textContent = "Klaar: " + leerGoed + " van " + leerRij.length + " goed (" + pct + "%)";
+    const s = document.createElement("span");
+    s.textContent = pct === 100 ? "Je kent ze allemaal." : "Klik op \u201eOpnieuw beginnen\u201d voor een nieuwe ronde.";
+    vak.firstChild.appendChild(s);
+    document.getElementById("leer-uitleg").textContent = "Ronde afgerond.";
+    tekenLeerScore();
+    return;
+  }
+  const juist = leerRij[leerNu];
+  const anderen = schud(leerRij.filter(l => l.id !== juist.id)).slice(0, 3);
+  const opties = schud(anderen.concat(juist));
+  document.getElementById("leer-uitleg").textContent = "Wie is dit?";
+  vak.innerHTML = "";
+  const img = document.createElement("img");
+  img.className = "leerfoto"; img.src = juist.foto; img.alt = "";
+  const knoppen = document.createElement("div");
+  knoppen.className = "leerknoppen";
+  opties.forEach(l => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "leerknop"; b.textContent = l.naam;
+    b.addEventListener("click", () => {
+      if (b.disabled) return;
+      knoppen.querySelectorAll("button").forEach(x => { x.disabled = true; });
+      if (l.id === juist.id){ b.classList.add("goed"); leerGoed++; }
+      else {
+        b.classList.add("mis"); leerFout++;
+        knoppen.querySelectorAll("button").forEach(x => { if (x.textContent === juist.naam) x.classList.add("goed"); });
+      }
+      tekenLeerScore();
+      setTimeout(() => { leerNu++; volgendeVraag(); }, l.id === juist.id ? 550 : 1300);
+    });
+    knoppen.appendChild(b);
+  });
+  vak.append(img, knoppen);
+  tekenLeerScore();
+}
+document.getElementById("btn-handleiding").addEventListener("click", () => {
+  /* De handleiding staat als los bestand naast de app, zodat de app zelf klein blijft. */
+  const adres = new URL("handleiding.pdf", location.href).href;
+  const venster = window.open(adres, "_blank");
+  if (!venster){
+    const a = document.createElement("a");
+    a.href = adres; a.download = "Klassenplattegrond - uitleg.pdf";
+    a.click();
+  }
+});
+document.getElementById("btn-namen").addEventListener("click", startLeren);
+document.getElementById("leer-opnieuw").addEventListener("click", startLeren);
+document.getElementById("leer-sluit").addEventListener("click", () => { leerOverlay.hidden = true; });
+leerOverlay.addEventListener("click", (e) => { if (e.target === leerOverlay) leerOverlay.hidden = true; });
+
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  [indeelOverlay, samenOverlay, groepOverlay, leerOverlay].forEach(o => { if (!o.hidden) o.hidden = true; });
+});
 
 Object.values(klassen).forEach(zorgVoorVersies);
 tekenVersieKnop();
