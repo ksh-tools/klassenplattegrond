@@ -638,6 +638,32 @@ body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
     </div>
   </div>
 
+  <div class="overlay" id="koppel-overlay" hidden>
+    <div class="venster" role="dialog" aria-modal="true" aria-labelledby="koppel-titel" style="width:min(620px,100%)">
+      <div class="venster-kop">
+        <h3 id="koppel-titel">Koppelen aan een bestand</h3>
+        <p>Vanaf dat moment wordt alles wat je verandert vanzelf opgeslagen.</p>
+      </div>
+      <div class="venster-lijf">
+        <div class="keuzes">
+          <button type="button" class="keuze" id="koppel-bestaand">
+            <span class="keuze-icoon" data-icon="upload" data-maat="20"></span>
+            <b>Ik heb al een bestand</b>
+            <span>Kies je bestaande plattegronden.json. Je klassen worden ingelezen.</span>
+          </button>
+          <button type="button" class="keuze" id="koppel-nieuw">
+            <span class="keuze-icoon" data-icon="save" data-maat="20"></span>
+            <b>Nieuw bestand maken</b>
+            <span>Kies waar het komt te staan, bijvoorbeeld in je OneDrive.</span>
+          </button>
+        </div>
+      </div>
+      <div class="venster-voet">
+        <span class="rechts"><button class="knop stil" id="koppel-annuleer">Annuleren</button></span>
+      </div>
+    </div>
+  </div>
+
   <div class="overlay zorgvenster" id="zorg-overlay" hidden>
     <div class="venster" role="dialog" aria-modal="true" aria-labelledby="zorg-titel">
       <div class="venster-kop">
@@ -1579,6 +1605,24 @@ function laadData(data){
     }
   });
   if (!klassen[huidig]){ huidig = Object.keys(klassen)[0]; keuze.value = huidig; markeer(); }
+  /* Sta je op een lege plaatshouderklas terwijl er net klassen met leerlingen
+     zijn ingelezen? Spring dan naar de eerste gevulde klas, anders lijkt het
+     alsof het inlezen niets heeft gedaan. */
+  const nuLeeg = !klassen[huidig] || !Object.keys(klassen[huidig].leerlingen).length;
+  if (nuLeeg){
+    const gevuld = Object.keys(data.klassen).find(n => klassen[n] && Object.keys(klassen[n].leerlingen).length)
+                || Object.keys(klassen).find(n => Object.keys(klassen[n].leerlingen).length);
+    if (gevuld){ huidig = gevuld; keuze.value = gevuld; markeer(); }
+  }
+  /* lege plaatshouder opruimen zodra er echte klassen zijn */
+  NOG_LEEG.forEach(naam => {
+    if (naam === huidig) return;
+    if (klassen[naam] && !Object.keys(klassen[naam].leerlingen).length && Object.keys(klassen).length > 1){
+      delete klassen[naam];
+      const o = Array.from(keuze.options).find(x => x.value === naam);
+      if (o) o.remove();
+    }
+  });
   if (data.stijl) zetStijl(data.stijl);
   volgnummer += 1000;
   selectie = null;
@@ -1746,16 +1790,38 @@ async function koppel(h, vraagInlezen){
   await schrijf();
 }
 
-document.getElementById("btn-koppel").addEventListener("click", async () => {
+const koppelOverlay = document.getElementById("koppel-overlay");
+const SOORT = [{ description:"Plattegronden", accept:{ "application/json":[".json"] } }];
+
+document.getElementById("btn-koppel").addEventListener("click", () => {
   if (!KAN_KOPPELEN){
     alert("Koppelen werkt in Chrome en Edge. In deze browser kan het niet.\n\nGebruik dan Meer \u203a Reservekopie maken en Reservekopie openen.");
     return;
   }
+  koppelOverlay.hidden = false;
+});
+document.getElementById("koppel-annuleer").addEventListener("click", () => { koppelOverlay.hidden = true; });
+koppelOverlay.addEventListener("click", (e) => { if (e.target === koppelOverlay) koppelOverlay.hidden = true; });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !koppelOverlay.hidden) koppelOverlay.hidden = true; });
+
+/* Bestaand bestand: een gewoon "openen"-venster, geen "opslaan als".
+   Met showSaveFilePicker lijkt het alsof je een nieuw bestand maakt en
+   waarschuwt Windows over overschrijven; dat is precies verkeerd hier. */
+document.getElementById("koppel-bestaand").addEventListener("click", async () => {
+  koppelOverlay.hidden = true;
+  if (typeof window.showOpenFilePicker !== "function"){
+    alert("Deze browser kan geen bestaand bestand koppelen. Gebruik Meer \u203a Reservekopie openen.");
+    return;
+  }
   try {
-    const h = await window.showSaveFilePicker({
-      suggestedName: "plattegronden.json",
-      types: [{ description:"Plattegronden", accept:{ "application/json":[".json"] } }]
-    });
+    const [h] = await window.showOpenFilePicker({ types: SOORT, multiple: false });
+    if (h) await koppel(h, true);
+  } catch (err){ /* geannuleerd */ }
+});
+document.getElementById("koppel-nieuw").addEventListener("click", async () => {
+  koppelOverlay.hidden = true;
+  try {
+    const h = await window.showSaveFilePicker({ suggestedName: "plattegronden.json", types: SOORT });
     await koppel(h, true);
   } catch (err){ /* geannuleerd */ }
 });
@@ -2488,7 +2554,7 @@ function magToon(stap){
 function magOpen(){
   magKeuze = null; magUitslag = null; magDoel = ""; fotoKeuze = [];
   magFout.hidden = true;
-  document.querySelectorAll(".keuze").forEach(k => k.classList.remove("aan"));
+  document.querySelectorAll("#mag-overlay .keuze").forEach(k => k.classList.remove("aan"));
   document.getElementById("fotoraster").innerHTML = "";
   magOverlay.hidden = false;
   magToon(1);
@@ -2536,7 +2602,7 @@ async function magLees(bestand){
       "<span><b>" + metFoto + "</b> met pasfoto</span>" +
       (magUitslag.klas ? "<span>klas <b>" + magUitslag.klas + "</b></span>" : "") +
       (magUitslag.lesperiode ? "<span>" + magUitslag.lesperiode + "</span>" : "");
-    document.querySelector('.keuze[data-keuze="fotos"]').disabled = !metFoto;
+    document.querySelector('#mag-overlay .keuze[data-keuze="fotos"]').disabled = !metFoto;
     magToon(2);
   } catch (fout){
     magFout.textContent = fout.message;
@@ -2547,9 +2613,9 @@ async function magLees(bestand){
 }
 
 /* --- stap 2: wat wil je doen --- */
-document.querySelectorAll(".keuze").forEach(k => k.addEventListener("click", () => {
+document.querySelectorAll("#mag-overlay .keuze").forEach(k => k.addEventListener("click", () => {
   if (k.disabled) return;
-  document.querySelectorAll(".keuze").forEach(x => x.classList.remove("aan"));
+  document.querySelectorAll("#mag-overlay .keuze").forEach(x => x.classList.remove("aan"));
   k.classList.add("aan");
   magKeuze = k.dataset.keuze;
   magVerder.disabled = false;
