@@ -82,6 +82,35 @@ svg{flex:none}
 .scheiding{width:1px;height:26px;background:var(--lijn-sterk);margin:0 2px}
 .meer-wikkel{position:relative}
 .meer-menu{position:absolute;top:calc(100% + 6px);right:0;z-index:40;min-width:250px;background:var(--kaart);border:1px solid var(--lijn);border-radius:12px;box-shadow:var(--schaduw);padding:6px;display:flex;flex-direction:column}
+.versiehoes{position:relative;margin-left:6px}
+.versieknop{display:inline-flex;align-items:center;gap:7px;padding:5px 10px;border:1px solid var(--lijn);border-radius:999px;background:var(--kaart);color:var(--tekst);font-size:13px;font-weight:700}
+.versieknop:hover{border-color:var(--lijn-sterk)}
+.versielabel{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--grijs);font-weight:800}
+.versielijst{position:absolute;top:calc(100% + 6px);left:0;z-index:45;min-width:230px;background:var(--kaart);border:1px solid var(--lijn);border-radius:12px;box-shadow:var(--schaduw);padding:6px;display:flex;flex-direction:column}
+.versielijst[hidden]{display:none}
+.versie-item{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:8px 11px;border:0;border-radius:8px;background:none;color:var(--tekst);font-size:14px}
+.versie-item:hover{background:var(--blauw-zacht)}
+.versie-item.actief{font-weight:800;color:var(--blauw)}
+.versie-scheiding{height:1px;background:var(--lijn);margin:5px 8px}
+.overlay{position:fixed;inset:0;z-index:80;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:22px}
+.overlay[hidden]{display:none}
+.venster{background:var(--kaart);border-radius:16px;box-shadow:0 24px 60px rgba(15,23,42,.3);width:min(860px,100%);max-height:88vh;display:flex;flex-direction:column;overflow:hidden}
+.venster-kop{padding:18px 22px 12px;border-bottom:1px solid var(--lijn)}
+.venster-kop h3{margin:0 0 4px;font-size:18px}
+.venster-kop p{margin:0;font-size:13px;color:var(--grijs)}
+.venster-lijf{padding:14px 22px;overflow:auto;flex:1}
+.venster-voet{padding:14px 22px;border-top:1px solid var(--lijn);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.venster-voet .rechts{margin-left:auto;display:flex;gap:10px}
+.fotoraster{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.fotokaart{border:2px solid var(--lijn);border-radius:12px;padding:10px;text-align:center;background:var(--papier);cursor:pointer;position:relative}
+.fotokaart.aan{border-color:var(--blauw);background:var(--blauw-zacht)}
+.fotokaart .paar{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:7px}
+.fotokaart img{width:54px;height:54px;border-radius:10px;object-fit:cover;background:var(--zacht)}
+.fotokaart .pijltje{color:var(--grijs);font-weight:800}
+.fotokaart .nm{font-size:12px;font-weight:700;line-height:1.25;word-break:break-word}
+.fotokaart .st{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--grijs);margin-top:3px}
+.fotokaart .vink{position:absolute;top:6px;right:8px;font-size:13px;color:var(--blauw);font-weight:900;display:none}
+.fotokaart.aan .vink{display:block}
 .meer-menu[hidden]{display:none}
 .meer-item{display:block;width:100%;text-align:left;padding:9px 12px;border:0;border-radius:8px;background:none;color:var(--tekst);font-size:14px}
 .meer-item:hover{background:var(--blauw-zacht)}
@@ -273,6 +302,14 @@ body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
         </span>
         <button class="mini" id="btn-klas-nieuw" data-icon="plus" title="Nieuwe klas toevoegen" aria-label="Nieuwe klas toevoegen"></button>
         <button class="mini gevaar" id="btn-klas-weg" data-icon="trash" title="Deze klas verwijderen" aria-label="Deze klas verwijderen"></button>
+        <span class="versiehoes">
+          <button type="button" class="versieknop" id="versieknop" aria-haspopup="listbox" aria-expanded="false">
+            <span class="versielabel">Versie</span>
+            <span id="versieknop-tekst">Standaard</span>
+            <span class="pijl" data-icon="chevron" data-maat="16"></span>
+          </button>
+          <div class="versielijst" id="versielijst" role="listbox" aria-label="Kies een versie" hidden></div>
+        </span>
       </div>
       <span class="opstelling" id="opstelling"></span>
     </div>
@@ -324,6 +361,25 @@ body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
     <div class="bord"><span data-icon="monitor" data-maat="18"></span> Bord &middot; voorkant lokaal</div>
     <div class="rijen" id="rijen"></div>
   </section>
+
+  <div class="overlay" id="foto-overlay" hidden>
+    <div class="venster" role="dialog" aria-modal="true" aria-labelledby="foto-titel">
+      <div class="venster-kop">
+        <h3 id="foto-titel">Foto's bijwerken</h3>
+        <p id="foto-uitleg"></p>
+      </div>
+      <div class="venster-lijf"><div class="fotoraster" id="fotoraster"></div></div>
+      <div class="venster-voet">
+        <button class="knop stil" id="btn-foto-alles">Alles aanvinken</button>
+        <button class="knop stil" id="btn-foto-niets">Niets aanvinken</button>
+        <button class="knop stil" id="btn-foto-nieuw">Alleen gewijzigde</button>
+        <span class="rechts">
+          <button class="knop stil" id="btn-foto-annuleer">Annuleren</button>
+          <button class="knop primair" id="btn-foto-ok">Bijwerken</button>
+        </span>
+      </div>
+    </div>
+  </div>
 
   <div class="onder">
     <div class="paneel">
@@ -691,9 +747,12 @@ document.addEventListener("click", e => {
 });
 
 keuze.addEventListener("change", () => {
+  if (klassen[huidig]) legActieveVersieVast(klassen[huidig]);
   huidig = keuze.value;
+  zorgVoorVersies(k());
   selectie = null;
   wisBeurt();
+  tekenVersieKnop();
   teken();
 });
 
@@ -974,9 +1033,11 @@ document.getElementById("btn-klas-nieuw").addEventListener("click", () => {
   keuze.appendChild(o);
   keuze.value = naam;
   huidig = naam;
+  zorgVoorVersies(k());
   selectie = null;
   wisBeurt();
   markeer();
+  tekenVersieKnop();
   teken();
 });
 document.getElementById("btn-klas-weg").addEventListener("click", () => {
@@ -987,8 +1048,10 @@ document.getElementById("btn-klas-weg").addEventListener("click", () => {
   Array.from(keuze.options).forEach(o => { if (o.value === huidig) o.remove(); });
   huidig = keuze.options[0].value;
   keuze.value = huidig;
+  zorgVoorVersies(k());
   selectie = null;
   wisBeurt();
+  tekenVersieKnop();
   markeer();
   teken();
 });
@@ -1103,6 +1166,8 @@ document.getElementById("btn-terug").addEventListener("click", () => {
   Object.assign(klassen[doelKlas], vorig);
   huidig = doelKlas;
   keuze.value = huidig;
+  zorgVoorVersies(k());
+  tekenVersieKnop();
   vorigeStaat = null;
   selectie = null;
   document.getElementById("btn-terug").disabled = true;
@@ -1117,25 +1182,43 @@ function bouwData(metFotos){
   Object.entries(klassen).forEach(([naam, kl]) => {
     const leerlingen = {};
     Object.entries(kl.leerlingen).forEach(([id, l]) => leerlingen[id] = metFotos ? l : Object.assign({}, l, { foto:null }));
-    uit.klassen[naam] = { rijen:kl.rijen, diep:kl.diep, leerlingen, plekken:kl.plekken, wachtrij:kl.wachtrij };
+    if (naam === huidig) legActieveVersieVast(kl); else zorgVoorVersies(kl);
+    uit.klassen[naam] = { rijen:kl.rijen, diep:kl.diep, leerlingen, plekken:kl.plekken, wachtrij:kl.wachtrij,
+                          versies:kl.versies, actief:kl.actief };
   });
   return uit;
 }
 function laadData(data){
   if (!data || !data.klassen) throw new Error("onvolledig");
   Object.entries(data.klassen).forEach(([naam, kl]) => {
-    if (!klassen[naam]) return;
+    if (!klassen[naam]) klassen[naam] = maakKlas([]);   // klas uit het bestand die de app nog niet kent
     Object.values(kl.leerlingen).forEach(l => { if (!("foto" in l)) l.foto = null; });
     Object.assign(klassen[naam], {
       rijen:kl.rijen || 3, diep:kl.diep || 5,
       leerlingen:kl.leerlingen, plekken:kl.plekken, wachtrij:kl.wachtrij || [],
       beurt:null, gehad:[]
     });
+    if (Array.isArray(kl.versies) && kl.versies.length){
+      klassen[naam].versies = kl.versies;
+      klassen[naam].actief = (typeof kl.actief === "number") ? kl.actief : 0;
+      zorgVoorVersies(klassen[naam]);
+    } else {
+      delete klassen[naam].versies; zorgVoorVersies(klassen[naam]);   // ouder bestand: één versie
+    }
   });
+  Object.keys(data.klassen).forEach(naam => {
+    if (!Array.from(keuze.options).some(o => o.value === naam)){
+      const o = document.createElement("option");
+      o.value = naam; o.textContent = keuzeLabel(naam);
+      keuze.appendChild(o);
+    }
+  });
+  if (!klassen[huidig]){ huidig = Object.keys(klassen)[0]; keuze.value = huidig; markeer(); }
   if (data.stijl) zetStijl(data.stijl);
   volgnummer += 1000;
   selectie = null;
   wisBeurt();
+  tekenVersieKnop();
   vernieuwKeuzelijst();
   teken();
 }
@@ -1574,16 +1657,21 @@ async function leesFotolijst(bestand){
     }
 
     // kopregels: label en waarde staan soms in losse stukjes op dezelfde regel
+    /* Labels als "Klas/groep:" komen soms als losse stukjes uit de PDF
+       ("Klas/" + "groep:"), dus zoeken we per regel in plaats van per woord. */
     function regelNa(label){
-      for (const w of woorden){
-        if (!new RegExp(label, "i").test(w.tekst)) continue;
-        const naDubbelePunt = w.tekst.split(":")[1];
-        if (naDubbelePunt && naDubbelePunt.trim()) return naDubbelePunt.trim();
-        const rest = woorden
-          .filter(v => Math.abs(v.top - w.top) < 4 && v.x > w.x)
-          .sort((a, c) => a.x - c.x)
-          .map(v => v.tekst).join(" ");
-        return rest.replace(/^:\s*/, "").replace(/\s+/g, " ").trim();
+      const doel = label.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const perRegel = [];
+      woorden.forEach(w => {
+        const r = perRegel.find(r => Math.abs(r.top - w.top) < 4);
+        if (r) r.delen.push(w); else perRegel.push({ top:w.top, delen:[w] });
+      });
+      for (const r of perRegel){
+        const delen = r.delen.slice().sort((a, c) => a.x - c.x);
+        const zin = delen.map(d => d.tekst).join(" ");
+        if (zin.toLowerCase().replace(/[^a-z0-9]/g, "").indexOf(doel) === -1) continue;
+        const na = zin.split(":").slice(1).join(":");
+        if (na && na.trim()) return na.replace(/\s+/g, " ").trim();
       }
       return null;
     }
@@ -1642,6 +1730,234 @@ document.addEventListener("click", (e) => {
 });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") sluitMeer(); });
 
+
+/* ---------- Versies van een plattegrond ----------
+   Een klas heeft één namenlijst (leerlingen, met foto's) en meerdere
+   indelingen. De actieve indeling staat gewoon in kl.rijen/diep/plekken/
+   wachtrij, zodat alle bestaande code ongewijzigd blijft werken; de andere
+   versies liggen opzij in kl.versies. Een nieuwe foto geldt daardoor
+   vanzelf voor élke versie. */
+
+function versieVak(kl){
+  return { naam:"", rijen:kl.rijen, diep:kl.diep,
+           plekken:kl.plekken.slice(), wachtrij:kl.wachtrij.slice() };
+}
+function zorgVoorVersies(kl){
+  if (!Array.isArray(kl.versies) || !kl.versies.length){
+    const v = versieVak(kl); v.naam = "Standaard";
+    kl.versies = [v]; kl.actief = 0;
+  }
+  if (typeof kl.actief !== "number" || kl.actief < 0 || kl.actief >= kl.versies.length) kl.actief = 0;
+  return kl;
+}
+function legActieveVersieVast(kl){
+  zorgVoorVersies(kl);
+  const v = kl.versies[kl.actief];
+  v.rijen = kl.rijen; v.diep = kl.diep;
+  v.plekken = kl.plekken.slice(); v.wachtrij = kl.wachtrij.slice();
+}
+function zetVersieOp(kl, n){
+  zorgVoorVersies(kl);
+  const v = kl.versies[n];
+  if (!v) return;
+  kl.actief = n;
+  kl.rijen = v.rijen; kl.diep = v.diep;
+  kl.plekken = v.plekken.slice(); kl.wachtrij = v.wachtrij.slice();
+  /* leerlingen die in deze versie nergens staan alsnog in de wachtrij */
+  const gezien = new Set(kl.plekken.filter(Boolean).concat(kl.wachtrij));
+  Object.keys(kl.leerlingen).forEach(id => { if (!gezien.has(id)) kl.wachtrij.push(id); });
+  const bestaat = new Set(Object.keys(kl.leerlingen));
+  kl.plekken = kl.plekken.map(id => (id && bestaat.has(id)) ? id : null);
+  kl.wachtrij = kl.wachtrij.filter(id => bestaat.has(id));
+}
+
+const versieKnop = document.getElementById("versieknop");
+const versieLijst = document.getElementById("versielijst");
+
+function versieNaam(){
+  const kl = zorgVoorVersies(k());
+  return kl.versies[kl.actief].naam || "Standaard";
+}
+function tekenVersieKnop(){
+  document.getElementById("versieknop-tekst").textContent = versieNaam();
+}
+function sluitVersielijst(){
+  versieLijst.hidden = true;
+  versieKnop.setAttribute("aria-expanded", "false");
+}
+function bouwVersielijst(){
+  const kl = zorgVoorVersies(k());
+  versieLijst.innerHTML = "";
+  kl.versies.forEach((v, n) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "versie-item" + (n === kl.actief ? " actief" : "");
+    b.setAttribute("role", "option");
+    b.textContent = (n === kl.actief ? "\u2713 " : "\u00a0\u00a0\u00a0") + (v.naam || "Standaard");
+    b.addEventListener("click", () => {
+      sluitVersielijst();
+      if (n === kl.actief) return;
+      legActieveVersieVast(kl);
+      zetVersieOp(kl, n);
+      selectie = null; wisBeurt();
+      tekenVersieKnop(); vernieuwKeuzelijst(); teken(); schrijf();
+    });
+    versieLijst.appendChild(b);
+  });
+  versieLijst.appendChild(Object.assign(document.createElement("div"), { className:"versie-scheiding" }));
+  const maak = (tekst, fn) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "versie-item"; b.textContent = tekst;
+    b.addEventListener("click", () => { sluitVersielijst(); fn(); });
+    versieLijst.appendChild(b);
+  };
+  maak("Deze versie kopiëren\u2026", () => {
+    const naam = prompt("Naam voor de nieuwe versie:", "Kopie van " + versieNaam());
+    if (naam === null) return;
+    legActieveVersieVast(kl);
+    const v = versieVak(kl); v.naam = naam.trim() || ("Versie " + (kl.versies.length + 1));
+    kl.versies.push(v);
+    zetVersieOp(kl, kl.versies.length - 1);
+    tekenVersieKnop(); teken(); schrijf();
+    zetStatus("Versie \u201e" + v.naam + "\u201d aangemaakt", true);
+  });
+  maak("Lege versie toevoegen\u2026", () => {
+    const naam = prompt("Naam voor de nieuwe versie:", "Versie " + (kl.versies.length + 1));
+    if (naam === null) return;
+    legActieveVersieVast(kl);
+    const v = versieVak(kl);
+    v.naam = naam.trim() || ("Versie " + (kl.versies.length + 1));
+    v.plekken = new Array(kl.rijen * kl.diep * 2).fill(null);
+    v.wachtrij = Object.keys(kl.leerlingen);
+    kl.versies.push(v);
+    zetVersieOp(kl, kl.versies.length - 1);
+    tekenVersieKnop(); teken(); schrijf();
+    zetStatus("Lege versie \u201e" + v.naam + "\u201d aangemaakt", true);
+  });
+  maak("Naam van deze versie wijzigen\u2026", () => {
+    const naam = prompt("Nieuwe naam:", versieNaam());
+    if (naam === null) return;
+    kl.versies[kl.actief].naam = naam.trim() || "Standaard";
+    tekenVersieKnop(); schrijf();
+  });
+  maak("Deze versie verwijderen", () => {
+    if (kl.versies.length < 2){ alert("Dit is de enige versie van deze klas. Maak eerst een tweede versie."); return; }
+    if (!confirm("Versie \u201e" + versieNaam() + "\u201d verwijderen?\n\nDe leerlingen en hun foto's blijven staan; alleen deze indeling verdwijnt.")) return;
+    kl.versies.splice(kl.actief, 1);
+    zetVersieOp(kl, Math.max(0, kl.actief - 1));
+    selectie = null; wisBeurt();
+    tekenVersieKnop(); vernieuwKeuzelijst(); teken(); schrijf();
+  });
+}
+versieKnop.addEventListener("click", (e) => {
+  e.stopPropagation();
+  if (versieLijst.hidden){ bouwVersielijst(); versieLijst.hidden = false; versieKnop.setAttribute("aria-expanded", "true"); }
+  else sluitVersielijst();
+});
+document.addEventListener("click", (e) => {
+  if (!versieLijst.hidden && !versieLijst.contains(e.target) && !versieKnop.contains(e.target)) sluitVersielijst();
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") sluitVersielijst(); });
+
+/* ---------- Foto's bijwerken uit een Magister-fotolijst ---------- */
+
+function sleutelNaam(naam){
+  return (naam || "").toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, " ").trim();
+}
+function omgedraaid(naam){
+  const d = sleutelNaam(naam).split(" ");
+  return d.length < 2 ? "" : d.slice(1).concat(d[0]).join(" ");
+}
+function zoekLeerlingOpNaam(kl, naam){
+  const doel = sleutelNaam(naam), doel2 = omgedraaid(naam);
+  let treffer = null;
+  Object.values(kl.leerlingen).forEach(l => {
+    const s = sleutelNaam(l.naam);
+    if (!treffer && (s === doel || s === doel2 || omgedraaid(l.naam) === doel)) treffer = l;
+  });
+  return treffer;
+}
+
+const fotoOverlay = document.getElementById("foto-overlay");
+let fotoKeuze = [];
+
+function sluitFotoVenster(){ fotoOverlay.hidden = true; fotoKeuze = []; }
+
+function toonFotoVenster(kl, klasnaam, gevonden){
+  fotoKeuze = [];
+  gevonden.forEach(g => {
+    if (!g.foto) return;
+    const l = zoekLeerlingOpNaam(kl, g.naam);
+    if (!l) return;
+    fotoKeuze.push({ leerling:l, nieuw:g.foto, anders:l.foto !== g.foto, aan:l.foto !== g.foto });
+  });
+  const zonderTreffer = gevonden.filter(g => g.foto && !zoekLeerlingOpNaam(kl, g.naam)).length;
+  if (!fotoKeuze.length){
+    alert("Geen van de leerlingen uit deze fotolijst staat in de klas " + klasnaam + ".\n\nControleer of je de juiste klas hebt gekozen.");
+    return;
+  }
+  const raster = document.getElementById("fotoraster");
+  raster.innerHTML = "";
+  fotoKeuze.forEach((r, n) => {
+    const kaart = document.createElement("div");
+    kaart.className = "fotokaart" + (r.aan ? " aan" : "");
+    kaart.dataset.n = n;
+    const oud = r.leerling.foto
+      ? '<img src="' + r.leerling.foto + '" alt="">'
+      : '<img alt="" style="background:var(--zacht)">';
+    kaart.innerHTML =
+      '<span class="vink">\u2713</span>' +
+      '<div class="paar">' + oud + '<span class="pijltje">\u2192</span><img src="' + r.nieuw + '" alt=""></div>' +
+      '<div class="nm"></div>' +
+      '<div class="st">' + (r.anders ? (r.leerling.foto ? "gewijzigd" : "nieuw") : "gelijk") + "</div>";
+    kaart.querySelector(".nm").textContent = r.leerling.naam;
+    kaart.addEventListener("click", () => {
+      r.aan = !r.aan;
+      kaart.classList.toggle("aan", r.aan);
+      werkFotoTellerBij();
+    });
+    raster.appendChild(kaart);
+  });
+  document.getElementById("foto-uitleg").textContent =
+    "Klas " + klasnaam + ". Vink aan welke foto's vervangen moeten worden."
+    + (zonderTreffer ? " " + zonderTreffer + " leerling(en) uit de lijst staan niet in deze klas en worden overgeslagen." : "");
+  werkFotoTellerBij();
+  fotoOverlay.hidden = false;
+}
+function werkFotoTellerBij(){
+  const n = fotoKeuze.filter(r => r.aan).length;
+  document.getElementById("btn-foto-ok").textContent =
+    n ? "Bijwerken (" + n + ")" : "Bijwerken";
+  document.getElementById("btn-foto-ok").disabled = !n;
+}
+function zetVinkjes(fn){
+  fotoKeuze.forEach((r, n) => {
+    r.aan = fn(r);
+    document.querySelector('.fotokaart[data-n="' + n + '"]').classList.toggle("aan", r.aan);
+  });
+  werkFotoTellerBij();
+}
+document.getElementById("btn-foto-alles").addEventListener("click", () => zetVinkjes(() => true));
+document.getElementById("btn-foto-niets").addEventListener("click", () => zetVinkjes(() => false));
+document.getElementById("btn-foto-nieuw").addEventListener("click", () => zetVinkjes(r => r.anders));
+document.getElementById("btn-foto-annuleer").addEventListener("click", sluitFotoVenster);
+fotoOverlay.addEventListener("click", (e) => { if (e.target === fotoOverlay) sluitFotoVenster(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !fotoOverlay.hidden) sluitFotoVenster(); });
+document.getElementById("btn-foto-ok").addEventListener("click", () => {
+  const gekozen = fotoKeuze.filter(r => r.aan);
+  if (!gekozen.length) return;
+  bewaarStap();
+  gekozen.forEach(r => { r.leerling.foto = r.nieuw; });
+  sluitFotoVenster();
+  teken(); schrijf();
+  zetStatus(gekozen.length + " foto('s) bijgewerkt", true);
+});
+
+Object.values(klassen).forEach(zorgVoorVersies);
+tekenVersieKnop();
+
 document.getElementById("btn-magister").addEventListener("click", () => {
   document.getElementById("magisterbestand").click();
 });
@@ -1655,13 +1971,45 @@ document.getElementById("magisterbestand").addEventListener("change", async (e) 
   try {
     const uitslag = await leesFotolijst(bestand);
     const metFoto = uitslag.leerlingen.filter(l => l.foto).length;
+    const kop = "Gevonden: " + uitslag.leerlingen.length + " leerlingen, " + metFoto + " met pasfoto."
+      + (uitslag.lesperiode ? "\nLesperiode " + uitslag.lesperiode : "");
+
+    /* Alleen foto's bijwerken? Dan verandert er niets aan de indelingen. */
+    const alleenFotos = metFoto > 0 && confirm(
+      kop + "\n\nWil je alleen de foto's bijwerken in een klas die je al hebt?"
+      + "\n\nOK = alleen foto's bijwerken (je kiest daarna wie).\nAnnuleren = deze lijst als klas inlezen.");
+
+    if (alleenFotos){
+      const namen = Object.keys(klassen);
+      const kaal = (t) => (t || "").replace(/\s+/g, "").toLowerCase();
+      let doel = namen.find(n => kaal(n) === kaal(uitslag.klas)) || "";
+      if (!doel){
+        const gevraagd = prompt("De fotolijst hoort bij klas \u201e" + (uitslag.klas || "onbekend")
+          + "\u201d, die je nog niet hebt.\n\nIn welke van jouw klassen wil je de foto's bijwerken?\n\nJe klassen: "
+          + namen.join(", "), namen.includes(huidig) ? huidig : namen[0] || "");
+        if (gevraagd === null){ if (status) status.textContent = oud; return; }
+        doel = namen.find(n => kaal(n) === kaal(gevraagd)) || "";
+        if (!doel){
+          if (status) status.textContent = oud;
+          alert("De klas \u201e" + gevraagd.trim() + "\u201d bestaat niet.");
+          return;
+        }
+      }
+      if (!doel || !klassen[doel]){
+        if (status) status.textContent = oud;
+        if (doel) alert("De klas " + doel + " bestaat niet.");
+        return;
+      }
+      if (doel !== huidig){ keuze.value = doel; huidig = doel; selectie = null; wisBeurt(); markeer(); teken(); }
+      toonFotoVenster(klassen[doel], doel, uitslag.leerlingen);
+      if (status) status.textContent = oud;
+      return;
+    }
+
     let naam = (uitslag.klas || "").toUpperCase();
-    naam = (prompt(
-      "Gevonden: " + uitslag.leerlingen.length + " leerlingen, " + metFoto + " met pasfoto."
-      + (uitslag.lesperiode ? "\nLesperiode " + uitslag.lesperiode : "")
-      + "\n\nOnder welke naam wil je deze klas opslaan?", naam) || "").trim().toUpperCase();
+    naam = (prompt(kop + "\n\nOnder welke naam wil je deze klas opslaan?", naam) || "").trim().toUpperCase();
     if (!naam) { if (status) status.textContent = oud; return; }
-    if (klassen[naam] && !confirm("Klas " + naam + " bestaat al. Vervangen door deze lijst?")) {
+    if (klassen[naam] && !confirm("Klas " + naam + " bestaat al.\n\nVervangen door deze lijst? Alle versies van de plattegrond van deze klas gaan dan verloren.")) {
       if (status) status.textContent = oud; return;
     }
     const bestond = !!klassen[naam];
@@ -1683,6 +2031,7 @@ document.getElementById("magisterbestand").addEventListener("change", async (e) 
     selectie = null;
     wisBeurt();
     markeer();
+    tekenVersieKnop();
     teken();
     if (status) status.textContent = uitslag.leerlingen.length + " leerlingen ingelezen, " + metFoto + " met pasfoto.";
   } catch (fout) {
