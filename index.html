@@ -246,6 +246,27 @@ svg{flex:none}
 .groep li{display:flex;align-items:center;gap:7px;font-size:13px;padding:2px 0}
 .groep li .bol{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;flex:none;overflow:hidden}
 .groep li .bol img{width:100%;height:100%;object-fit:cover}
+.leermodus{margin-top:11px;flex-wrap:wrap}
+.leerfotos{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:520px;margin:0 auto}
+.leerfotokeuze{border:3px solid var(--lijn);border-radius:13px;padding:0;overflow:hidden;background:none;cursor:pointer;line-height:0}
+.leerfotokeuze img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.leerfotokeuze:hover:not(:disabled){border-color:var(--blauw)}
+.leerfotokeuze.goed{border-color:var(--groen)}
+.leerfotokeuze.mis{border-color:#dc2626}
+.leervraagnaam{font-size:26px;font-weight:800;color:var(--inkt);margin-bottom:16px;letter-spacing:-.01em}
+.typrij{display:flex;gap:9px;max-width:420px;margin:0 auto;align-items:center}
+.typrij .tekstveld{flex:1;font-size:15px;text-align:center}
+.typuitslag{margin-top:13px;font-size:14.5px;font-weight:700;min-height:22px}
+.typuitslag.goed{color:var(--groen)}
+.typuitslag.mis{color:#b91c1c}
+.minilokaal{display:grid;gap:20px;justify-content:center;margin:0 auto}
+.minirij{display:grid;gap:6px}
+.miniplek{border:2px solid var(--lijn);border-radius:8px;background:var(--kaart);width:46px;height:34px;font-size:11px;color:var(--zacht);cursor:pointer;padding:0}
+.miniplek:hover:not(:disabled){border-color:var(--blauw)}
+.miniplek.leeg{background:var(--papier);border-style:dashed;cursor:default}
+.miniplek.goed{border-color:var(--groen);background:#dcfce7}
+.miniplek.mis{border-color:#dc2626;background:#fee2e2}
+.minibord{background:var(--inkt);color:#fff;border-radius:7px;padding:5px;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;text-align:center;margin-bottom:4px}
 .leervenster .venster-lijf{min-height:330px;display:flex;align-items:center;justify-content:center}
 .leervak{text-align:center;width:100%}
 .leerfoto{width:168px;height:168px;border-radius:16px;object-fit:cover;margin:0 auto 16px;display:block;box-shadow:var(--schaduw)}
@@ -568,6 +589,12 @@ body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
       <div class="venster-kop">
         <h3 id="leer-titel">Namen leren</h3>
         <p id="leer-uitleg"></p>
+        <div class="wijzekiezer leermodus" id="leer-modus" role="group" aria-label="Oefenvorm">
+          <button type="button" data-m="fotonaam" class="actief">Wie is dit?</button>
+          <button type="button" data-m="naamfoto">Welke foto?</button>
+          <button type="button" data-m="typen">Zelf typen</button>
+          <button type="button" data-m="plek">Waar zit die?</button>
+        </div>
       </div>
       <div class="venster-lijf">
         <div class="leervak" id="leervak"></div>
@@ -2906,77 +2933,214 @@ document.getElementById("groep-print").addEventListener("click", () => {
   setTimeout(() => document.body.classList.remove("groep-print"), 800);
 });
 
-/* ---------- 3. Namen leren ---------- */
+/* ---------- 3. Namen leren: vier oefenvormen ---------- */
 const leerOverlay = document.getElementById("leer-overlay");
-let leerRij = [], leerNu = 0, leerGoed = 0, leerFout = 0;
+let leerRij = [], leerNu = 0, leerGoed = 0, leerFout = 0, leerModus = "fotonaam", leerMisgegaan = [];
+
+const leerVak = () => document.getElementById("leervak");
+
+function leerKandidaten(){
+  const kl = k();
+  if (leerModus === "plek"){
+    return kl.plekken.map((id, i) => id ? Object.assign({ plek: i }, kl.leerlingen[id]) : null).filter(Boolean);
+  }
+  return Object.values(kl.leerlingen).filter(l => l.foto);
+}
 
 function startLeren(){
-  const kl = k();
-  leerRij = schud(Object.values(kl.leerlingen).filter(l => l.foto));
-  leerNu = 0; leerGoed = 0; leerFout = 0;
-  if (leerRij.length < 2){
-    alert("Namen leren werkt met pasfoto's. Lees eerst een klas met foto's in via Klas uit Magister.");
+  const lijst = leerKandidaten();
+  if (lijst.length < 2){
+    alert(leerModus === "plek"
+      ? "Zet eerst leerlingen op een plek in het lokaal."
+      : "Deze oefenvorm werkt met pasfoto's. Lees eerst een klas met foto's in via Klas uit Magister.");
     return false;
   }
+  leerRij = schud(lijst.slice());
+  leerNu = 0; leerGoed = 0; leerFout = 0; leerMisgegaan = [];
   leerOverlay.hidden = false;
   volgendeVraag();
   return true;
 }
 function tekenLeerScore(){
   document.getElementById("leer-score").textContent =
-    leerGoed + " goed \u00b7 " + leerFout + " mis \u00b7 vraag " + Math.min(leerNu + 1, leerRij.length) + " van " + leerRij.length;
+    leerGoed + " goed \u00b7 " + leerFout + " mis \u00b7 vraag " +
+    Math.min(leerNu + 1, leerRij.length) + " van " + leerRij.length;
 }
-function volgendeVraag(){
-  const vak = document.getElementById("leervak");
-  if (leerNu >= leerRij.length){
-    const pct = Math.round(leerGoed / leerRij.length * 100);
-    vak.innerHTML = '<div class="leerklaar"></div>';
-    vak.firstChild.textContent = "Klaar: " + leerGoed + " van " + leerRij.length + " goed (" + pct + "%)";
-    const s = document.createElement("span");
-    s.textContent = pct === 100 ? "Je kent ze allemaal." : "Klik op \u201eOpnieuw beginnen\u201d voor een nieuwe ronde.";
-    vak.firstChild.appendChild(s);
-    document.getElementById("leer-uitleg").textContent = "Ronde afgerond.";
-    tekenLeerScore();
-    return;
-  }
-  const juist = leerRij[leerNu];
-  const anderen = schud(leerRij.filter(l => l.id !== juist.id)).slice(0, 3);
-  const opties = schud(anderen.concat(juist));
-  document.getElementById("leer-uitleg").textContent = "Wie is dit?";
-  vak.innerHTML = "";
-  const img = document.createElement("img");
-  img.className = "leerfoto"; img.src = juist.foto; img.alt = "";
-  const knoppen = document.createElement("div");
-  knoppen.className = "leerknoppen";
-  opties.forEach(l => {
+function leerVerder(goed, wie){
+  if (goed) leerGoed++; else { leerFout++; if (!leerMisgegaan.includes(wie)) leerMisgegaan.push(wie); }
+  tekenLeerScore();
+  setTimeout(() => { leerNu++; volgendeVraag(); }, goed ? 550 : 1400);
+}
+
+function leerKlaar(){
+  const vak = leerVak();
+  const pct = Math.round(leerGoed / Math.max(1, leerRij.length) * 100);
+  vak.innerHTML = '<div class="leerklaar"></div>';
+  vak.firstChild.textContent = "Klaar: " + leerGoed + " van " + leerRij.length + " goed (" + pct + "%)";
+  const s = document.createElement("span");
+  if (leerMisgegaan.length){
+    s.textContent = "Deze gingen mis: " + leerMisgegaan.map(l => l.naam).join(", ") + ".";
     const b = document.createElement("button");
-    b.type = "button"; b.className = "leerknop"; b.textContent = l.naam;
+    b.className = "knop primair";
+    b.style.marginTop = "14px";
+    b.textContent = "Alleen deze " + leerMisgegaan.length + " nog eens";
     b.addEventListener("click", () => {
-      if (b.disabled) return;
-      knoppen.querySelectorAll("button").forEach(x => { x.disabled = true; });
-      if (l.id === juist.id){ b.classList.add("goed"); leerGoed++; }
-      else {
-        b.classList.add("mis"); leerFout++;
-        knoppen.querySelectorAll("button").forEach(x => { if (x.textContent === juist.naam) x.classList.add("goed"); });
-      }
-      tekenLeerScore();
-      setTimeout(() => { leerNu++; volgendeVraag(); }, l.id === juist.id ? 550 : 1300);
+      leerRij = schud(leerMisgegaan.slice());
+      leerNu = 0; leerGoed = 0; leerFout = 0; leerMisgegaan = [];
+      volgendeVraag();
     });
-    knoppen.appendChild(b);
-  });
-  vak.append(img, knoppen);
+    vak.firstChild.append(s, b);
+  } else {
+    s.textContent = "Je kent ze allemaal.";
+    vak.firstChild.appendChild(s);
+  }
+  document.getElementById("leer-uitleg").textContent = "Ronde afgerond.";
   tekenLeerScore();
 }
-document.getElementById("btn-handleiding").addEventListener("click", () => {
-  /* De handleiding staat als los bestand naast de app, zodat de app zelf klein blijft. */
-  const adres = new URL("handleiding.pdf", location.href).href;
-  const venster = window.open(adres, "_blank");
-  if (!venster){
-    const a = document.createElement("a");
-    a.href = adres; a.download = "Klassenplattegrond - uitleg.pdf";
-    a.click();
+
+function volgendeVraag(){
+  if (leerNu >= leerRij.length){ leerKlaar(); return; }
+  const juist = leerRij[leerNu];
+  const vak = leerVak();
+  vak.innerHTML = "";
+  const anderen = schud(leerKandidaten().filter(l => l.id !== juist.id));
+
+  if (leerModus === "fotonaam"){
+    document.getElementById("leer-uitleg").textContent = "Wie is dit?";
+    const img = document.createElement("img");
+    img.className = "leerfoto"; img.src = juist.foto; img.alt = "";
+    const knoppen = document.createElement("div");
+    knoppen.className = "leerknoppen";
+    schud(anderen.slice(0, 3).concat(juist)).forEach(l => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "leerknop"; b.textContent = l.naam;
+      b.addEventListener("click", () => {
+        knoppen.querySelectorAll("button").forEach(x => { x.disabled = true; });
+        const goed = l.id === juist.id;
+        b.classList.add(goed ? "goed" : "mis");
+        if (!goed) knoppen.querySelectorAll("button").forEach(x => {
+          if (x.textContent === juist.naam) x.classList.add("goed");
+        });
+        leerVerder(goed, juist);
+      });
+      knoppen.appendChild(b);
+    });
+    vak.append(img, knoppen);
+
+  } else if (leerModus === "naamfoto"){
+    document.getElementById("leer-uitleg").textContent = "Welke foto hoort hierbij?";
+    const nm = document.createElement("div");
+    nm.className = "leervraagnaam"; nm.textContent = juist.naam;
+    const raster = document.createElement("div");
+    raster.className = "leerfotos";
+    schud(anderen.slice(0, 3).concat(juist)).forEach(l => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "leerfotokeuze";
+      const img = document.createElement("img"); img.src = l.foto; img.alt = "";
+      b.appendChild(img);
+      b.addEventListener("click", () => {
+        raster.querySelectorAll("button").forEach(x => { x.disabled = true; });
+        const goed = l.id === juist.id;
+        b.classList.add(goed ? "goed" : "mis");
+        if (!goed) raster.querySelectorAll("button").forEach((x, n) => {
+          if (x.querySelector("img").src === juist.foto) x.classList.add("goed");
+        });
+        leerVerder(goed, juist);
+      });
+      raster.appendChild(b);
+    });
+    vak.append(nm, raster);
+
+  } else if (leerModus === "typen"){
+    document.getElementById("leer-uitleg").textContent = "Typ de naam die bij deze foto hoort.";
+    const img = document.createElement("img");
+    img.className = "leerfoto"; img.src = juist.foto; img.alt = "";
+    const rij = document.createElement("div");
+    rij.className = "typrij";
+    const veld = document.createElement("input");
+    veld.type = "text"; veld.className = "tekstveld"; veld.placeholder = "Naam"; veld.autocomplete = "off";
+    const knop = document.createElement("button");
+    knop.className = "knop primair"; knop.textContent = "Controleren";
+    const uitslag = document.createElement("div");
+    uitslag.className = "typuitslag";
+    const alleVoornamen = leerKandidaten().map(l => sleutelNaam(l.naam).split(" ")[0]);
+    const nazien = () => {
+      if (veld.disabled) return;
+      const getypt = sleutelNaam(veld.value);
+      if (!getypt) return;
+      const voor = sleutelNaam(juist.naam).split(" ")[0];
+      const uniek = alleVoornamen.filter(v => v === voor).length === 1;
+      const goed = getypt === sleutelNaam(juist.naam)
+                || getypt === omgedraaid(juist.naam)
+                || (uniek && getypt === voor);
+      veld.disabled = true; knop.disabled = true;
+      uitslag.className = "typuitslag " + (goed ? "goed" : "mis");
+      uitslag.textContent = goed ? "Goed!" : "Het was " + juist.naam;
+      leerVerder(goed, juist);
+    };
+    knop.addEventListener("click", nazien);
+    veld.addEventListener("keydown", (e) => { if (e.key === "Enter") nazien(); });
+    rij.append(veld, knop);
+    vak.append(img, rij, uitslag);
+    setTimeout(() => veld.focus(), 60);
+
+  } else {
+    document.getElementById("leer-uitleg").textContent = "Waar zit deze leerling?";
+    const kl = k();
+    const nm = document.createElement("div");
+    nm.className = "leervraagnaam"; nm.textContent = juist.naam;
+    const bord = document.createElement("div");
+    bord.className = "minibord"; bord.textContent = "Bord";
+    const lokaal = document.createElement("div");
+    lokaal.className = "minilokaal";
+    lokaal.style.gridTemplateColumns = "repeat(" + kl.rijen + ",auto)";
+    for (let r = 0; r < kl.rijen; r++){
+      const kolom = document.createElement("div");
+      kolom.className = "minirij";
+      kolom.style.gridTemplateRows = "repeat(" + kl.diep + ",auto)";
+      for (let t = 0; t < kl.diep; t++){
+        const tafel = document.createElement("div");
+        tafel.style.display = "flex"; tafel.style.gap = "3px";
+        [0, 1].forEach(kant => {
+          const i = idx(r, t, kant);
+          const b = document.createElement("button");
+          b.type = "button";
+          b.className = "miniplek" + (kl.plekken[i] ? "" : " leeg");
+          b.dataset.i = i;
+          if (!kl.plekken[i]) b.disabled = true;
+          b.addEventListener("click", () => {
+            lokaal.querySelectorAll("button").forEach(x => { x.disabled = true; });
+            const goed = i === juist.plek;
+            b.classList.add(goed ? "goed" : "mis");
+            if (!goed){
+              const juisteKnop = lokaal.querySelector('[data-i="' + juist.plek + '"]');
+              if (juisteKnop) juisteKnop.classList.add("goed");
+            }
+            leerVerder(goed, juist);
+          });
+          tafel.appendChild(b);
+        });
+        kolom.appendChild(tafel);
+      }
+      lokaal.appendChild(kolom);
+    }
+    const houder = document.createElement("div");
+    houder.append(bord, lokaal);
+    vak.append(nm, houder);
   }
-});
+  tekenLeerScore();
+}
+
+document.querySelectorAll("#leer-modus button").forEach(b => b.addEventListener("click", () => {
+  const vorige = leerModus;
+  leerModus = b.dataset.m;
+  document.querySelectorAll("#leer-modus button").forEach(x => x.classList.toggle("actief", x === b));
+  if (!startLeren()){
+    leerModus = vorige;
+    document.querySelectorAll("#leer-modus button").forEach(x => x.classList.toggle("actief", x.dataset.m === vorige));
+  }
+}));
+
 document.getElementById("btn-namen").addEventListener("click", startLeren);
 document.getElementById("leer-opnieuw").addEventListener("click", startLeren);
 document.getElementById("leer-sluit").addEventListener("click", () => { leerOverlay.hidden = true; });
