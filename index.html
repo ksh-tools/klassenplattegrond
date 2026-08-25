@@ -101,6 +101,43 @@ svg{flex:none}
 .venster-lijf{padding:14px 22px;overflow:auto;flex:1}
 .venster-voet{padding:14px 22px;border-top:1px solid var(--lijn);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .venster-voet .rechts{margin-left:auto;display:flex;gap:10px}
+.stappen{display:flex;gap:0;list-style:none;margin:13px 0 2px;padding:0;counter-reset:s}
+.stappen li{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;color:var(--zacht);padding-right:16px;margin-right:12px;position:relative}
+.stappen li:not(:last-child):after{content:"";position:absolute;right:0;top:50%;width:12px;height:1px;background:var(--lijn)}
+.stappen li span{width:19px;height:19px;border-radius:50%;background:var(--lijn);color:var(--grijs);display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800}
+.stappen li.nu{color:var(--blauw)}
+.stappen li.nu span{background:var(--blauw);color:#fff}
+.stappen li.klaar{color:var(--groen)}
+.stappen li.klaar span{background:var(--groen);color:#fff}
+.mag-stap{min-height:150px}
+.neerzet{border:2px dashed var(--lijn-sterk);border-radius:14px;padding:26px 18px;text-align:center;background:var(--papier);transition:.15s}
+.neerzet.over{border-color:var(--blauw);background:var(--blauw-zacht)}
+.neerzet-icoon{color:var(--blauw);margin-bottom:8px}
+.neerzet-kop{font-size:15px;font-weight:700;color:var(--tekst);margin:0 0 3px}
+.neerzet-sub{font-size:12.5px;color:var(--grijs);margin:0 0 14px}
+.uitlegblok{margin-top:14px;padding:11px 14px;border-radius:11px;background:var(--blauw-zacht);border-left:3px solid var(--blauw)}
+.uitlegblok b{display:block;font-size:12.5px;color:var(--blauw);margin-bottom:3px}
+.uitlegblok p{margin:0;font-size:12.5px;color:var(--tekst);line-height:1.5}
+.mag-fout{margin-top:12px;padding:10px 13px;border-radius:10px;background:#fef2f2;border-left:3px solid #dc2626;color:#991b1b;font-size:12.5px}
+.vondst{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px}
+.vondst span{padding:6px 11px;border-radius:999px;background:var(--papier);border:1px solid var(--lijn);font-size:12.5px;color:var(--tekst)}
+.vondst span b{color:var(--inkt);font-weight:800}
+.kiesvraag{font-size:13px;font-weight:700;color:var(--tekst);margin:0 0 9px}
+.keuzes{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.keuze{text-align:left;padding:15px 16px;border:2px solid var(--lijn);border-radius:13px;background:var(--kaart);cursor:pointer;display:block}
+.keuze:hover{border-color:var(--lijn-sterk)}
+.keuze.aan{border-color:var(--blauw);background:var(--blauw-zacht)}
+.keuze-icoon{display:block;color:var(--blauw);margin-bottom:7px}
+.keuze b{display:block;font-size:14px;color:var(--inkt);margin-bottom:4px}
+.keuze span:last-child{display:block;font-size:12.5px;color:var(--grijs);line-height:1.45}
+.veldlabel{display:block;font-size:13px;font-weight:700;color:var(--tekst);margin-bottom:6px}
+.tekstveld{width:100%;padding:10px 13px;border:1px solid var(--lijn-sterk);border-radius:10px;font-size:14px;color:var(--tekst);background:var(--kaart)}
+.tekstveld:focus{outline:2px solid var(--blauw);outline-offset:1px;border-color:var(--blauw)}
+.veldhulp{margin-top:7px;font-size:12.5px;color:var(--grijs)}
+.veldhulp.waarschuw{color:#b45309}
+.klaskiezer{margin-bottom:13px}
+.vinkbalk{display:flex;gap:8px;align-items:center;margin-bottom:11px;flex-wrap:wrap}
+.vinkbalk .teller{margin-left:auto;font-size:12.5px;color:var(--grijs)}
 .fotoraster{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .fotokaart{border:2px solid var(--lijn);border-radius:12px;padding:10px;text-align:center;background:var(--papier);cursor:pointer;position:relative}
 .fotokaart.aan{border-color:var(--blauw);background:var(--blauw-zacht)}
@@ -362,20 +399,77 @@ body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
     <div class="rijen" id="rijen"></div>
   </section>
 
-  <div class="overlay" id="foto-overlay" hidden>
-    <div class="venster" role="dialog" aria-modal="true" aria-labelledby="foto-titel">
+  <div class="overlay" id="mag-overlay" hidden>
+    <div class="venster" role="dialog" aria-modal="true" aria-labelledby="mag-titel">
       <div class="venster-kop">
-        <h3 id="foto-titel">Foto's bijwerken</h3>
-        <p id="foto-uitleg"></p>
+        <h3 id="mag-titel">Klas uit Magister</h3>
+        <p id="mag-uitleg">Kies de fotolijst die je uit Magister hebt opgeslagen.</p>
+        <ol class="stappen" id="mag-stappen">
+          <li data-stap="1"><span>1</span>Bestand</li>
+          <li data-stap="2"><span>2</span>Wat wil je doen</li>
+          <li data-stap="3"><span>3</span>Bevestigen</li>
+        </ol>
       </div>
-      <div class="venster-lijf"><div class="fotoraster" id="fotoraster"></div></div>
+
+      <div class="venster-lijf">
+        <div class="mag-stap" data-stap="1">
+          <div class="neerzet" id="mag-neerzet">
+            <div class="neerzet-icoon" data-icon="upload" data-maat="26"></div>
+            <p class="neerzet-kop">Sleep de fotolijst hierheen</p>
+            <p class="neerzet-sub">of kies hem zelf &middot; een PDF uit Magister</p>
+            <button class="knop primair" id="mag-kiesbestand">Bestand kiezen</button>
+          </div>
+          <div class="uitlegblok">
+            <b>Zo maak je die lijst</b>
+            <p>Open in Magister je klas, kies <em>Fotolijst</em> en sla het resultaat op als PDF.
+               Namen en pasfoto's worden daarna hier ingelezen; er gaat niets naar internet.</p>
+          </div>
+          <p class="mag-fout" id="mag-fout" hidden></p>
+        </div>
+
+        <div class="mag-stap" data-stap="2" hidden>
+          <div class="vondst" id="mag-vondst"></div>
+          <p class="kiesvraag">Wat wil je met deze lijst doen?</p>
+          <div class="keuzes">
+            <button type="button" class="keuze" data-keuze="klas">
+              <span class="keuze-icoon" data-icon="userplus" data-maat="20"></span>
+              <b>De klas inlezen</b>
+              <span>Zet alle leerlingen met hun foto in een klas en geef ze meteen een plek.</span>
+            </button>
+            <button type="button" class="keuze" data-keuze="fotos">
+              <span class="keuze-icoon" data-icon="imageplus" data-maat="20"></span>
+              <b>Alleen foto's bijwerken</b>
+              <span>Vervang pasfoto's in een klas die je al hebt. Je indelingen blijven zoals ze zijn.</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="mag-stap" data-stap="3klas" hidden>
+          <label class="veldlabel" for="mag-klasnaam">Onder welke naam sla je deze klas op?</label>
+          <input type="text" id="mag-klasnaam" class="tekstveld" autocomplete="off">
+          <p class="veldhulp" id="mag-klashulp"></p>
+        </div>
+
+        <div class="mag-stap" data-stap="3fotos" hidden>
+          <div class="klaskiezer">
+            <label class="veldlabel" for="mag-doelklas">In welke klas werk je de foto's bij?</label>
+            <select id="mag-doelklas" class="tekstveld"></select>
+          </div>
+          <div class="vinkbalk">
+            <button class="knop stil" id="btn-foto-nieuw">Alleen gewijzigde</button>
+            <button class="knop stil" id="btn-foto-alles">Alles</button>
+            <button class="knop stil" id="btn-foto-niets">Niets</button>
+            <span class="teller" id="mag-teller"></span>
+          </div>
+          <div class="fotoraster" id="fotoraster"></div>
+        </div>
+      </div>
+
       <div class="venster-voet">
-        <button class="knop stil" id="btn-foto-alles">Alles aanvinken</button>
-        <button class="knop stil" id="btn-foto-niets">Niets aanvinken</button>
-        <button class="knop stil" id="btn-foto-nieuw">Alleen gewijzigde</button>
+        <button class="knop stil" id="mag-terug" hidden>Terug</button>
         <span class="rechts">
-          <button class="knop stil" id="btn-foto-annuleer">Annuleren</button>
-          <button class="knop primair" id="btn-foto-ok">Bijwerken</button>
+          <button class="knop stil" id="mag-annuleer">Annuleren</button>
+          <button class="knop primair" id="mag-verder" disabled>Verder</button>
         </span>
       </div>
     </div>
@@ -1880,26 +1974,171 @@ function zoekLeerlingOpNaam(kl, naam){
   return treffer;
 }
 
-const fotoOverlay = document.getElementById("foto-overlay");
-let fotoKeuze = [];
+/* ---------- Klas uit Magister: één venster met stappen ---------- */
 
-function sluitFotoVenster(){ fotoOverlay.hidden = true; fotoKeuze = []; }
+const magOverlay = document.getElementById("mag-overlay");
+const magVerder  = document.getElementById("mag-verder");
+const magTerug   = document.getElementById("mag-terug");
+const magFout    = document.getElementById("mag-fout");
+let magStap = 1, magKeuze = null, magUitslag = null, magDoel = "", fotoKeuze = [];
 
-function toonFotoVenster(kl, klasnaam, gevonden){
+const kaalNaam = (t) => (t || "").replace(/\s+/g, "").toLowerCase();
+
+function magToon(stap){
+  stap = String(stap);
+  magStap = stap;
+  document.querySelectorAll(".mag-stap").forEach(d => { d.hidden = d.dataset.stap !== stap; });
+  const nr = stap === "1" ? 1 : (stap === "2" ? 2 : 3);
+  document.querySelectorAll("#mag-stappen li").forEach(li => {
+    const n = +li.dataset.stap;
+    li.classList.toggle("nu", n === nr);
+    li.classList.toggle("klaar", n < nr);
+  });
+  magTerug.hidden = (stap === "1");
+  const uitleg = document.getElementById("mag-uitleg");
+  if (stap === "1"){
+    uitleg.textContent = "Kies de fotolijst die je uit Magister hebt opgeslagen.";
+    magVerder.textContent = "Verder"; magVerder.disabled = true;
+  } else if (stap === "2"){
+    uitleg.textContent = "De lijst is ingelezen. Kies wat er moet gebeuren.";
+    magVerder.textContent = "Verder"; magVerder.disabled = !magKeuze;
+  } else if (stap === "3klas"){
+    uitleg.textContent = "Controleer de naam waaronder de klas wordt opgeslagen.";
+    magVerder.textContent = "Klas inlezen"; magVerder.disabled = false;
+    magKlasHulp();
+  } else {
+    uitleg.textContent = "Vink aan welke pasfoto's vervangen moeten worden.";
+    werkFotoTellerBij();
+  }
+}
+
+function magOpen(){
+  magKeuze = null; magUitslag = null; magDoel = ""; fotoKeuze = [];
+  magFout.hidden = true;
+  document.querySelectorAll(".keuze").forEach(k => k.classList.remove("aan"));
+  document.getElementById("fotoraster").innerHTML = "";
+  magOverlay.hidden = false;
+  magToon(1);
+}
+function magSluit(){ magOverlay.hidden = true; fotoKeuze = []; magUitslag = null; }
+
+document.getElementById("btn-magister").addEventListener("click", magOpen);
+document.getElementById("mag-annuleer").addEventListener("click", magSluit);
+magOverlay.addEventListener("click", (e) => { if (e.target === magOverlay) magSluit(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !magOverlay.hidden) magSluit(); });
+
+/* --- stap 1: bestand kiezen of neerzetten --- */
+const neerzet = document.getElementById("mag-neerzet");
+document.getElementById("mag-kiesbestand").addEventListener("click", () => {
+  document.getElementById("magisterbestand").click();
+});
+["dragenter", "dragover"].forEach(t => neerzet.addEventListener(t, (e) => {
+  e.preventDefault(); neerzet.classList.add("over");
+}));
+["dragleave", "drop"].forEach(t => neerzet.addEventListener(t, (e) => {
+  e.preventDefault(); neerzet.classList.remove("over");
+}));
+neerzet.addEventListener("drop", (e) => {
+  const f = e.dataTransfer.files[0];
+  if (f) magLees(f);
+});
+document.getElementById("magisterbestand").addEventListener("change", (e) => {
+  const f = e.target.files[0];
+  e.target.value = "";
+  if (f) magLees(f);
+});
+
+async function magLees(bestand){
+  magFout.hidden = true;
+  const kop = document.querySelector("#mag-neerzet .neerzet-kop");
+  const oudeKop = kop.textContent;
+  kop.textContent = "Bezig met inlezen\u2026";
+  try {
+    magUitslag = await leesFotolijst(bestand);
+    const metFoto = magUitslag.leerlingen.filter(l => l.foto).length;
+    const namen = Object.keys(klassen);
+    magDoel = namen.find(n => kaalNaam(n) === kaalNaam(magUitslag.klas)) || "";
+    document.getElementById("mag-vondst").innerHTML =
+      "<span><b>" + magUitslag.leerlingen.length + "</b> leerlingen</span>" +
+      "<span><b>" + metFoto + "</b> met pasfoto</span>" +
+      (magUitslag.klas ? "<span>klas <b>" + magUitslag.klas + "</b></span>" : "") +
+      (magUitslag.lesperiode ? "<span>" + magUitslag.lesperiode + "</span>" : "");
+    document.querySelector('.keuze[data-keuze="fotos"]').disabled = !metFoto;
+    magToon(2);
+  } catch (fout){
+    magFout.textContent = fout.message;
+    magFout.hidden = false;
+  } finally {
+    kop.textContent = oudeKop;
+  }
+}
+
+/* --- stap 2: wat wil je doen --- */
+document.querySelectorAll(".keuze").forEach(k => k.addEventListener("click", () => {
+  if (k.disabled) return;
+  document.querySelectorAll(".keuze").forEach(x => x.classList.remove("aan"));
+  k.classList.add("aan");
+  magKeuze = k.dataset.keuze;
+  magVerder.disabled = false;
+}));
+
+/* --- stap 3a: klasnaam --- */
+const magKlasnaam = document.getElementById("mag-klasnaam");
+function magKlasHulp(){
+  const naam = magKlasnaam.value.trim().toUpperCase();
+  const h = document.getElementById("mag-klashulp");
+  if (!naam){
+    h.textContent = "Vul een naam in, bijvoorbeeld H4E."; h.className = "veldhulp";
+    magVerder.disabled = true; return;
+  }
+  magVerder.disabled = false;
+  if (klassen[naam]){
+    h.textContent = "Let op: " + naam + " bestaat al. De leerlingen én alle versies van de plattegrond worden vervangen.";
+    h.className = "veldhulp waarschuw";
+  } else {
+    h.textContent = "Nieuwe klas. Iedereen krijgt meteen een plek in het lokaal.";
+    h.className = "veldhulp";
+  }
+}
+magKlasnaam.addEventListener("input", magKlasHulp);
+
+/* --- stap 3b: foto's kiezen --- */
+function sleutelNaam(naam){
+  return (naam || "").toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, " ").trim();
+}
+function omgedraaid(naam){
+  const d = sleutelNaam(naam).split(" ");
+  return d.length < 2 ? "" : d.slice(1).concat(d[0]).join(" ");
+}
+function zoekLeerlingOpNaam(kl, naam){
+  const doel = sleutelNaam(naam), doel2 = omgedraaid(naam);
+  let treffer = null;
+  Object.values(kl.leerlingen).forEach(l => {
+    const t = sleutelNaam(l.naam);
+    if (!treffer && (t === doel || t === doel2 || omgedraaid(l.naam) === doel)) treffer = l;
+  });
+  return treffer;
+}
+
+function bouwFotoRaster(klasnaam){
+  const kl = klassen[klasnaam];
   fotoKeuze = [];
-  gevonden.forEach(g => {
+  magUitslag.leerlingen.forEach(g => {
     if (!g.foto) return;
     const l = zoekLeerlingOpNaam(kl, g.naam);
     if (!l) return;
     fotoKeuze.push({ leerling:l, nieuw:g.foto, anders:l.foto !== g.foto, aan:l.foto !== g.foto });
   });
-  const zonderTreffer = gevonden.filter(g => g.foto && !zoekLeerlingOpNaam(kl, g.naam)).length;
-  if (!fotoKeuze.length){
-    alert("Geen van de leerlingen uit deze fotolijst staat in de klas " + klasnaam + ".\n\nControleer of je de juiste klas hebt gekozen.");
-    return;
-  }
   const raster = document.getElementById("fotoraster");
   raster.innerHTML = "";
+  if (!fotoKeuze.length){
+    raster.innerHTML = '<p class="veldhulp waarschuw" style="grid-column:1/-1">' +
+      "Niemand uit deze fotolijst staat in " + klasnaam + ". Kies een andere klas.</p>";
+    werkFotoTellerBij();
+    return;
+  }
   fotoKeuze.forEach((r, n) => {
     const kaart = document.createElement("div");
     kaart.className = "fotokaart" + (r.aan ? " aan" : "");
@@ -1907,138 +2146,104 @@ function toonFotoVenster(kl, klasnaam, gevonden){
     const oud = r.leerling.foto
       ? '<img src="' + r.leerling.foto + '" alt="">'
       : '<img alt="" style="background:var(--zacht)">';
-    kaart.innerHTML =
-      '<span class="vink">\u2713</span>' +
-      '<div class="paar">' + oud + '<span class="pijltje">\u2192</span><img src="' + r.nieuw + '" alt=""></div>' +
-      '<div class="nm"></div>' +
-      '<div class="st">' + (r.anders ? (r.leerling.foto ? "gewijzigd" : "nieuw") : "gelijk") + "</div>";
+    kaart.innerHTML = '<span class="vink">\u2713</span><div class="paar">' + oud +
+      '<span class="pijltje">\u2192</span><img src="' + r.nieuw + '" alt=""></div>' +
+      '<div class="nm"></div><div class="st">' +
+      (r.anders ? (r.leerling.foto ? "gewijzigd" : "nieuw") : "gelijk") + "</div>";
     kaart.querySelector(".nm").textContent = r.leerling.naam;
     kaart.addEventListener("click", () => {
-      r.aan = !r.aan;
-      kaart.classList.toggle("aan", r.aan);
-      werkFotoTellerBij();
+      r.aan = !r.aan; kaart.classList.toggle("aan", r.aan); werkFotoTellerBij();
     });
     raster.appendChild(kaart);
   });
-  document.getElementById("foto-uitleg").textContent =
-    "Klas " + klasnaam + ". Vink aan welke foto's vervangen moeten worden."
-    + (zonderTreffer ? " " + zonderTreffer + " leerling(en) uit de lijst staan niet in deze klas en worden overgeslagen." : "");
   werkFotoTellerBij();
-  fotoOverlay.hidden = false;
 }
 function werkFotoTellerBij(){
   const n = fotoKeuze.filter(r => r.aan).length;
-  document.getElementById("btn-foto-ok").textContent =
-    n ? "Bijwerken (" + n + ")" : "Bijwerken";
-  document.getElementById("btn-foto-ok").disabled = !n;
+  const gewijzigd = fotoKeuze.filter(r => r.anders).length;
+  document.getElementById("mag-teller").textContent =
+    fotoKeuze.length ? (n + " van " + fotoKeuze.length + " aangevinkt \u00b7 " + gewijzigd + " gewijzigd") : "";
+  magVerder.textContent = n ? "Bijwerken (" + n + ")" : "Bijwerken";
+  magVerder.disabled = !n;
 }
 function zetVinkjes(fn){
   fotoKeuze.forEach((r, n) => {
     r.aan = fn(r);
-    document.querySelector('.fotokaart[data-n="' + n + '"]').classList.toggle("aan", r.aan);
+    const kaart = document.querySelector('.fotokaart[data-n="' + n + '"]');
+    if (kaart) kaart.classList.toggle("aan", r.aan);
   });
   werkFotoTellerBij();
 }
 document.getElementById("btn-foto-alles").addEventListener("click", () => zetVinkjes(() => true));
 document.getElementById("btn-foto-niets").addEventListener("click", () => zetVinkjes(() => false));
 document.getElementById("btn-foto-nieuw").addEventListener("click", () => zetVinkjes(r => r.anders));
-document.getElementById("btn-foto-annuleer").addEventListener("click", sluitFotoVenster);
-fotoOverlay.addEventListener("click", (e) => { if (e.target === fotoOverlay) sluitFotoVenster(); });
-document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !fotoOverlay.hidden) sluitFotoVenster(); });
-document.getElementById("btn-foto-ok").addEventListener("click", () => {
+document.getElementById("mag-doelklas").addEventListener("change", (e) => bouwFotoRaster(e.target.value));
+
+/* --- navigatie --- */
+magTerug.addEventListener("click", () => {
+  if (magStap === "2") magToon(1); else magToon(2);
+});
+magVerder.addEventListener("click", () => {
+  if (magStap === "2"){
+    if (magKeuze === "klas"){
+      magKlasnaam.value = (magUitslag.klas || "").toUpperCase();
+      magToon("3klas");
+      magKlasnaam.focus(); magKlasnaam.select();
+    } else {
+      const kiezer = document.getElementById("mag-doelklas");
+      kiezer.innerHTML = "";
+      Object.keys(klassen).forEach(n => {
+        const o = document.createElement("option");
+        o.value = n; o.textContent = keuzeLabel(n);
+        kiezer.appendChild(o);
+      });
+      kiezer.value = magDoel || (klassen[huidig] ? huidig : Object.keys(klassen)[0]);
+      bouwFotoRaster(kiezer.value);
+      magToon("3fotos");
+    }
+    return;
+  }
+  if (magStap === "3klas"){ magRondKlasAf(); return; }
+  if (magStap === "3fotos"){ magRondFotosAf(); return; }
+});
+
+function magRondKlasAf(){
+  const naam = magKlasnaam.value.trim().toUpperCase();
+  if (!naam) return;
+  bewaarStap();
+  klassen[naam] = maakKlas(magUitslag.leerlingen);
+  zorgVoorVersies(klassen[naam]);
+  if (!Array.from(keuze.options).some(o => o.value === naam)){
+    const o = document.createElement("option");
+    o.value = naam; o.textContent = keuzeLabel(naam);
+    keuze.appendChild(o);
+  }
+  const metFoto = magUitslag.leerlingen.filter(l => l.foto).length;
+  const aantal = magUitslag.leerlingen.length;
+  keuze.value = naam; huidig = naam; selectie = null;
+  wisBeurt(); markeer(); tekenVersieKnop(); vernieuwKeuzelijst(); teken(); schrijf();
+  magSluit();
+  zetStatus(aantal + " leerlingen ingelezen, " + metFoto + " met pasfoto", true);
+}
+
+function magRondFotosAf(){
   const gekozen = fotoKeuze.filter(r => r.aan);
   if (!gekozen.length) return;
+  const doel = document.getElementById("mag-doelklas").value;
   bewaarStap();
   gekozen.forEach(r => { r.leerling.foto = r.nieuw; });
-  sluitFotoVenster();
+  if (doel !== huidig){
+    keuze.value = doel; huidig = doel; selectie = null;
+    wisBeurt(); markeer(); tekenVersieKnop();
+  }
+  magSluit();
   teken(); schrijf();
-  zetStatus(gekozen.length + " foto('s) bijgewerkt", true);
-});
+  zetStatus(gekozen.length + " foto('s) bijgewerkt in " + doel, true);
+}
 
 Object.values(klassen).forEach(zorgVoorVersies);
 tekenVersieKnop();
 
-document.getElementById("btn-magister").addEventListener("click", () => {
-  document.getElementById("magisterbestand").click();
-});
-document.getElementById("magisterbestand").addEventListener("change", async (e) => {
-  const bestand = e.target.files[0];
-  e.target.value = "";
-  if (!bestand) return;
-  const status = document.getElementById("foto-status");
-  const oud = status ? status.textContent : "";
-  if (status) status.textContent = "Fotolijst inlezen\u2026";
-  try {
-    const uitslag = await leesFotolijst(bestand);
-    const metFoto = uitslag.leerlingen.filter(l => l.foto).length;
-    const kop = "Gevonden: " + uitslag.leerlingen.length + " leerlingen, " + metFoto + " met pasfoto."
-      + (uitslag.lesperiode ? "\nLesperiode " + uitslag.lesperiode : "");
-
-    /* Alleen foto's bijwerken? Dan verandert er niets aan de indelingen. */
-    const alleenFotos = metFoto > 0 && confirm(
-      kop + "\n\nWil je alleen de foto's bijwerken in een klas die je al hebt?"
-      + "\n\nOK = alleen foto's bijwerken (je kiest daarna wie).\nAnnuleren = deze lijst als klas inlezen.");
-
-    if (alleenFotos){
-      const namen = Object.keys(klassen);
-      const kaal = (t) => (t || "").replace(/\s+/g, "").toLowerCase();
-      let doel = namen.find(n => kaal(n) === kaal(uitslag.klas)) || "";
-      if (!doel){
-        const gevraagd = prompt("De fotolijst hoort bij klas \u201e" + (uitslag.klas || "onbekend")
-          + "\u201d, die je nog niet hebt.\n\nIn welke van jouw klassen wil je de foto's bijwerken?\n\nJe klassen: "
-          + namen.join(", "), namen.includes(huidig) ? huidig : namen[0] || "");
-        if (gevraagd === null){ if (status) status.textContent = oud; return; }
-        doel = namen.find(n => kaal(n) === kaal(gevraagd)) || "";
-        if (!doel){
-          if (status) status.textContent = oud;
-          alert("De klas \u201e" + gevraagd.trim() + "\u201d bestaat niet.");
-          return;
-        }
-      }
-      if (!doel || !klassen[doel]){
-        if (status) status.textContent = oud;
-        if (doel) alert("De klas " + doel + " bestaat niet.");
-        return;
-      }
-      if (doel !== huidig){ keuze.value = doel; huidig = doel; selectie = null; wisBeurt(); markeer(); teken(); }
-      toonFotoVenster(klassen[doel], doel, uitslag.leerlingen);
-      if (status) status.textContent = oud;
-      return;
-    }
-
-    let naam = (uitslag.klas || "").toUpperCase();
-    naam = (prompt(kop + "\n\nOnder welke naam wil je deze klas opslaan?", naam) || "").trim().toUpperCase();
-    if (!naam) { if (status) status.textContent = oud; return; }
-    if (klassen[naam] && !confirm("Klas " + naam + " bestaat al.\n\nVervangen door deze lijst? Alle versies van de plattegrond van deze klas gaan dan verloren.")) {
-      if (status) status.textContent = oud; return;
-    }
-    const bestond = !!klassen[naam];
-    klassen[naam] = maakKlas(uitslag.leerlingen);
-    // lege startklas opruimen zodra er een echte klas is
-    Object.keys(klassen).forEach(n => {
-      if (n !== naam && n === "KLAS 1" && !Object.keys(klassen[n].leerlingen).length){
-        delete klassen[n];
-        Array.from(keuze.options).forEach(o => { if (o.value === n) o.remove(); });
-      }
-    });
-    if (!bestond){
-      const o = document.createElement("option");
-      o.value = naam; o.textContent = keuzeLabel(naam);
-      keuze.appendChild(o);
-    }
-    keuze.value = naam;
-    huidig = naam;
-    selectie = null;
-    wisBeurt();
-    markeer();
-    tekenVersieKnop();
-    teken();
-    if (status) status.textContent = uitslag.leerlingen.length + " leerlingen ingelezen, " + metFoto + " met pasfoto.";
-  } catch (fout) {
-    if (status) status.textContent = oud;
-    alert("Inlezen mislukt: " + fout.message);
-  }
-});
 })();
 </script>
 </body>
