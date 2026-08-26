@@ -312,7 +312,12 @@ svg{flex:none}
 .zorgnotitie{width:100%;margin-top:auto;flex:none;font-size:11px;line-height:1.3;color:var(--grijs);
   background:var(--papier);border:1px solid var(--lijn);border-radius:6px;padding:3px 5px;
   text-align:left;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.zorgnotitie.leeg{color:var(--zacht);font-style:italic}
+.zorgnotitie:empty:before{content:"notitie\2026 ";color:var(--zacht);font-style:italic}
+.zorgnotitie:hover{border-color:var(--lijn-sterk);background:var(--kaart)}
+.zorgnotitie:focus{outline:2px solid var(--blauw);outline-offset:1px;border-color:var(--blauw);
+  background:var(--kaart);-webkit-line-clamp:unset;display:block;cursor:text}
+.lokaal[data-zorgmerken="uit"] .zorgnotitie,
+body.presentatie .zorgnotitie{pointer-events:none}
 .lokaal:not([data-stijl="zorg"]) .zorgnotitie{display:none}
 .lokaal[data-zorgmerken="uit"] .zorgmerken{display:none}
 .lokaal[data-stijl="zorg"] .stoel{padding:6px 7px 6px;justify-content:flex-start}
@@ -2434,8 +2439,47 @@ function zorgMerkenVak(l){
 /* notitieregel onder het kaartje */
 function zorgNotitieVak(l){
   const el = document.createElement("div");
-  el.className = "zorgnotitie" + (l.notitie ? "" : " leeg");
-  el.textContent = l.notitie || "geen notitie";
+  el.className = "zorgnotitie";
+  el.textContent = l.notitie || "";
+  /* Direct typen onder het kaartje: geen menu nodig voor een korte notitie.
+     Alleen in de weergave Aandachtspunten, en niet op het digibord. */
+  el.contentEditable = "true";
+  el.spellcheck = false;
+  el.dataset.leerling = l.id;
+  el.setAttribute("role", "textbox");
+  el.setAttribute("aria-label", "Notitie bij " + l.naam);
+  el.draggable = false;
+
+  /* klikken mag de stoel niet selecteren of een sleepactie starten */
+  ["mousedown", "click", "dblclick", "pointerdown"].forEach(t =>
+    el.addEventListener(t, (e) => e.stopPropagation()));
+  el.addEventListener("dragstart", (e) => { e.preventDefault(); e.stopPropagation(); });
+
+  let stapBewaard = false, origineel = l.notitie || "";
+  el.addEventListener("focus", () => { stapBewaard = false; origineel = l.notitie || ""; });
+  el.addEventListener("keydown", (e) => {
+    e.stopPropagation();
+    if (e.key === "Enter"){ e.preventDefault(); el.blur(); }
+    if (e.key === "Escape"){
+      e.preventDefault();
+      l.notitie = origineel;          /* terug naar hoe het was toen je begon */
+      el.textContent = origineel;
+      schrijf();
+      el.blur();
+    }
+  });
+  el.addEventListener("input", () => {
+    if (!stapBewaard){ bewaarStap(); stapBewaard = true; }
+    if (el.textContent.length > 180) el.textContent = el.textContent.slice(0, 180);
+    l.notitie = el.textContent.trim();
+    schrijf();          /* geen teken(): dat zou je cursor wegnemen */
+  });
+  el.addEventListener("blur", () => {
+    if (l.notitie === origineel && el.textContent.trim() === origineel){ el.textContent = origineel; return; }
+    l.notitie = el.textContent.replace(/\s+/g, " ").trim();
+    el.textContent = l.notitie;
+    schrijf();
+  });
   return el;
 }
 
