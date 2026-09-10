@@ -303,7 +303,10 @@ svg{flex:none}
   body.groep-print #groep-overlay{display:block !important;position:static;background:none;padding:0}
   body.groep-print #groep-overlay .venster{box-shadow:none;max-height:none;width:100%}
   body.groep-print #groep-overlay .venster-voet,
-  body.groep-print #groep-overlay .groepinstel{display:none !important}
+  body.groep-print #groep-overlay .groepinstel,
+  body.groep-print #groep-overlay .groepregels,
+  body.groep-print #groep-overlay .niveaublok,
+  body.groep-print #groep-overlay .groeprapport{display:none !important}
 }
 /* ---------- weergave met aandachtspunten ---------- */
 .zorgmerken{position:absolute;top:4px;right:4px;display:flex;gap:3px;z-index:2;pointer-events:none}
@@ -402,7 +405,7 @@ body.presentatie{background:#0b1220;--foto:112px;--naam:25px}
 body.presentatie .wrap{max-width:none;padding:14px 18px;height:100vh;display:flex;flex-direction:column}
 body.presentatie .kop,body.presentatie .onder,body.presentatie .acties{display:none}
 body.presentatie .balk{margin:0 0 12px;justify-content:flex-end}
-body.presentatie .balk .knop:not(#btn-presentatie):not(#btn-beurt){display:none}
+body.presentatie .balk .knop:not(#btn-presentatie):not(#btn-beurt):not(#btn-timer){display:none}
 body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
 
 @media (max-width:1100px){
@@ -456,7 +459,94 @@ body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
   .lokaal[data-stijl="portret"] .naam{-webkit-hyphens:none;hyphens:none;word-break:normal}
   .lokaal[data-stijl="naamkaart"] .voornaam{font-size:3.4mm!important}
   .lokaal[data-stijl="naamkaart"] .achternaam{font-size:2.9mm!important}
+  .lokaal[data-stijl="naamkaart"] .kortnaam{font-size:3.8mm!important}
 }
+
+/* ---------- naamkaart: welke naam ---------- */
+.kortnaam{display:none}
+.lokaal[data-stijl="naamkaart"][data-naamkeuze="voor"] .voornaam,
+.lokaal[data-stijl="naamkaart"][data-naamkeuze="voor"] .achternaam,
+.lokaal[data-stijl="naamkaart"][data-naamkeuze="achter"] .voornaam,
+.lokaal[data-stijl="naamkaart"][data-naamkeuze="achter"] .achternaam{display:none}
+.lokaal[data-stijl="naamkaart"][data-naamkeuze="voor"] .kortnaam,
+.lokaal[data-stijl="naamkaart"][data-naamkeuze="achter"] .kortnaam{display:block;font-size:min(calc(var(--naam) * 1.35),40cqh);font-weight:700;line-height:1.15;-webkit-hyphens:none;hyphens:none}
+.naamkeuze{margin-top:12px}
+.naamkeuze[hidden]{display:none}
+.naamkeuze .veldlabel{font-size:12.5px;color:var(--grijs);margin-bottom:5px}
+.naamkeuze .wijzekiezer{display:grid;grid-template-columns:repeat(3,1fr)}
+.naamkeuze .wijzekiezer button{padding:7px 4px;font-size:12.5px}
+
+/* ---------- groepjes: voorwaarden en niveaus ---------- */
+.groepregels{margin-bottom:12px}
+.groepregels .vlak{background:var(--blauw-zacht);color:var(--blauw)}
+.groepregels .regel.aan .vlak{background:var(--blauw);color:#fff}
+.niveaublok{margin:0 0 14px;padding:10px 13px;border:1px solid var(--lijn);border-radius:12px;background:var(--papier)}
+.niveaukop{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.niveaukop span{font-size:12.5px;color:var(--grijs);flex:1;min-width:180px}
+.niveaukop .knop{padding:6px 11px;font-size:12.5px}
+.niveaulijst{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px 16px;margin-top:10px;padding-top:10px;border-top:1px solid var(--lijn)}
+.niveaulijst[hidden]{display:none}
+.niveaurij{display:flex;align-items:center;gap:8px;font-size:13px;min-height:28px}
+.niveaurij .wie{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nvknoppen{display:flex;gap:3px;flex:none}
+.nvknop{width:27px;height:25px;border:1px solid var(--lijn-sterk);border-radius:7px;background:var(--kaart);font-size:12px;font-weight:700;color:var(--grijs);padding:0}
+.nvknop:hover{border-color:var(--blauw);color:var(--inkt)}
+.nvknop.aan{background:var(--blauw);border-color:var(--blauw);color:#fff}
+.niveauuitleg{grid-column:1/-1;font-size:12px;color:var(--grijs);margin:0 0 4px}
+.groeprapport{margin:0 0 12px;padding:9px 13px;border-radius:10px;font-size:12.5px;line-height:1.5}
+.groeprapport[hidden]{display:none}
+.groeprapport.ok{background:#f0fdf4;border-left:3px solid var(--groen);color:#14532d}
+.groeprapport.let{background:#fffbeb;border-left:3px solid var(--oranje);color:#92400e}
+.groeprapport p{margin:0}
+.groeprapport p + p{margin-top:4px}
+#groep-onthoud.gedaan{color:var(--groen)}
+
+/* ---------- timer ---------- */
+.timer{position:fixed;z-index:70;top:110px;right:28px;width:310px;max-width:calc(100vw - 24px);
+  background:rgba(15,23,42,.95);color:#f8fafc;border:1px solid rgba(255,255,255,.08);border-radius:20px;
+  box-shadow:0 26px 54px -20px rgba(2,6,23,.8);padding:10px 14px 14px;touch-action:none}
+.timer[hidden]{display:none}
+.timer-kop{display:flex;align-items:center;gap:8px;cursor:grab;margin:0 -4px 2px;padding:2px 4px;user-select:none;-webkit-user-select:none}
+.timer.sleept .timer-kop{cursor:grabbing}
+.timer-titel{display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:#93c5fd}
+.timer-knopjes{margin-left:auto;display:flex;gap:5px}
+.tk{width:30px;height:30px;border-radius:9px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#e2e8f0;display:flex;align-items:center;justify-content:center;padding:0}
+.tk:hover{background:rgba(255,255,255,.16)}
+.tk[aria-pressed="false"]{color:#64748b}
+.timer-tijd{font-variant-numeric:tabular-nums;font-weight:800;letter-spacing:-.03em;text-align:center;font-size:66px;line-height:1.05;margin:6px 0 8px;user-select:none;-webkit-user-select:none}
+.timer-invoer{display:flex;align-items:center;justify-content:center;gap:4px;margin:8px 0 10px}
+.timer-invoer input{width:92px;text-align:center;font:inherit;font-variant-numeric:tabular-nums;font-size:54px;font-weight:800;letter-spacing:-.03em;line-height:1.1;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:#fff;border-radius:12px;padding:2px 0;-moz-appearance:textfield;appearance:textfield}
+.timer-invoer input::-webkit-inner-spin-button,.timer-invoer input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.timer-invoer input:focus{outline:2px solid #38bdf8;outline-offset:1px}
+.timer-invoer .dubbelepunt{font-size:48px;font-weight:800;color:#94a3b8}
+.timer-eenheid{display:flex;justify-content:center;gap:66px;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#94a3b8;font-weight:700;margin-top:-6px;margin-bottom:10px}
+.timer-snel{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.timer-snel button{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);color:#e2e8f0;border-radius:10px;padding:7px 0;font-size:13px;font-weight:700}
+.timer-snel button:hover{background:rgba(255,255,255,.14)}
+.timer-balk{height:8px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin-bottom:12px}
+.timer-balk span{display:block;height:100%;width:100%;background:#38bdf8;border-radius:inherit}
+.timer-knoppen{display:flex;gap:8px}
+.timer-knoppen button{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:12px;padding:10px 8px;font-size:14px;font-weight:700;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#f1f5f9}
+.timer-knoppen button:hover{background:rgba(255,255,255,.15)}
+.timer-knoppen button.hoofd{background:linear-gradient(135deg,var(--oranje),var(--oranje-diep));border-color:transparent;color:#fff}
+.timer-knoppen button[hidden]{display:none}
+.timer-melding{text-align:center;font-size:15px;font-weight:800;letter-spacing:.02em;margin:-2px 0 10px;color:#fecaca}
+.timer-melding[hidden]{display:none}
+.timer.bijna .timer-balk span{background:var(--oranje)}
+.timer.bijna .timer-tijd{color:#fcd34d}
+.timer.klaar{background:rgba(153,27,27,.96);animation:timerpuls 1.1s ease-in-out infinite}
+.timer.klaar .timer-tijd{color:#fff}
+.timer.klaar .timer-balk span{background:#fca5a5}
+@keyframes timerpuls{50%{box-shadow:0 0 0 16px rgba(239,68,68,.28),0 26px 54px -20px rgba(2,6,23,.8)}}
+.timer.groot{width:min(640px,calc(100vw - 24px));padding:14px 22px 20px}
+.timer.groot .timer-tijd{font-size:clamp(92px,15vw,200px)}
+.timer.groot .timer-balk{height:12px}
+.timer.groot .timer-knoppen button{font-size:16px;padding:13px 10px}
+#btn-timer.loopt{border-color:#38bdf8;background:#f0f9ff}
+body.presentatie .balk .scheiding{display:none}
+@media (prefers-reduced-motion:reduce){.timer.klaar{animation:none}}
+@media print{.timer{display:none!important}}
 </style>
 </head>
 <body>
@@ -506,6 +596,7 @@ body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
   <div class="balk">
     <button class="knop primair" id="btn-beurt" data-icon="dice">Beurt trekken</button>
     <button class="knop donker" id="btn-presentatie" data-icon="monitor">Op het bord</button>
+    <button class="knop" id="btn-timer" data-icon="klok">Timer</button>
     <button class="knop" id="btn-shuffle" data-icon="shuffle">Willekeurig indelen</button>
     <button class="knop violet" id="btn-spiegel" data-icon="omdraaien">Docentweergave</button>
     <span class="scheiding"></span>
@@ -554,6 +645,41 @@ body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
     <div class="bord"><span data-icon="monitor" data-maat="18"></span> Bord &middot; voorkant lokaal</div>
     <div class="rijen" id="rijen"></div>
   </section>
+
+  <div class="timer" id="timer" role="dialog" aria-label="Timer" hidden>
+    <div class="timer-kop" id="timer-kop">
+      <span class="timer-titel"><span data-icon="klok" data-maat="14"></span> Timer</span>
+      <span class="timer-knopjes">
+        <button type="button" class="tk" id="timer-geluid" aria-pressed="true" title="Geluid aan of uit" aria-label="Geluid aan of uit"></button>
+        <button type="button" class="tk" id="timer-maat" title="Groter of kleiner" aria-label="Groter of kleiner"></button>
+        <button type="button" class="tk" id="timer-dicht" data-icon="kruis" data-maat="15" title="Timer sluiten" aria-label="Timer sluiten"></button>
+      </span>
+    </div>
+    <div id="timer-instel">
+      <div class="timer-invoer">
+        <input type="number" id="timer-min" min="0" max="99" value="5" inputmode="numeric" aria-label="Minuten">
+        <span class="dubbelepunt">:</span>
+        <input type="number" id="timer-sec" min="0" max="59" value="00" inputmode="numeric" aria-label="Seconden">
+      </div>
+      <div class="timer-eenheid"><span>min</span><span>sec</span></div>
+      <div class="timer-snel" id="timer-snel">
+        <button type="button" data-min="1">1</button><button type="button" data-min="2">2</button>
+        <button type="button" data-min="3">3</button><button type="button" data-min="5">5</button>
+        <button type="button" data-min="10">10</button><button type="button" data-min="15">15</button>
+        <button type="button" data-min="20">20</button><button type="button" data-min="30">30</button>
+      </div>
+    </div>
+    <div id="timer-loop" hidden>
+      <div class="timer-tijd" id="timer-tijd" aria-live="off">5:00</div>
+      <p class="timer-melding" id="timer-melding" role="status" hidden>De tijd is om</p>
+      <div class="timer-balk"><span id="timer-voortgang"></span></div>
+    </div>
+    <div class="timer-knoppen">
+      <button type="button" class="hoofd" id="timer-start"></button>
+      <button type="button" id="timer-erbij" hidden>+1 min</button>
+      <button type="button" id="timer-opnieuw" hidden></button>
+    </div>
+  </div>
 
   <div class="overlay" id="indeel-overlay" hidden>
     <div class="venster" role="dialog" aria-modal="true" aria-labelledby="indeel-titel">
@@ -614,10 +740,21 @@ body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
           </div>
           <button class="knop primair" id="groep-maak">Nieuwe verdeling</button>
         </div>
+        <div class="regels groepregels" id="groep-regels"></div>
+        <div class="niveaublok" id="niveau-blok">
+          <div class="niveaukop">
+            <span id="niveau-samenvatting"></span>
+            <button type="button" class="knop stil" id="niveau-toon" aria-expanded="false">Niveaus invullen</button>
+          </div>
+          <div class="niveaulijst" id="niveau-lijst" hidden></div>
+        </div>
+        <div class="groeprapport" id="groep-rapport" hidden></div>
         <div class="groepen" id="groepen"></div>
       </div>
       <div class="venster-voet">
         <button class="knop stil" id="groep-print">Afdrukken</button>
+        <button class="knop stil" id="groep-onthoud" title="Onthoudt wie er samen zat, zodat de volgende keer andere combinaties ontstaan">Deze indeling onthouden</button>
+        <button class="knop stil" id="groep-vergeet">Geschiedenis wissen</button>
         <span class="rechts"><button class="knop primair" id="groep-sluit">Sluiten</button></span>
       </div>
     </div>
@@ -822,6 +959,14 @@ body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
         <button type="button" data-stijl="naamkaart">Naamkaart</button>
         <button type="button" data-stijl="zorg">Aandachtspunten</button>
       </div>
+      <div class="naamkeuze" id="naamkeuze" hidden>
+        <span class="veldlabel">Op het naamkaartje</span>
+        <div class="wijzekiezer" id="naamkeuze-knoppen" role="group" aria-label="Welke naam op het naamkaartje">
+          <button type="button" data-nk="beide" class="actief">Beide</button>
+          <button type="button" data-nk="voor">Voornaam</button>
+          <button type="button" data-nk="achter">Achternaam</button>
+        </div>
+      </div>
       <div class="schuifrij">
         <div class="schuifkop"><label for="fotoschaal">Grootte foto / naam</label><span id="grootte-waarde">76px</span></div>
         <input type="range" id="fotoschaal" min="0" max="132" step="4" value="76" aria-label="Grootte van foto en naam">
@@ -869,7 +1014,15 @@ const ICONEN = {
   lijst:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
   sparkles:'<path d="m12 3 1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3Z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15Z"/>',
   sliders:'<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h10M18 18h2"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="16" cy="18" r="2"/>',
-  raster:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18"/>'
+  raster:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18"/>',
+  speel:'<path d="M7 4.5v15l12-7.5-12-7.5Z"/>',
+  pauzeer:'<path d="M8 5v14M16 5v14"/>',
+  bel:'<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16Z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
+  groter:'<path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/>',
+  kleiner:'<path d="M4 14h6v6M20 10h-6V4M10 14l-7 7M14 10l7-7"/>',
+  mensen:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20v-1a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v1"/><circle cx="17" cy="9" r="2.6"/><path d="M17 14a4.5 4.5 0 0 1 4.5 4.5V20"/>',
+  lagen:'<path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/>',
+  herhaal:'<path d="M4 12a8 8 0 0 1 14-5.3L20 9"/><path d="M20 4v5h-5"/><path d="M20 12a8 8 0 0 1-14 5.3L4 15"/><path d="M4 20v-5h5"/>'
 };
 function svg(naam, maat){
   return '<svg width="' + (maat||18) + '" height="' + (maat||18) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICONEN[naam]||"") + '</svg>';
@@ -968,6 +1121,7 @@ const lokaalEl = document.getElementById("lokaal");
 
 function teken(){
   const kl = k();
+  telNamen(kl);
   rijenEl.style.gridTemplateColumns = "repeat(" + kl.rijen + ",1fr)";
   rijenEl.innerHTML = "";
   const toonFoto = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--foto"), 10) > 0;
@@ -1017,6 +1171,45 @@ function teken(){
   tekenActies();
 }
 
+/* ---------- naamkaartje: voornaam, achternaam of beide ----------
+   Een naam is één tekst. Het eerste woord is de voornaam, de rest de
+   achternaam met tussenvoegsel ("Eva van der Wal" -> "Eva" / "van der Wal").
+   Hebben twee leerlingen dezelfde voornaam, dan komt er een letter achter
+   (Sam V. en Sam K.); bij dezelfde achternaam de voorletter (Jansen, T.). */
+let naamkeuze = "beide";
+let naamTelling = { voor:new Map(), achter:new Map() };
+function naamDelen(naam){
+  const d = String(naam || "").trim().split(/\s+/).filter(Boolean);
+  return { voor: d[0] || "", achter: d.slice(1).join(" ") };
+}
+function telNamen(kl){
+  const voor = new Map(), achter = new Map();
+  Object.values(kl.leerlingen).forEach(l => {
+    const n = naamDelen(l.naam);
+    const v = n.voor.toLowerCase(), a = n.achter.toLowerCase();
+    voor.set(v, (voor.get(v) || 0) + 1);
+    if (a) achter.set(a, (achter.get(a) || 0) + 1);
+  });
+  naamTelling = { voor, achter };
+}
+function korteNaam(naam, keuze){
+  const n = naamDelen(naam);
+  if (!n.achter) return n.voor;
+  if (keuze === "achter"){
+    const dubbel = (naamTelling.achter.get(n.achter.toLowerCase()) || 0) > 1;
+    return n.achter + (dubbel ? ", " + n.voor.charAt(0).toUpperCase() + "." : "");
+  }
+  const dubbel = (naamTelling.voor.get(n.voor.toLowerCase()) || 0) > 1;
+  const kern = n.achter.split(" ").pop();
+  return n.voor + (dubbel ? " " + kern.charAt(0).toUpperCase() + "." : "");
+}
+function zetNaamkeuze(nk){
+  if (!["beide","voor","achter"].includes(nk)) nk = "beide";
+  naamkeuze = nk;
+  lokaalEl.dataset.naamkeuze = nk;
+  document.querySelectorAll("#naamkeuze-knoppen button").forEach(b => b.classList.toggle("actief", b.dataset.nk === nk));
+}
+
 function maakStoel(i, toonFoto){
   const kl = k();
   const id = kl.plekken[i];
@@ -1046,6 +1239,12 @@ function maakStoel(i, toonFoto){
       achter.className = "achternaam";
       achter.textContent = stukken.slice(1).join(" ");
       nm.appendChild(achter);
+    }
+    if (naamkeuze !== "beide"){
+      const kort = document.createElement("span");
+      kort.className = "kortnaam";
+      kort.textContent = korteNaam(l.naam, naamkeuze);
+      nm.appendChild(kort);
     }
     el.appendChild(nm);
     const merken = zorgMerkenVak(l);
@@ -1424,12 +1623,20 @@ function vernieuwKeuzelijst(){
 /* ---------- tegelstijl ---------- */
 function zetStijl(naam){
   lokaalEl.dataset.stijl = naam;
+  document.getElementById("naamkeuze").hidden = naam !== "naamkaart";
   document.querySelectorAll("#stijlkiezer button").forEach(b => b.classList.toggle("actief", b.dataset.stijl === naam));
 }
 document.getElementById("stijlkiezer").addEventListener("click", e => {
   const knop = e.target.closest("button[data-stijl]");
   if (!knop) return;
   zetStijl(knop.dataset.stijl);
+  markeer();
+});
+document.getElementById("naamkeuze-knoppen").addEventListener("click", e => {
+  const knop = e.target.closest("button[data-nk]");
+  if (!knop) return;
+  zetNaamkeuze(knop.dataset.nk);
+  teken();
   markeer();
 });
 
@@ -1537,7 +1744,7 @@ document.getElementById("btn-beurt-2").addEventListener("click", trekBeurt);
 /* ---------- werkbalk ---------- */
 document.getElementById("btn-presentatie").addEventListener("click", () => {
   const aan = document.body.classList.toggle("presentatie");
-  document.getElementById("btn-presentatie").textContent = aan ? "Terug naar bewerken" : "Op het bord";
+  document.getElementById("btn-presentatie").lastChild.textContent = aan ? " Terug naar bewerken" : " Op het bord";
   if (aan && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
   if (!aan && document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(()=>{});
   teken();
@@ -1574,18 +1781,19 @@ document.getElementById("btn-terug").disabled = true;
 document.getElementById("btn-print").addEventListener("click", () => window.print());
 
 function bouwData(metFotos, metZorg){
-  const uit = { versie:5, datum:new Date().toISOString().slice(0,10), stijl:lokaalEl.dataset.stijl, klassen:{} };
+  const uit = { versie:5, datum:new Date().toISOString().slice(0,10), stijl:lokaalEl.dataset.stijl, naamkeuze, klassen:{} };
   Object.entries(klassen).forEach(([naam, kl]) => {
     const leerlingen = {};
     Object.entries(kl.leerlingen).forEach(([id, l]) => {
       let uitL = metFotos ? Object.assign({}, l) : Object.assign({}, l, { foto:null });
-      if (!metZorg){ uitL.zorg = []; uitL.notitie = ""; }
+      if (!metZorg){ uitL.zorg = []; uitL.notitie = ""; uitL.niveau = null; }
       leerlingen[id] = uitL;
     });
     if (naam === huidig) legActieveVersieVast(kl); else zorgVoorVersies(kl);
     uit.klassen[naam] = { rijen:kl.rijen, diep:kl.diep, leerlingen, plekken:kl.plekken, wachtrij:kl.wachtrij,
                           versies:kl.versies, actief:kl.actief,
-                          nietSamen: metZorg ? (kl.nietSamen || []) : [] };
+                          nietSamen: metZorg ? (kl.nietSamen || []) : [],
+                          groepGeschiedenis: kl.groepGeschiedenis || [] };
   });
   return uit;
 }
@@ -1597,7 +1805,8 @@ function laadData(data){
     Object.assign(klassen[naam], {
       rijen:kl.rijen || 3, diep:kl.diep || 5,
       leerlingen:kl.leerlingen, plekken:kl.plekken, wachtrij:kl.wachtrij || [],
-      beurt:null, gehad:[], nietSamen: Array.isArray(kl.nietSamen) ? kl.nietSamen : []
+      beurt:null, gehad:[], nietSamen: Array.isArray(kl.nietSamen) ? kl.nietSamen : [],
+      groepGeschiedenis: Array.isArray(kl.groepGeschiedenis) ? kl.groepGeschiedenis : []
     });
     if (Array.isArray(kl.versies) && kl.versies.length){
       klassen[naam].versies = kl.versies;
@@ -1634,6 +1843,7 @@ function laadData(data){
     }
   });
   if (data.stijl) zetStijl(data.stijl);
+  zetNaamkeuze(data.naamkeuze || "beide");
   volgnummer += 1000;
   selectie = null;
   wisBeurt();
@@ -1680,7 +1890,7 @@ document.addEventListener("keydown", e => {
   if (k() && k().beurt) wisBeurt();
   if (document.body.classList.contains("presentatie")){
     document.body.classList.remove("presentatie");
-    document.getElementById("btn-presentatie").textContent = "Op het bord";
+    document.getElementById("btn-presentatie").lastChild.textContent = " Op het bord";
   }
   selectie = null;
   teken();
@@ -1761,7 +1971,7 @@ async function schrijf(){
       return;
     }
     const w = await bestandHandle.createWritable();
-    await w.write(JSON.stringify(bouwData(true)));
+    await w.write(JSON.stringify(bouwData(true, true)));
     await w.close();
     gewijzigd = false;
     zetStatus(bestandHandle.name + " \u00b7 opgeslagen " + tijdNu(), true);
@@ -3060,40 +3270,114 @@ document.getElementById("samen-toevoeg").addEventListener("click", () => {
 /* ---------- 2. Groepjes maken ---------- */
 const groepOverlay = document.getElementById("groep-overlay");
 var groepWijze;
+/* Het algoritme komt uit de losse groepjesmaker (v1.0.1): twaalf
+   startverdelingen, elk verbeterd met tweeduizend gerichte ruilen. Wie niet
+   samen mag weegt het zwaarst, daarna het spreiden van niveaus, daarna het
+   vermijden van combinaties van de vorige keren. */
+const GROEP_BEWAREN = 12, HERHALING_MEETELLEN = 5;
+const paarSleutel = (a, b) => a < b ? a + "|" + b : b + "|" + a;
+const groepAan = { nietsamen:true, niveau:false, herhaling:false };
+const groepZelfGezet = {};
+let laatsteGroepen = null, groepOnthouden = false;
+
+function geschiedenisVan(kl){
+  if (!Array.isArray(kl.groepGeschiedenis)) kl.groepGeschiedenis = [];
+  return kl.groepGeschiedenis;
+}
+function groepMaten(n, wijze, getal){
+  if (!n) return [];
+  const aantal = wijze === "aantal"
+    ? Math.max(1, Math.min(getal, n))
+    : Math.max(1, Math.round(n / Math.max(2, getal)));
+  const basis = Math.floor(n / aantal), rest = n % aantal;
+  return Array.from({length: aantal}, (_, i) => basis + (i < rest ? 1 : 0));
+}
+function herhalingKaart(kl){
+  const m = new Map();
+  geschiedenisVan(kl).slice(-HERHALING_MEETELLEN).forEach((indeling, n) => {
+    const gewicht = n + 1;                       /* recenter weegt zwaarder */
+    (indeling.groepen || []).forEach(g => {
+      for (let i = 0; i < g.length; i++)
+        for (let j = i + 1; j < g.length; j++){
+          const sl = paarSleutel(g[i], g[j]);
+          m.set(sl, (m.get(sl) || 0) + gewicht);
+        }
+    });
+  });
+  return m;
+}
+function beoordeelGroepen(groepen, o){
+  let verboden = 0, herhaling = 0, niveauStraf = 0, herhaaldeParen = 0;
+  for (const g of groepen){
+    for (let i = 0; i < g.length; i++){
+      for (let j = i + 1; j < g.length; j++){
+        const sl = paarSleutel(g[i], g[j]);
+        if (o.nietSamen.has(sl)) verboden++;
+        if (o.herhaling){ const w = o.herhaling.get(sl) || 0; herhaling += w; if (w) herhaaldeParen++; }
+      }
+    }
+  }
+  if (o.niveau){
+    const n = o.totaalLln;
+    for (const g of groepen){
+      const tel = {1:0, 2:0, 3:0};
+      g.forEach(id => { const nv = o.niveau.get(id); if (nv) tel[nv]++; });
+      for (const nv of [1,2,3]){
+        const ideaal = n ? o.niveauTotaal[nv] * g.length / n : 0;
+        niveauStraf += (tel[nv] - ideaal) ** 2;
+      }
+    }
+  }
+  return { score: 1000 * verboden + 12 * niveauStraf + herhaling, verboden, herhaling, herhaaldeParen, niveauStraf };
+}
+function verbeterGroepen(groepen, o, stappen){
+  const g = groepen.map(x => x.slice());
+  let oordeel = beoordeelGroepen(g, o);
+  if (g.length < 2) return { groepen: g, oordeel };
+  for (let s = 0; s < stappen && oordeel.score > 0; s++){
+    const a = Math.floor(Math.random() * g.length), b = Math.floor(Math.random() * g.length);
+    if (a === b) continue;
+    const i = Math.floor(Math.random() * g[a].length), j = Math.floor(Math.random() * g[b].length);
+    [g[a][i], g[b][j]] = [g[b][j], g[a][i]];
+    const nieuw = beoordeelGroepen(g, o);
+    if (nieuw.score <= oordeel.score) oordeel = nieuw;
+    else [g[a][i], g[b][j]] = [g[b][j], g[a][i]];
+  }
+  return { groepen: g, oordeel };
+}
+function deelInGroepen(ids, maten, o){
+  let beste = null, besteOordeel = null;
+  for (let p = 0; p < 12; p++){
+    const geschud = schud(ids.slice()), start = [];
+    let n = 0;
+    maten.forEach(m => { start.push(geschud.slice(n, n + m)); n += m; });
+    const { groepen, oordeel } = verbeterGroepen(start, o, 2000);
+    if (!besteOordeel || oordeel.score < besteOordeel.score){
+      beste = groepen; besteOordeel = oordeel;
+      if (oordeel.score === 0) break;
+    }
+  }
+  return { groepen: beste, oordeel: besteOordeel };
+}
+
 function maakGroepjes(){
   const kl = k();
-  const ids = schud(aanwezigen().map(p => p.id));
+  const ids = aanwezigen().map(p => p.id);
   const getal = Math.max(1, parseInt(document.getElementById("groep-maat").value, 10) || 3);
-  const aantal = groepWijze === "aantal"
-    ? Math.max(1, Math.min(getal, ids.length))
-    : Math.max(1, Math.round(ids.length / Math.max(2, getal)));
-  const groepen = Array.from({length: aantal}, () => []);
-  ids.forEach((id, n) => groepen[n % aantal].push(id));
+  const maten = groepMaten(ids.length, groepWijze, getal);
 
-  /* tweetallen uit elkaar: ruilen tussen groepen */
-  const paren = nietSamenVan(kl);
-  const botst = (g) => paren.some(p => g.includes(p[0]) && g.includes(p[1]));
-  for (let ronde = 0; ronde < 4; ronde++){
-    groepen.forEach((g, gi) => {
-      if (!botst(g)) return;
-      const paar = paren.find(p => g.includes(p[0]) && g.includes(p[1]));
-      const eruit = paar[1];
-      for (const [hi, h] of groepen.entries()){
-        if (hi === gi) continue;
-        const kandidaat = h.find(id => {
-          const nieuwG = g.filter(x => x !== eruit).concat(id);
-          const nieuwH = h.filter(x => x !== id).concat(eruit);
-          return !botst(nieuwG) && !botst(nieuwH);
-        });
-        if (kandidaat){
-          g[g.indexOf(eruit)] = kandidaat;
-          h[h.indexOf(kandidaat)] = eruit;
-          break;
-        }
-      }
-    });
-  }
-  const rest = groepen.filter(botst).length;
+  const niveau = new Map(), niveauTotaal = {1:0, 2:0, 3:0};
+  ids.forEach(id => { const nv = kl.leerlingen[id].niveau; if (nv){ niveau.set(id, nv); niveauTotaal[nv]++; } });
+  const o = {
+    nietSamen: new Set(groepAan.nietsamen ? nietSamenVan(kl).map(p => paarSleutel(p[0], p[1])) : []),
+    niveau: groepAan.niveau && niveau.size ? niveau : null, niveauTotaal, totaalLln: ids.length,
+    herhaling: groepAan.herhaling && geschiedenisVan(kl).length ? herhalingKaart(kl) : null
+  };
+  const { groepen, oordeel } = deelInGroepen(ids, maten, o);
+  laatsteGroepen = groepen;
+  groepOnthouden = false;
+  tekenGroepOnthoud();
+
   const vak = document.getElementById("groepen");
   vak.innerHTML = "";
   groepen.forEach((g, n) => {
@@ -3124,13 +3408,180 @@ function maakGroepjes(){
     vak.appendChild(d);
   });
   document.getElementById("groep-uitleg").textContent =
-    ids.length + " aanwezige leerlingen in " + groepen.length + " groepjes"
-    + (rest ? " \u00b7 " + rest + " groepje(s) met een tweetal dat eigenlijk uit elkaar moet" : "");
+    ids.length + " aanwezige leerlingen in " + groepen.length + " groepjes (" + maten.join(", ") + ")";
+
+  /* eerlijk melden wat wel en niet gelukt is */
+  const meld = [], rap = document.getElementById("groep-rapport");
+  if (oordeel.verboden){
+    const namen = [];
+    groepen.forEach(g => nietSamenVan(kl).forEach(p => {
+      if (g.includes(p[0]) && g.includes(p[1])) namen.push(kl.leerlingen[p[0]].naam + " en " + kl.leerlingen[p[1]].naam);
+    }));
+    meld.push("Niet gelukt om uit elkaar te houden: " + namen.join("; ") + ". Probeer een andere groepsgrootte.");
+  }
+  if (groepAan.niveau){
+    const zonder = ids.length - niveau.size;
+    if (!niveau.size) meld.push("Niveaus spreiden staat aan, maar er is nog bij niemand een niveau ingevuld.");
+    else {
+      let scheef = false;
+      groepen.forEach(g => [1,2,3].forEach(nv => {
+        const tel = g.filter(id => niveau.get(id) === nv).length;
+        if (Math.abs(tel - niveauTotaal[nv] * g.length / ids.length) > 1) scheef = true;
+      }));
+      if (scheef) meld.push("De niveaus zijn niet helemaal gelijk verdeeld; bij deze groepsgrootte lukt dat niet beter.");
+      if (zonder) meld.push(zonder + " leerling" + (zonder === 1 ? "" : "en") + " zonder niveau " + (zonder === 1 ? "telt" : "tellen") + " niet mee bij het spreiden.");
+    }
+  }
+  if (groepAan.herhaling){
+    if (!geschiedenisVan(kl).length) meld.push("Er is nog geen eerdere indeling onthouden, dus nieuwe combinaties maken heeft nu geen effect.");
+    else if (oordeel.herhaaldeParen) meld.push(oordeel.herhaaldeParen + " tweetal" + (oordeel.herhaaldeParen === 1 ? " zat" : "len zaten") + " een vorige keer al samen. Helemaal vermijden lukt niet altijd.");
+  }
+  const aanTal = Object.values(groepAan).filter(Boolean).length;
+  rap.innerHTML = "";
+  if (meld.length){
+    rap.className = "groeprapport let";
+    meld.forEach(t => { const p = document.createElement("p"); p.textContent = t; rap.appendChild(p); });
+    rap.hidden = false;
+  } else if (aanTal){
+    rap.className = "groeprapport ok";
+    rap.textContent = "Alle gekozen voorwaarden zijn gehaald.";
+    rap.hidden = false;
+  } else rap.hidden = true;
+}
+
+/* ---- voorwaarden ---- */
+const GROEPREGELS = [
+  { id:"nietsamen", icoon:"mensen", naam:"Bepaalde tweetallen uit elkaar",
+    uitleg:"Wie je bij 'Wie niet naast elkaar' hebt opgegeven, komt niet in hetzelfde groepje." },
+  { id:"niveau", icoon:"lagen", naam:"Niveaus spreiden",
+    uitleg:"Elk groepje krijgt een vergelijkbare mix van niveau 1, 2 en 3." },
+  { id:"herhaling", icoon:"herhaal", naam:"Nieuwe combinaties",
+    uitleg:"Vermijdt wie de laatste " + HERHALING_MEETELLEN + " onthouden keren al samen zat." }
+];
+function regelTelt(id){
+  const kl = k();
+  if (id === "nietsamen"){ const n = nietSamenVan(kl).length; return n + " tweetal" + (n === 1 ? "" : "len"); }
+  if (id === "niveau"){
+    const allen = Object.values(kl.leerlingen);
+    return allen.filter(l => l.niveau).length + " van " + allen.length;
+  }
+  const n = geschiedenisVan(kl).length; return n + " onthouden";
+}
+function tekenGroepRegels(){
+  const vak = document.getElementById("groep-regels");
+  vak.innerHTML = "";
+  GROEPREGELS.forEach(r => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "regel" + (groepAan[r.id] ? " aan" : "");
+    b.setAttribute("aria-pressed", groepAan[r.id] ? "true" : "false");
+    b.innerHTML = '<span class="vlak">' + svg(r.icoon, 16) + '</span><span><b></b><small></small></span><span class="telt"></span>';
+    b.querySelector("b").textContent = r.naam;
+    b.querySelector("small").textContent = r.uitleg;
+    b.querySelector(".telt").textContent = regelTelt(r.id);
+    b.addEventListener("click", () => {
+      groepAan[r.id] = !groepAan[r.id];
+      groepZelfGezet[r.id] = true;
+      tekenGroepRegels();
+      maakGroepjes();
+    });
+    vak.appendChild(b);
+  });
+}
+
+/* ---- niveaus per leerling: standaard ingeklapt, want dit hoort niet op het bord ---- */
+function tekenNiveauSamenvatting(){
+  const allen = Object.values(k().leerlingen);
+  const met = allen.filter(l => l.niveau).length;
+  document.getElementById("niveau-samenvatting").textContent = met
+    ? "Niveau ingevuld bij " + met + " van de " + allen.length + " leerlingen."
+    : "Nog geen niveaus ingevuld. Die heb je alleen nodig om niveaus te spreiden.";
+}
+function tekenNiveauLijst(){
+  const kl = k(), vak = document.getElementById("niveau-lijst");
+  vak.innerHTML = '<p class="niveauuitleg">Jouw eigen indeling, bijvoorbeeld 1 = veel steun nodig, 3 = zelfstandig. Nog eens klikken haalt het niveau weg.</p>';
+  Object.values(kl.leerlingen).sort((a, b) => a.naam.localeCompare(b.naam, "nl")).forEach(l => {
+    const rij = document.createElement("div");
+    rij.className = "niveaurij";
+    const wie = document.createElement("span");
+    wie.className = "wie"; wie.textContent = l.naam; wie.title = l.naam;
+    const knoppen = document.createElement("span");
+    knoppen.className = "nvknoppen";
+    [1,2,3].forEach(nv => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "nvknop" + (l.niveau === nv ? " aan" : "");
+      b.textContent = nv;
+      b.setAttribute("aria-label", l.naam + ": niveau " + nv);
+      b.setAttribute("aria-pressed", l.niveau === nv ? "true" : "false");
+      b.addEventListener("click", () => {
+        l.niveau = l.niveau === nv ? null : nv;
+        knoppen.querySelectorAll(".nvknop").forEach((x, n) => {
+          x.classList.toggle("aan", l.niveau === n + 1);
+          x.setAttribute("aria-pressed", l.niveau === n + 1 ? "true" : "false");
+        });
+        tekenNiveauSamenvatting();
+        tekenGroepRegels();
+        markeer();
+      });
+      knoppen.appendChild(b);
+    });
+    rij.append(wie, knoppen);
+    vak.appendChild(rij);
+  });
+}
+function klapNiveaus(open){
+  const lijst = document.getElementById("niveau-lijst"), knop = document.getElementById("niveau-toon");
+  lijst.hidden = !open;
+  knop.setAttribute("aria-expanded", open ? "true" : "false");
+  knop.textContent = open ? "Niveaus verbergen" : "Niveaus invullen";
+  if (open) tekenNiveauLijst();
+}
+document.getElementById("niveau-toon").addEventListener("click", () => {
+  klapNiveaus(document.getElementById("niveau-lijst").hidden);
+});
+
+/* ---- onthouden en vergeten ---- */
+function tekenGroepOnthoud(){
+  const knop = document.getElementById("groep-onthoud");
+  knop.textContent = groepOnthouden ? "Onthouden \u2713" : "Deze indeling onthouden";
+  knop.classList.toggle("gedaan", groepOnthouden);
+  knop.disabled = groepOnthouden || !laatsteGroepen || !laatsteGroepen.length;
+  document.getElementById("groep-vergeet").disabled = !geschiedenisVan(k()).length;
+}
+document.getElementById("groep-onthoud").addEventListener("click", () => {
+  if (!laatsteGroepen || groepOnthouden) return;
+  const lijst = geschiedenisVan(k());
+  lijst.push({ datum: new Date().toISOString().slice(0,10), groepen: laatsteGroepen.map(g => g.slice()) });
+  while (lijst.length > GROEP_BEWAREN) lijst.shift();
+  groepOnthouden = true;
+  tekenGroepOnthoud();
+  tekenGroepRegels();
+  markeer();
+});
+document.getElementById("groep-vergeet").addEventListener("click", () => {
+  const lijst = geschiedenisVan(k());
+  if (!lijst.length) return;
+  if (!confirm("De " + lijst.length + " onthouden indeling" + (lijst.length === 1 ? "" : "en") + " van " + huidig + " vergeten?\n\nDaarna begint 'Nieuwe combinaties' weer bij nul.")) return;
+  k().groepGeschiedenis = [];
+  groepOnthouden = false;
+  tekenGroepOnthoud();
+  tekenGroepRegels();
+  markeer();
+});
+
+function openGroepVenster(){
+  const kl = k();
+  if (!groepZelfGezet.niveau) groepAan.niveau = Object.values(kl.leerlingen).some(l => l.niveau);
+  if (!groepZelfGezet.herhaling) groepAan.herhaling = geschiedenisVan(kl).length > 0;
+  tekenGroepRegels();
+  tekenNiveauSamenvatting();
+  klapNiveaus(false);
+  groepOverlay.hidden = false;
+  maakGroepjes();
 }
 document.getElementById("btn-groepjes").addEventListener("click", () => {
   if (!aanwezigen().length){ alert("Er zijn geen aanwezige leerlingen in deze klas."); return; }
-  groepOverlay.hidden = false;
-  maakGroepjes();
+  openGroepVenster();
 });
 groepWijze = "maat";
 document.querySelectorAll("#groep-wijze button").forEach(b => b.addEventListener("click", () => {
@@ -3373,6 +3824,244 @@ document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
   [indeelOverlay, samenOverlay, groepOverlay, leerOverlay].forEach(o => { if (!o.hidden) o.hidden = true; });
 });
+
+
+/* ================= Timer =================
+   Zweeft boven de plattegrond, ook op het bord. Loopt op de klok van de
+   computer (eindtijd), dus hij blijft kloppen als het tabblad even op de
+   achtergrond staat. Alleen de laatste duur, het geluid en de grootte worden
+   onthouden in deze browser; er gaat niets over leerlingen in. */
+const timerEl = document.getElementById("timer");
+const tMin = document.getElementById("timer-min"), tSec = document.getElementById("timer-sec");
+const tStart = document.getElementById("timer-start"), tErbij = document.getElementById("timer-erbij"), tStop = document.getElementById("timer-opnieuw");
+const tGeluidKnop = document.getElementById("timer-geluid"), tMaatKnop = document.getElementById("timer-maat");
+let tStaat = "instel", tDuur = 300, tEind = 0, tRest = 0, tLus = null, tAudio = null, tZelfGeplaatst = false;
+
+function tVoorkeur(sleutel, standaard){
+  try { const v = localStorage.getItem("plattegrond-timer-" + sleutel); return v === null ? standaard : JSON.parse(v); }
+  catch (e){ return standaard; }
+}
+function tBewaarVoorkeur(sleutel, waarde){
+  try { localStorage.setItem("plattegrond-timer-" + sleutel, JSON.stringify(waarde)); } catch (e){}
+}
+let tGeluid = tVoorkeur("geluid", true) !== false;
+let tGroot = tVoorkeur("groot", false) === true;
+
+const tKlem = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
+function tOpmaak(sec){
+  sec = Math.max(0, Math.ceil(sec - 0.001));
+  return Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0");
+}
+function tLeesInvoer(){
+  return tKlem(parseInt(tMin.value, 10) || 0, 0, 99) * 60 + tKlem(parseInt(tSec.value, 10) || 0, 0, 59);
+}
+function tZetInvoer(sec){
+  tMin.value = Math.floor(sec / 60);
+  tSec.value = String(sec % 60).padStart(2, "0");
+}
+function tResterend(){
+  if (tStaat === "loopt") return Math.max(0, (tEind - Date.now()) / 1000);
+  if (tStaat === "pauze") return tRest;
+  if (tStaat === "klaar") return 0;
+  return tLeesInvoer();
+}
+function tKnop(knop, icoon, tekst){
+  knop.innerHTML = (icoon ? svg(icoon, 16) : "") + "<span></span>";
+  knop.lastChild.textContent = tekst;
+}
+function tekenTimer(){
+  const rest = tResterend();
+  document.getElementById("timer-instel").hidden = tStaat !== "instel";
+  document.getElementById("timer-loop").hidden = tStaat === "instel";
+  document.getElementById("timer-tijd").textContent = tOpmaak(rest);
+  document.getElementById("timer-voortgang").style.width = (tDuur ? tKlem(rest / tDuur, 0, 1) * 100 : 0) + "%";
+  document.getElementById("timer-melding").hidden = tStaat !== "klaar";
+  timerEl.classList.toggle("bijna", (tStaat === "loopt" || tStaat === "pauze") && rest <= Math.min(60, tDuur * 0.2));
+  timerEl.classList.toggle("klaar", tStaat === "klaar");
+  if (tStaat === "instel") tKnop(tStart, "speel", "Start");
+  else if (tStaat === "loopt") tKnop(tStart, "pauzeer", "Pauze");
+  else if (tStaat === "pauze") tKnop(tStart, "speel", "Verder");
+  else tKnop(tStart, "herhaal", "Opnieuw");
+  tErbij.hidden = tStaat === "instel";
+  tStop.hidden = tStaat === "instel";
+  tKnop(tStop, null, tStaat === "klaar" ? "Instellen" : "Stoppen");
+  document.getElementById("btn-timer").classList.toggle("loopt", tStaat === "loopt" || tStaat === "pauze" || tStaat === "klaar");
+}
+function tTik(){
+  if (tStaat === "loopt" && Date.now() >= tEind){
+    tStaat = "klaar";
+    clearInterval(tLus); tLus = null;
+    tBel();
+  }
+  tekenTimer();
+}
+function tLaatLopen(){
+  clearInterval(tLus);
+  tLus = setInterval(tTik, 200);
+  tTik();
+}
+function tStartMet(sec){
+  if (!sec){ tMin.focus(); tMin.select(); return; }
+  tDuur = sec;
+  tBewaarVoorkeur("duur", sec);
+  tEind = Date.now() + sec * 1000;
+  tStaat = "loopt";
+  tOntgrendelGeluid();
+  tLaatLopen();
+}
+function tNaarInstellen(){
+  clearInterval(tLus); tLus = null;
+  tStopGeluid();
+  tStaat = "instel";
+  tZetInvoer(tDuur);
+  tekenTimer();
+}
+
+/* ---- geluid: drie korte, zachte tonen, zonder extern bestand ---- */
+function tOntgrendelGeluid(){
+  if (!tGeluid) return;
+  try {
+    if (!tAudio) tAudio = new (window.AudioContext || window.webkitAudioContext)();
+    if (tAudio.state === "suspended") tAudio.resume();
+  } catch (e){ tAudio = null; }
+}
+let tBronnen = [];
+function tBel(){
+  if (!tGeluid || !tAudio) return;
+  try {
+    const nu = tAudio.currentTime;
+    [0, 0.32, 0.64, 1.6, 1.92, 2.24].forEach(t => {
+      const osc = tAudio.createOscillator(), gain = tAudio.createGain();
+      osc.type = "sine"; osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.0001, nu + t);
+      gain.gain.exponentialRampToValueAtTime(0.28, nu + t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, nu + t + 0.24);
+      osc.connect(gain).connect(tAudio.destination);
+      osc.start(nu + t); osc.stop(nu + t + 0.26);
+      tBronnen.push(osc);
+    });
+  } catch (e){}
+}
+function tStopGeluid(){
+  tBronnen.forEach(o => { try { o.stop(); } catch (e){} });
+  tBronnen = [];
+}
+function tekenGeluidKnop(){
+  tGeluidKnop.innerHTML = svg("bel", 15);
+  tGeluidKnop.setAttribute("aria-pressed", tGeluid ? "true" : "false");
+  tGeluidKnop.title = tGeluid ? "Geluid staat aan" : "Geluid staat uit";
+}
+function tekenMaatKnop(){
+  timerEl.classList.toggle("groot", tGroot);
+  tMaatKnop.innerHTML = svg(tGroot ? "kleiner" : "groter", 15);
+  tMaatKnop.title = tGroot ? "Kleiner" : "Groter, voor het bord";
+}
+
+/* ---- plaats: standaard rechtsboven op de plattegrond, verslepen kan ---- */
+function tHoudBinnen(){
+  if (timerEl.hidden || !timerEl.style.left) return;
+  const r = timerEl.getBoundingClientRect();
+  timerEl.style.left = tKlem(r.left, 8, Math.max(8, window.innerWidth - r.width - 8)) + "px";
+  timerEl.style.top = tKlem(r.top, 8, Math.max(8, window.innerHeight - r.height - 8)) + "px";
+}
+function tPlaatsStandaard(){
+  const lk = lokaalEl.getBoundingClientRect();
+  const breed = timerEl.offsetWidth;
+  timerEl.style.right = "auto";
+  timerEl.style.left = (Math.min(lk.right, window.innerWidth) - breed - 18) + "px";
+  timerEl.style.top = Math.max(12, lk.top + 14) + "px";
+  tHoudBinnen();
+}
+(function tSlepen(){
+  const kop = document.getElementById("timer-kop");
+  let start = null;
+  kop.addEventListener("pointerdown", e => {
+    if (e.target.closest("button")) return;
+    const r = timerEl.getBoundingClientRect();
+    start = { dx: e.clientX - r.left, dy: e.clientY - r.top, id: e.pointerId };
+    kop.setPointerCapture(e.pointerId);
+    timerEl.classList.add("sleept");
+    e.preventDefault();
+  });
+  kop.addEventListener("pointermove", e => {
+    if (!start || e.pointerId !== start.id) return;
+    timerEl.style.right = "auto";
+    timerEl.style.left = (e.clientX - start.dx) + "px";
+    timerEl.style.top = (e.clientY - start.dy) + "px";
+    tHoudBinnen();
+    tZelfGeplaatst = true;
+  });
+  const los = () => { start = null; timerEl.classList.remove("sleept"); };
+  kop.addEventListener("pointerup", los);
+  kop.addEventListener("pointercancel", los);
+})();
+window.addEventListener("resize", tHoudBinnen);
+document.addEventListener("fullscreenchange", () => setTimeout(() => { if (!tZelfGeplaatst) tPlaatsStandaard(); else tHoudBinnen(); }, 60));
+
+/* ---- knoppen ---- */
+function tOpen(){
+  timerEl.hidden = false;
+  if (!tZelfGeplaatst) tPlaatsStandaard(); else tHoudBinnen();
+  tekenTimer();
+  if (tStaat === "instel") tStart.focus();
+}
+function tSluit(){
+  tNaarInstellen();
+  timerEl.hidden = true;
+}
+document.getElementById("btn-timer").addEventListener("click", () => {
+  if (timerEl.hidden) tOpen();
+  else if (tStaat === "instel") tSluit();
+  else tStart.focus();
+});
+document.getElementById("timer-dicht").addEventListener("click", tSluit);
+tStart.addEventListener("click", () => {
+  if (tStaat === "instel") tStartMet(tLeesInvoer());
+  else if (tStaat === "loopt"){ tRest = tResterend(); tStaat = "pauze"; clearInterval(tLus); tLus = null; tekenTimer(); }
+  else if (tStaat === "pauze"){ tEind = Date.now() + tRest * 1000; tStaat = "loopt"; tLaatLopen(); }
+  else { tStopGeluid(); tStartMet(tDuur); }
+});
+tErbij.addEventListener("click", () => {
+  if (tStaat === "loopt"){ tEind += 60000; tDuur += 60; tekenTimer(); }
+  else if (tStaat === "pauze"){ tRest += 60; tDuur += 60; tekenTimer(); }
+  else if (tStaat === "klaar"){ tStopGeluid(); tDuur = 60; tEind = Date.now() + 60000; tStaat = "loopt"; tLaatLopen(); }
+});
+tStop.addEventListener("click", tNaarInstellen);
+document.getElementById("timer-snel").addEventListener("click", e => {
+  const b = e.target.closest("button[data-min]");
+  if (!b) return;
+  const sec = Number(b.dataset.min) * 60;
+  tZetInvoer(sec);
+  tStartMet(sec);
+});
+[tMin, tSec].forEach(veld => {
+  veld.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); tStartMet(tLeesInvoer()); } });
+  veld.addEventListener("focus", () => veld.select());
+  veld.addEventListener("change", () => {
+    tMin.value = tKlem(parseInt(tMin.value, 10) || 0, 0, 99);
+    tSec.value = String(tKlem(parseInt(tSec.value, 10) || 0, 0, 59)).padStart(2, "0");
+  });
+});
+tGeluidKnop.addEventListener("click", () => {
+  tGeluid = !tGeluid;
+  tBewaarVoorkeur("geluid", tGeluid);
+  if (tGeluid) tOntgrendelGeluid(); else tStopGeluid();
+  tekenGeluidKnop();
+});
+tMaatKnop.addEventListener("click", () => {
+  tGroot = !tGroot;
+  tBewaarVoorkeur("groot", tGroot);
+  tekenMaatKnop();
+  if (!tZelfGeplaatst) tPlaatsStandaard(); else tHoudBinnen();
+});
+document.addEventListener("visibilitychange", () => { if (!document.hidden && tStaat === "loopt") tTik(); });
+
+tDuur = tKlem(Number(tVoorkeur("duur", 300)) || 300, 1, 99 * 60 + 59);
+tZetInvoer(tDuur);
+tekenGeluidKnop();
+tekenMaatKnop();
+zetIconen(timerEl);
+tekenTimer();
 
 Object.values(klassen).forEach(zorgVoorVersies);
 tekenVersieKnop();
