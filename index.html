@@ -547,6 +547,47 @@ body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
 body.presentatie .balk .scheiding{display:none}
 @media (prefers-reduced-motion:reduce){.timer.klaar{animation:none}}
 @media print{.timer{display:none!important}}
+
+/* ---------- jongens en meisjes ---------- */
+.regel.driekeuze{flex-wrap:wrap;cursor:default}
+.regel.driekeuze .wijzekiezer{flex-basis:100%;margin:8px 0 0 39px;display:grid;grid-template-columns:repeat(3,1fr);max-width:540px}
+.regel.driekeuze .wijzekiezer button{white-space:nowrap}
+.regel.driekeuze .vlak{background:#ede9fe;color:var(--violet)}
+.regel.driekeuze.aan .vlak{background:var(--violet);color:#fff}
+.niveaulijst{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+@media (max-width:600px){.regel.driekeuze .wijzekiezer{margin-left:0}}
+.regel.driekeuze .wijzekiezer button{padding:6px 8px;font-size:12.5px}
+.indeelregels-extra{margin-top:9px}
+.gsknop{width:27px;height:25px;border:1px solid var(--lijn-sterk);border-radius:7px;background:var(--kaart);font-size:12px;font-weight:700;color:var(--grijs);padding:0}
+.gsknop:hover{border-color:var(--violet);color:var(--inkt)}
+.gsknop.aan{background:var(--violet);border-color:var(--violet);color:#fff}
+.nvknoppen + .nvknoppen{margin-left:6px;padding-left:8px;border-left:1px solid var(--lijn-sterk)}
+.gegevensblok{margin-top:10px}
+
+/* ---------- jongens en meisjes aanklikken op de plattegrond ---------- */
+.gsbalk{display:flex;align-items:center;gap:12px 16px;flex-wrap:wrap;margin-top:14px;padding:12px 16px;border:1px solid #ddd6fe;background:#f5f3ff;border-radius:14px}
+.gsbalk[hidden]{display:none}
+.gsbalk .gs-icoon{color:var(--violet);display:flex}
+.gsbalk b{display:block;color:var(--inkt);font-size:15px}
+.gsbalk .gs-uitleg{font-size:13.5px;color:var(--tekst)}
+.gsbalk .gs-tel{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.gsbalk .gs-tel span{padding:4px 10px;border-radius:999px;font-size:13px;font-weight:700;background:#fff;border:1px solid var(--lijn)}
+.gsmerk{display:none;position:absolute;top:5px;left:6px;min-width:24px;height:24px;border-radius:8px;font-size:13px;font-weight:800;align-items:center;justify-content:center;padding:0 6px;z-index:3;pointer-events:none}
+.gsmerk[data-gs="j"]{background:#0f766e;color:#fff}
+.gsmerk[data-gs="m"]{background:var(--violet);color:#fff}
+.gsmerk[data-gs=""]{background:#fff;border:1.5px dashed var(--zacht);color:var(--zacht)}
+body.gs-modus .gsmerk{display:flex}
+body.gs-modus .stoel.bezet{cursor:pointer}
+body.gs-modus .stoel.bezet[data-gs="j"]{border:2px solid #14b8a6;background:#f0fdfa}
+body.gs-modus .stoel.bezet[data-gs="m"]{border:2px solid #a78bfa;background:#f5f3ff}
+body.gs-modus .chip{cursor:pointer;position:relative;padding-left:4px}
+body.gs-modus .chip .gsmerk{position:static;margin-right:2px}
+body.gs-modus .chip[data-gs="j"]{border-color:#14b8a6;background:#f0fdfa}
+body.gs-modus .chip[data-gs="m"]{border-color:#a78bfa;background:#f5f3ff}
+body.gs-modus .zorgmerken{display:none}
+.regel.driekeuze .gs-aanklik{flex-basis:100%;margin:8px 0 0 39px;justify-content:flex-start;width:max-content;padding:7px 12px;font-size:13px}
+@media (max-width:600px){.regel.driekeuze .gs-aanklik{margin-left:0}}
+@media print{.gsbalk{display:none!important} .gsmerk{display:none!important}}
 </style>
 </head>
 <body>
@@ -621,6 +662,7 @@ body.presentatie .balk .scheiding{display:none}
         <button class="meer-item" id="btn-groepjes" role="menuitem">Groepjes maken…</button>
         <button class="meer-item" id="btn-namen" role="menuitem">Namen leren</button>
         <button class="meer-item" id="btn-nietsamen" role="menuitem">Wie niet naast elkaar…</button>
+        <button class="meer-item" id="btn-jongensmeisjes" role="menuitem">Jongens en meisjes aanklikken</button>
         <div class="meer-scheiding"></div>
         <button class="meer-item" id="btn-handleiding" role="menuitem">Handleiding openen (PDF)</button>
       </div>
@@ -629,6 +671,16 @@ body.presentatie .balk .scheiding{display:none}
     <input type="file" id="magisterbestand" accept="application/pdf" hidden>
     <input type="file" id="fotobestanden" accept="image/*" multiple hidden>
     <input type="file" id="enkelefoto" accept="image/*" hidden>
+  </div>
+
+  <div class="gsbalk" id="gsbalk" role="region" aria-label="Jongens en meisjes aanklikken" hidden>
+    <span class="gs-icoon" data-icon="mensen" data-maat="24"></span>
+    <div>
+      <b>Jongens en meisjes aanklikken</b>
+      <span class="gs-uitleg">Klik op een leerling: 1 keer is jongen, 2 keer is meisje, 3 keer is weer leeg.</span>
+    </div>
+    <span class="gs-tel" id="gs-tel"></span>
+    <button class="knop primair" id="gs-klaar" data-icon="vink">Klaar</button>
   </div>
 
   <div class="acties" id="acties" role="region" aria-label="Acties voor geselecteerde leerling">
@@ -744,7 +796,7 @@ body.presentatie .balk .scheiding{display:none}
         <div class="niveaublok" id="niveau-blok">
           <div class="niveaukop">
             <span id="niveau-samenvatting"></span>
-            <button type="button" class="knop stil" id="niveau-toon" aria-expanded="false">Niveaus invullen</button>
+            <button type="button" class="knop stil" id="niveau-toon" aria-expanded="false">Invullen</button>
           </div>
           <div class="niveaulijst" id="niveau-lijst" hidden></div>
         </div>
@@ -1169,6 +1221,7 @@ function teken(){
   tekenWachtrij();
   tekenTellers();
   tekenActies();
+  if (gsModus) tekenGsTel();
 }
 
 /* ---------- naamkaartje: voornaam, achternaam of beide ----------
@@ -1224,7 +1277,10 @@ function maakStoel(i, toonFoto){
     if (selectie && selectie.type === "plek" && selectie.waarde === i) el.classList.add("geselecteerd");
     if (kl.beurt === id) el.classList.add("beurt");
     el.draggable = true;
-    el.setAttribute("aria-label", l.naam + ", " + plekLabel(i) + (l.afwezig ? ", afwezig" : ""));
+    el.setAttribute("aria-label", l.naam + ", " + plekLabel(i) + (l.afwezig ? ", afwezig" : "") +
+      (gsModus ? ", " + ({ j:"jongen", m:"meisje" }[l.geslacht] || "nog niet ingevuld") : ""));
+    el.dataset.gs = l.geslacht || "";
+    el.appendChild(gsMerk(l));
     if (toonFoto) el.appendChild(fotoVak(l));
     const nm = document.createElement("div");
     nm.className = "naam";
@@ -1277,6 +1333,8 @@ function tekenWachtrij(){
     chip.dataset.wacht = id;
     chip.tabIndex = 0;
     chip.appendChild(fotoVak(l));
+    chip.dataset.gs = l.geslacht || "";
+    chip.appendChild(gsMerk(l));
     chip.appendChild(document.createTextNode(l.naam));
     vak.appendChild(chip);
   });
@@ -1362,6 +1420,84 @@ keuze.addEventListener("change", () => {
   tekenVersieKnop();
   teken();
 });
+
+/* ---------- jongens en meisjes aanklikken ----------
+   Eén klik: jongen, twee: meisje, drie: weer leeg. Werkt op de tegels en op
+   de wachtrij. Buiten deze stand zie je niets van jongen/meisje, dus ook
+   niet op het bord. */
+var gsModus = false, gsTerug = null;
+function gsMerk(l){
+  const m = document.createElement("span");
+  m.className = "gsmerk";
+  m.dataset.gs = l.geslacht || "";
+  m.textContent = l.geslacht === "j" ? "J" : l.geslacht === "m" ? "M" : "?";
+  m.setAttribute("aria-hidden", "true");
+  return m;
+}
+function volgendGeslacht(l){
+  l.geslacht = l.geslacht === "j" ? "m" : l.geslacht === "m" ? null : "j";
+  markeer();
+}
+function tekenGsTel(){
+  const allen = Object.values(k().leerlingen);
+  const j = allen.filter(l => l.geslacht === "j").length, m = allen.filter(l => l.geslacht === "m").length;
+  const vak = document.getElementById("gs-tel");
+  vak.innerHTML = "";
+  [[j, j === 1 ? "jongen" : "jongens"], [m, m === 1 ? "meisje" : "meisjes"], [allen.length - j - m, "nog leeg"]].forEach(([n, t]) => {
+    const sp = document.createElement("span"); sp.textContent = n + " " + t; vak.appendChild(sp);
+  });
+}
+function zetGsModus(aan, terug){
+  gsModus = aan;
+  gsTerug = aan ? (terug || null) : null;
+  document.body.classList.toggle("gs-modus", aan);
+  const balk = document.getElementById("gsbalk");
+  balk.hidden = !aan;
+  const klaar = document.getElementById("gs-klaar");
+  klaar.lastChild.textContent = gsTerug === "groep" ? " Klaar, terug naar groepjes"
+                              : gsTerug === "indeel" ? " Klaar, terug naar indelen" : " Klaar";
+  if (aan){
+    selectie = null;
+    if (document.body.classList.contains("presentatie")) document.getElementById("btn-presentatie").click();
+  }
+  teken();
+  if (aan) balk.scrollIntoView({ block:"nearest", behavior:"smooth" });
+}
+rijenEl.addEventListener("click", e => {
+  if (!gsModus) return;
+  e.stopImmediatePropagation();
+  const stoel = e.target.closest(".stoel.bezet");
+  if (!stoel) return;
+  volgendGeslacht(k().leerlingen[k().plekken[Number(stoel.dataset.plek)]]);
+  teken();
+  const terugFocus = rijenEl.querySelector('.stoel[data-plek="' + stoel.dataset.plek + '"]');
+  if (terugFocus && document.activeElement === document.body) terugFocus.focus({ preventScroll:true });
+}, true);
+document.getElementById("wacht").addEventListener("click", e => {
+  if (!gsModus) return;
+  e.stopImmediatePropagation();
+  const chip = e.target.closest(".chip");
+  if (!chip) return;
+  volgendGeslacht(k().leerlingen[chip.dataset.wacht]);
+  teken();
+}, true);
+document.addEventListener("dragstart", e => {
+  if (!gsModus) return;
+  e.preventDefault();
+  e.stopImmediatePropagation();
+}, true);
+document.getElementById("gs-klaar").addEventListener("click", () => {
+  const terug = gsTerug;
+  zetGsModus(false);
+  if (terug === "groep") openGroepVenster();
+  else if (terug === "indeel") toonIndeelVenster();
+});
+document.getElementById("btn-jongensmeisjes").addEventListener("click", () => zetGsModus(!gsModus));
+/* de handleiding staat als handleiding.pdf naast deze pagina, ook op GitHub Pages */
+document.getElementById("btn-handleiding").addEventListener("click", () => {
+  window.open("handleiding.pdf", "_blank", "noopener");
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape" && gsModus) zetGsModus(false); });
 
 /* ---------- klikken ---------- */
 rijenEl.addEventListener("click", e => {
@@ -1781,7 +1917,7 @@ document.getElementById("btn-terug").disabled = true;
 document.getElementById("btn-print").addEventListener("click", () => window.print());
 
 function bouwData(metFotos, metZorg){
-  const uit = { versie:5, datum:new Date().toISOString().slice(0,10), stijl:lokaalEl.dataset.stijl, naamkeuze, klassen:{} };
+  const uit = { versie:5, datum:new Date().toISOString().slice(0,10), stijl:lokaalEl.dataset.stijl, naamkeuze, geslachtKeuze, klassen:{} };
   Object.entries(klassen).forEach(([naam, kl]) => {
     const leerlingen = {};
     Object.entries(kl.leerlingen).forEach(([id, l]) => {
@@ -1844,6 +1980,11 @@ function laadData(data){
   });
   if (data.stijl) zetStijl(data.stijl);
   zetNaamkeuze(data.naamkeuze || "beide");
+  if (data.geslachtKeuze && typeof data.geslachtKeuze === "object"){
+    ["indeel","groep"].forEach(o => {
+      if (["vrij","gemengd","apart"].includes(data.geslachtKeuze[o])) geslachtKeuze[o] = data.geslachtKeuze[o];
+    });
+  }
   volgnummer += 1000;
   selectie = null;
   wisBeurt();
@@ -3082,6 +3223,127 @@ const INDEELREGELS = [
     telt:null }
 ];
 const indeelOverlay = document.getElementById("indeel-overlay");
+
+/* ---------- Jongens en meisjes ----------
+   Per leerling "j", "m" of leeg. Leeg telt nergens mee, dus wie je niet
+   wilt of kunt indelen, laat je gewoon leeg. De keuze per onderdeel:
+   "vrij" (maakt niet uit), "gemengd" of "apart". */
+var geslachtKeuze = { indeel:"vrij", groep:"vrij" };
+const GS_TEKST = {
+  indeel: { naam:"Jongens en meisjes naast elkaar",
+            knoppen:{ vrij:"Maakt niet uit", gemengd:"Juist naast elkaar", apart:"Niet naast elkaar" },
+            uitleg:{ vrij:"Er wordt niet op gelet wie naast wie zit.",
+                     gemengd:"Aan elke tafel zoveel mogelijk een jongen naast een meisje.",
+                     apart:"Aan elke tafel zoveel mogelijk twee jongens of twee meisjes." } },
+  groep:  { naam:"Jongens en meisjes in een groepje",
+            knoppen:{ vrij:"Maakt niet uit", gemengd:"Gemengd", apart:"Apart" },
+            uitleg:{ vrij:"Er wordt niet op gelet.",
+                     gemengd:"Elk groepje krijgt een vergelijkbare mix van jongens en meisjes.",
+                     apart:"Jongens en meisjes komen zoveel mogelijk in aparte groepjes." } }
+};
+function telGeslacht(kl){
+  const allen = Object.values(kl.leerlingen);
+  return { totaal: allen.length, met: allen.filter(l => l.geslacht === "j" || l.geslacht === "m").length };
+}
+function maakGeslachtRegel(onderdeel, bijKeuze){
+  const t = GS_TEKST[onderdeel];
+  const rij = document.createElement("div");
+  const zet = () => {
+    const nu = geslachtKeuze[onderdeel];
+    rij.className = "regel driekeuze" + (nu !== "vrij" ? " aan" : "");
+    rij.querySelector("small").textContent = t.uitleg[nu];
+    const g = telGeslacht(k());
+    rij.querySelector(".telt").textContent = g.met + " van " + g.totaal;
+    rij.querySelectorAll(".wijzekiezer button").forEach(b => {
+      b.classList.toggle("actief", b.dataset.gs === nu);
+      b.setAttribute("aria-pressed", b.dataset.gs === nu ? "true" : "false");
+    });
+  };
+  rij.innerHTML = '<span class="vlak">' + svg("mensen", 16) + '</span><span><b></b><small></small></span><span class="telt"></span>' +
+    '<div class="wijzekiezer" role="group"></div>';
+  rij.querySelector("b").textContent = t.naam;
+  const aanklik = document.createElement("button");
+  aanklik.type = "button";
+  aanklik.className = "knop stil gs-aanklik";
+  aanklik.innerHTML = svg("pen", 14) + "<span>Jongens en meisjes aanklikken op de plattegrond</span>";
+  aanklik.addEventListener("click", () => {
+    indeelOverlay.hidden = true;
+    document.getElementById("groep-overlay").hidden = true;
+    zetGsModus(true, onderdeel);
+  });
+  rij.appendChild(aanklik);
+  const kiezer = rij.querySelector(".wijzekiezer");
+  kiezer.setAttribute("aria-label", t.naam);
+  ["vrij","gemengd","apart"].forEach(w => {
+    const b = document.createElement("button");
+    b.type = "button"; b.dataset.gs = w; b.textContent = t.knoppen[w];
+    b.addEventListener("click", () => {
+      geslachtKeuze[onderdeel] = w;
+      zet();
+      markeer();
+      if (bijKeuze) bijKeuze(w);
+    });
+    kiezer.appendChild(b);
+  });
+  rij.vernieuw = zet;
+  zet();
+  return rij;
+}
+
+/* Eén lijst om per leerling gegevens in te vullen: jongen/meisje en/of niveau.
+   Standaard ingeklapt, want dit hoort niet op het bord. */
+function knoppenGroep(l, veld, opties, klasse, naWijziging){
+  const groep = document.createElement("span");
+  groep.className = "nvknoppen";
+  const teken = () => groep.querySelectorAll("button").forEach(x => {
+    const aan = l[veld] === (typeof opties[0][0] === "number" ? Number(x.dataset.w) : x.dataset.w);
+    x.classList.toggle("aan", aan);
+    x.setAttribute("aria-pressed", aan ? "true" : "false");
+  });
+  opties.forEach(([waarde, label, uitleg]) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = klasse; b.dataset.w = waarde; b.textContent = label;
+    b.setAttribute("aria-label", l.naam + ": " + uitleg);
+    b.title = uitleg;
+    b.addEventListener("click", () => {
+      l[veld] = l[veld] === waarde ? null : waarde;
+      teken();
+      markeer();
+      if (naWijziging) naWijziging();
+    });
+    groep.appendChild(b);
+  });
+  teken();
+  return groep;
+}
+function tekenGegevensLijst(vak, metNiveau, naWijziging, metGeslacht){
+  const kl = k();
+  vak.innerHTML = "";
+  const uitleg = document.createElement("p");
+  uitleg.className = "niveauuitleg";
+  uitleg.textContent = (metGeslacht ? "J = jongen, M = meisje. " : "") +
+    (metNiveau ? "Niveau is jouw eigen indeling, bijvoorbeeld 1 = veel steun nodig, 3 = zelfstandig. " : "") +
+    "Nog eens klikken haalt de keuze weg; leeg telt nergens mee.";
+  vak.appendChild(uitleg);
+  Object.values(kl.leerlingen).sort((a, b) => a.naam.localeCompare(b.naam, "nl")).forEach(l => {
+    const rij = document.createElement("div");
+    rij.className = "niveaurij";
+    const wie = document.createElement("span");
+    wie.className = "wie"; wie.textContent = l.naam; wie.title = l.naam;
+    rij.appendChild(wie);
+    if (metGeslacht) rij.appendChild(knoppenGroep(l, "geslacht", [["j","J","jongen"],["m","M","meisje"]], "gsknop", naWijziging));
+    if (metNiveau) rij.appendChild(knoppenGroep(l, "niveau", [[1,"1","niveau 1"],[2,"2","niveau 2"],[3,"3","niveau 3"]], "nvknop", naWijziging));
+    vak.appendChild(rij);
+  });
+}
+function klapLijst(lijstId, knopId, open, dichtTekst, openTekst, teken){
+  const lijst = document.getElementById(lijstId), knop = document.getElementById(knopId);
+  lijst.hidden = !open;
+  knop.setAttribute("aria-expanded", open ? "true" : "false");
+  knop.textContent = open ? openTekst : dichtTekst;
+  if (open) teken();
+}
+
 let indeelAan = {};
 INDEELREGELS.forEach(r => indeelAan[r.id] = r.aan);
 
@@ -3108,6 +3370,8 @@ function toonIndeelVenster(){
     });
     vak.appendChild(b);
   });
+  const gsRegel = maakGeslachtRegel("indeel");
+  vak.appendChild(gsRegel);
   document.getElementById("indeel-hulp").textContent =
     allen.length + " leerlingen, " + plaatsen() + " plekken. Zet alles uit voor een gewone willekeurige verdeling.";
   indeelOverlay.hidden = false;
@@ -3133,12 +3397,13 @@ document.getElementById("indeel-ok").addEventListener("click", () => {
   const allen = kl.plekken.filter(Boolean).concat(kl.wachtrij);
   const nieuw = new Array(totaal).fill(null);
   const bezet = new Set();
+  const vastePlek = new Set();   /* plekken die een regel heeft bepaald; die ruilen we niet meer */
 
   /* vaste plekken eerst vastzetten */
   if (indeelAan.vast){
     kl.plekken.forEach((id, i) => {
       if (id && heeftZorg(kl.leerlingen[id], "autisme") && i < totaal){
-        nieuw[i] = id; bezet.add(id);
+        nieuw[i] = id; bezet.add(id); vastePlek.add(i);
       }
     });
   }
@@ -3164,7 +3429,7 @@ document.getElementById("indeel-ok").addEventListener("click", () => {
   };
   const zetNeer = (ids, volgorde) => ids.forEach(id => {
     const plek = volgorde.find(i => nieuw[i] === null);
-    if (plek !== undefined){ nieuw[plek] = id; bezet.add(id); }
+    if (plek !== undefined){ nieuw[plek] = id; bezet.add(id); vastePlek.add(plek); }
   });
 
   if (indeelAan.vooraan)   zetNeer(pak(vooraanRij, l => heeftZorg(l,"dyslexie") || heeftZorg(l,"extratijd")), vooraanRij);
@@ -3181,39 +3446,53 @@ document.getElementById("indeel-ok").addEventListener("click", () => {
     if (plek !== undefined) nieuw[plek] = id; else wacht.push(id);
   });
 
-  /* tweetallen uit elkaar halen door te ruilen */
-  let geruild = 0, restConflict = 0;
-  if (indeelAan.uitelkaar){
-    const paren = nietSamenVan(kl);
-    const botst = (arr, i) => {
-      const b = buurPlek(i);
-      if (b < 0 || b >= totaal || !arr[i] || !arr[b]) return false;
-      return paren.some(p => (p[0] === arr[i] && p[1] === arr[b]) || (p[1] === arr[i] && p[0] === arr[b]));
-    };
-    for (let ronde = 0; ronde < 3; ronde++){
-      for (let i = 0; i < totaal; i++){
-        if (!botst(nieuw, i)) continue;
-        const kandidaten = schud(Array.from({length: totaal}, (_, n) => n)
-          .filter(n => n !== i && n !== buurPlek(i)));
-        const gevonden = kandidaten.find(n => {
-          const kopie = nieuw.slice();
-          [kopie[i], kopie[n]] = [kopie[n], kopie[i]];
-          return !botst(kopie, i) && !botst(kopie, n) && !botst(kopie, buurPlek(i)) && !botst(kopie, buurPlek(n));
-        });
-        if (gevonden !== undefined){ [nieuw[i], nieuw[gevonden]] = [nieuw[gevonden], nieuw[i]]; geruild++; }
-      }
+  /* Ruilen tot de tafels kloppen: tweetallen die niet naast elkaar mogen wegen
+     het zwaarst, daarna jongen/meisje. Alleen plekken die geen regel heeft
+     bepaald doen mee; een lege plek mag ook, zo kan iemand verschuiven. */
+  const paarSet = new Set(indeelAan.uitelkaar ? nietSamenVan(kl).map(p => paarSleutel(p[0], p[1])) : []);
+  const gsWens = geslachtKeuze.indeel;
+  const gsVan = id => id ? kl.leerlingen[id].geslacht : null;
+  const tafelFout = (arr, t) => {
+    const a = arr[t * 2], b = arr[t * 2 + 1];
+    if (!a || !b) return { paar:0, gs:0 };
+    const paar = paarSet.has(paarSleutel(a, b)) ? 1 : 0;
+    let gs = 0;
+    if (gsWens !== "vrij"){
+      const ga = gsVan(a), gb = gsVan(b);
+      if (ga && gb && ((gsWens === "gemengd" && ga === gb) || (gsWens === "apart" && ga !== gb))) gs = 1;
     }
-    for (let i = 0; i < totaal; i += 2) if (botst(nieuw, i)) restConflict++;
+    return { paar, gs };
+  };
+  const tafelScore = (arr, t) => { const f = tafelFout(arr, t); return 1000 * f.paar + 10 * f.gs; };
+  const ruilbaar = [];
+  for (let i = 0; i < totaal; i++) if (!vastePlek.has(i)) ruilbaar.push(i);
+  if ((paarSet.size || gsWens !== "vrij") && ruilbaar.length > 1){
+    let score = 0;
+    for (let t = 0; t < totaal / 2; t++) score += tafelScore(nieuw, t);
+    for (let stap = 0; stap < 8000 && score > 0; stap++){
+      const a = ruilbaar[Math.floor(Math.random() * ruilbaar.length)];
+      const b = ruilbaar[Math.floor(Math.random() * ruilbaar.length)];
+      if (a === b || (!nieuw[a] && !nieuw[b])) continue;
+      const ta = a >> 1, tb = b >> 1;
+      const voor = tafelScore(nieuw, ta) + (tb !== ta ? tafelScore(nieuw, tb) : 0);
+      [nieuw[a], nieuw[b]] = [nieuw[b], nieuw[a]];
+      const na = tafelScore(nieuw, ta) + (tb !== ta ? tafelScore(nieuw, tb) : 0);
+      if (na <= voor) score += na - voor;
+      else [nieuw[a], nieuw[b]] = [nieuw[b], nieuw[a]];
+    }
   }
+  let restConflict = 0, gsFout = 0;
+  for (let t = 0; t < totaal / 2; t++){ const f = tafelFout(nieuw, t); restConflict += f.paar; gsFout += f.gs; }
 
   kl.plekken = nieuw;
   kl.wachtrij = wacht;
   selectie = null;
   sluitIndeel();
   teken(); schrijf();
-  zetStatus(restConflict
-    ? "Ingedeeld, maar " + restConflict + " tweetal(len) konden niet uit elkaar"
-    : "Klas opnieuw ingedeeld", true);
+  const kanttekening = [];
+  if (restConflict) kanttekening.push(restConflict + " tweetal(len) konden niet uit elkaar");
+  if (gsFout) kanttekening.push(gsFout + " tafel(s) " + (gsWens === "gemengd" ? "niet gemengd" : "wel gemengd") + ", de aantallen komen niet uit");
+  zetStatus(kanttekening.length ? "Ingedeeld, maar " + kanttekening.join(" en ") : "Klas opnieuw ingedeeld", true);
 });
 
 /* ---------- Wie niet naast elkaar ---------- */
@@ -3317,6 +3596,24 @@ function beoordeelGroepen(groepen, o){
       }
     }
   }
+  let gsStraf = 0;
+  if (o.gsKeuze === "gemengd"){
+    const n = o.totaalLln;
+    for (const g of groepen){
+      const tel = { j:0, m:0 };
+      g.forEach(id => { const x = o.gs.get(id); if (x) tel[x]++; });
+      for (const x of ["j","m"]){
+        const ideaal = n ? o.gsTotaal[x] * g.length / n : 0;
+        gsStraf += (tel[x] - ideaal) ** 2;
+      }
+    }
+  } else if (o.gsKeuze === "apart"){
+    for (const g of groepen){
+      let j = 0, m = 0;
+      g.forEach(id => { const x = o.gs.get(id); if (x === "j") j++; else if (x === "m") m++; });
+      gsStraf += j * m;                        /* aantal gemengde tweetallen in dit groepje */
+    }
+  }
   if (o.niveau){
     const n = o.totaalLln;
     for (const g of groepen){
@@ -3328,7 +3625,7 @@ function beoordeelGroepen(groepen, o){
       }
     }
   }
-  return { score: 1000 * verboden + 12 * niveauStraf + herhaling, verboden, herhaling, herhaaldeParen, niveauStraf };
+  return { score: 1000 * verboden + 12 * niveauStraf + 12 * gsStraf + herhaling, verboden, herhaling, herhaaldeParen, niveauStraf, gsStraf };
 }
 function verbeterGroepen(groepen, o, stappen){
   const g = groepen.map(x => x.slice());
@@ -3373,6 +3670,10 @@ function maakGroepjes(){
     niveau: groepAan.niveau && niveau.size ? niveau : null, niveauTotaal, totaalLln: ids.length,
     herhaling: groepAan.herhaling && geschiedenisVan(kl).length ? herhalingKaart(kl) : null
   };
+  const gs = new Map(), gsTotaal = { j:0, m:0 };
+  ids.forEach(id => { const x = kl.leerlingen[id].geslacht; if (x === "j" || x === "m"){ gs.set(id, x); gsTotaal[x]++; } });
+  o.gs = gs; o.gsTotaal = gsTotaal;
+  o.gsKeuze = gs.size ? geslachtKeuze.groep : "vrij";
   const { groepen, oordeel } = deelInGroepen(ids, maten, o);
   laatsteGroepen = groepen;
   groepOnthouden = false;
@@ -3432,11 +3733,29 @@ function maakGroepjes(){
       if (zonder) meld.push(zonder + " leerling" + (zonder === 1 ? "" : "en") + " zonder niveau " + (zonder === 1 ? "telt" : "tellen") + " niet mee bij het spreiden.");
     }
   }
+  if (geslachtKeuze.groep !== "vrij"){
+    const zonder = ids.length - gs.size;
+    if (!gs.size) meld.push("Jongens en meisjes: er is nog bij niemand jongen of meisje ingevuld.");
+    else {
+      if (geslachtKeuze.groep === "gemengd"){
+        let scheef = false;
+        groepen.forEach(g => ["j","m"].forEach(x => {
+          const tel = g.filter(id => gs.get(id) === x).length;
+          if (Math.abs(tel - gsTotaal[x] * g.length / ids.length) > 1) scheef = true;
+        }));
+        if (scheef) meld.push("Jongens en meisjes zijn niet helemaal gelijk verdeeld; bij deze groepsgrootte lukt dat niet beter.");
+      } else {
+        const gemengd = groepen.filter(g => g.some(id => gs.get(id) === "j") && g.some(id => gs.get(id) === "m")).length;
+        if (gemengd) meld.push(gemengd + " groepje" + (gemengd === 1 ? " is" : "s zijn") + " toch gemengd, omdat de aantallen niet precies uitkomen.");
+      }
+      if (zonder) meld.push(zonder + " leerling" + (zonder === 1 ? "" : "en") + " zonder jongen/meisje " + (zonder === 1 ? "telt" : "tellen") + " daarbij niet mee.");
+    }
+  }
   if (groepAan.herhaling){
     if (!geschiedenisVan(kl).length) meld.push("Er is nog geen eerdere indeling onthouden, dus nieuwe combinaties maken heeft nu geen effect.");
     else if (oordeel.herhaaldeParen) meld.push(oordeel.herhaaldeParen + " tweetal" + (oordeel.herhaaldeParen === 1 ? " zat" : "len zaten") + " een vorige keer al samen. Helemaal vermijden lukt niet altijd.");
   }
-  const aanTal = Object.values(groepAan).filter(Boolean).length;
+  const aanTal = Object.values(groepAan).filter(Boolean).length + (geslachtKeuze.groep !== "vrij" ? 1 : 0);
   rap.innerHTML = "";
   if (meld.length){
     rap.className = "groeprapport let";
@@ -3487,6 +3806,7 @@ function tekenGroepRegels(){
     });
     vak.appendChild(b);
   });
+  vak.appendChild(maakGeslachtRegel("groep", () => maakGroepjes()));
 }
 
 /* ---- niveaus per leerling: standaard ingeklapt, want dit hoort niet op het bord ---- */
@@ -3497,44 +3817,12 @@ function tekenNiveauSamenvatting(){
     ? "Niveau ingevuld bij " + met + " van de " + allen.length + " leerlingen."
     : "Nog geen niveaus ingevuld. Die heb je alleen nodig om niveaus te spreiden.";
 }
-function tekenNiveauLijst(){
-  const kl = k(), vak = document.getElementById("niveau-lijst");
-  vak.innerHTML = '<p class="niveauuitleg">Jouw eigen indeling, bijvoorbeeld 1 = veel steun nodig, 3 = zelfstandig. Nog eens klikken haalt het niveau weg.</p>';
-  Object.values(kl.leerlingen).sort((a, b) => a.naam.localeCompare(b.naam, "nl")).forEach(l => {
-    const rij = document.createElement("div");
-    rij.className = "niveaurij";
-    const wie = document.createElement("span");
-    wie.className = "wie"; wie.textContent = l.naam; wie.title = l.naam;
-    const knoppen = document.createElement("span");
-    knoppen.className = "nvknoppen";
-    [1,2,3].forEach(nv => {
-      const b = document.createElement("button");
-      b.type = "button"; b.className = "nvknop" + (l.niveau === nv ? " aan" : "");
-      b.textContent = nv;
-      b.setAttribute("aria-label", l.naam + ": niveau " + nv);
-      b.setAttribute("aria-pressed", l.niveau === nv ? "true" : "false");
-      b.addEventListener("click", () => {
-        l.niveau = l.niveau === nv ? null : nv;
-        knoppen.querySelectorAll(".nvknop").forEach((x, n) => {
-          x.classList.toggle("aan", l.niveau === n + 1);
-          x.setAttribute("aria-pressed", l.niveau === n + 1 ? "true" : "false");
-        });
-        tekenNiveauSamenvatting();
-        tekenGroepRegels();
-        markeer();
-      });
-      knoppen.appendChild(b);
-    });
-    rij.append(wie, knoppen);
-    vak.appendChild(rij);
-  });
-}
 function klapNiveaus(open){
-  const lijst = document.getElementById("niveau-lijst"), knop = document.getElementById("niveau-toon");
-  lijst.hidden = !open;
-  knop.setAttribute("aria-expanded", open ? "true" : "false");
-  knop.textContent = open ? "Niveaus verbergen" : "Niveaus invullen";
-  if (open) tekenNiveauLijst();
+  klapLijst("niveau-lijst", "niveau-toon", open, "Niveaus invullen", "Verbergen",
+    () => tekenGegevensLijst(document.getElementById("niveau-lijst"), true, () => {
+      tekenNiveauSamenvatting();
+      tekenGroepRegels();
+    }));
 }
 document.getElementById("niveau-toon").addEventListener("click", () => {
   klapNiveaus(document.getElementById("niveau-lijst").hidden);
