@@ -637,17 +637,33 @@ body.presentatie .toetsband{margin-top:6px;font-size:clamp(17px,2.1vw,30px);padd
 .les-knopjes{margin-left:auto;display:flex;gap:5px}
 .lk{width:30px;height:30px;border-radius:9px;border:1px solid var(--lijn);background:#fbfdff;color:var(--grijs);display:flex;align-items:center;justify-content:center;padding:0}
 .lk:hover{background:var(--blauw-zacht);color:var(--blauw)}
-.les-inhoud{font-size:15px;line-height:1.5;color:var(--tekst);max-height:52vh;overflow:auto}
-.les-inhoud p{margin:0 0 5px;display:flex;gap:8px}
-.les-inhoud p::before{content:"";flex:none;width:7px;height:7px;border-radius:50%;background:var(--blauw);margin-top:.55em}
-.les-inhoud p.lesk{font-weight:800;color:var(--inkt);margin-top:9px}
-.les-inhoud p.lesk:first-child{margin-top:0}
-.les-inhoud p.lesk::before{display:none}
-.les-inhoud .leeg-tekst{font-style:italic}
-.les-invoer{width:100%;min-height:150px;border:1px solid var(--lijn-sterk);border-radius:12px;padding:9px 11px;
-  font:inherit;font-size:14px;line-height:1.5;color:var(--tekst);background:#fbfdff;resize:vertical}
+.les-inhoud,.les-invoer{font-size:calc(15px * var(--lesmaat,1));line-height:1.45;color:var(--tekst);max-height:52vh;overflow:auto}
+.les-inhoud div,.les-inhoud p,.les-invoer div,.les-invoer p{margin:0 0 2px}
+.les-inhoud ul,.les-inhoud ol,.les-invoer ul,.les-invoer ol{margin:3px 0 5px;padding-left:1.3em}
+.les-inhoud li,.les-invoer li{margin-bottom:2px}
+.les-inhoud .leeg-tekst{font-style:italic;color:var(--grijs)}
+.lesvak[data-lettertype="verdana"] .les-inhoud,.lesvak[data-lettertype="verdana"] .les-invoer{font-family:Verdana,Geneva,sans-serif}
+.lesvak[data-lettertype="georgia"] .les-inhoud,.lesvak[data-lettertype="georgia"] .les-invoer{font-family:Georgia,"Times New Roman",serif}
+.lesvak[data-lettertype="mono"] .les-inhoud,.lesvak[data-lettertype="mono"] .les-invoer{font-family:"Courier New",monospace}
+.lesvak[data-lettertype="rond"] .les-inhoud,.lesvak[data-lettertype="rond"] .les-invoer{font-family:"Trebuchet MS","Segoe UI",sans-serif}
+.les-invoer{min-height:150px;border:1px solid var(--lijn-sterk);border-radius:12px;padding:9px 11px;background:#fbfdff;
+  max-height:46vh;overflow:auto;-webkit-user-select:text;user-select:text}
 .les-invoer:focus{outline:2px solid var(--blauw);outline-offset:1px;background:#fff}
 .les-invoer[hidden]{display:none}
+.les-balk{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:0 0 8px;padding-bottom:8px;border-bottom:1px solid var(--lijn)}
+.les-balk[hidden]{display:none}
+.les-balk button{min-width:30px;height:30px;padding:0 8px;border:1px solid var(--lijn);background:#fbfdff;
+  border-radius:8px;font-size:13.5px;font-weight:700;color:var(--tekst);line-height:1}
+.les-balk button:hover{background:var(--blauw-zacht);border-color:#bfdbfe;color:var(--blauw)}
+.les-balk button[data-opmaak="italic"]{font-style:italic}
+.les-balk button[data-opmaak="underline"]{text-decoration:underline}
+.les-balk select{height:30px;border:1px solid var(--lijn);border-radius:8px;background:#fbfdff;color:var(--tekst);font-size:12.5px;padding:0 5px;max-width:120px}
+.les-balk .scheidinkje{width:1px;height:20px;background:var(--lijn-sterk);margin:0 3px}
+.les-balk .maatwaarde{font-size:12px;color:var(--grijs);min-width:38px;text-align:center}
+.lesvak.groot .les-inhoud,.lesvak.groot .les-invoer{font-size:calc(clamp(20px,2.4vw,30px) * var(--lesmaat,1));max-height:60vh}
+body.presentatie .les-balk{border-color:rgba(255,255,255,.14)}
+body.presentatie .les-balk button,body.presentatie .les-balk select{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16);color:#e2e8f0}
+body.presentatie .les-balk .maatwaarde{color:#94a3b8}
 .lesvak.groot{width:min(620px,calc(100vw - 24px));padding:14px 22px 20px}
 .lesvak.groot .les-inhoud{font-size:clamp(20px,2.4vw,30px);line-height:1.45;max-height:64vh}
 .lesvak.groot .les-inhoud p::before{width:10px;height:10px}
@@ -790,9 +806,27 @@ body.presentatie .balk .knop:not(#btn-presentatie):not(#btn-beurt):not(#btn-time
         <button type="button" class="lk" id="les-dicht" data-icon="kruis" title="Sluiten" aria-label="Sluiten"></button>
       </span>
     </div>
+    <div class="les-balk" id="les-balk" hidden role="toolbar" aria-label="Opmaak">
+      <button type="button" data-opmaak="bold" title="Dikgedrukt (Ctrl/Cmd + B)" aria-label="Dikgedrukt"><b>B</b></button>
+      <button type="button" data-opmaak="italic" title="Schuin (Ctrl/Cmd + I)" aria-label="Schuin">I</button>
+      <button type="button" data-opmaak="underline" title="Onderstreept (Ctrl/Cmd + U)" aria-label="Onderstreept">U</button>
+      <button type="button" data-opmaak="insertUnorderedList" title="Opsomming" aria-label="Opsomming">&#8226;&#8202;&#8212;</button>
+      <button type="button" data-opmaak="removeFormat" title="Opmaak weghalen" aria-label="Opmaak weghalen">&#10005;</button>
+      <span class="scheidinkje"></span>
+      <select id="les-lettertype" aria-label="Lettertype" title="Lettertype">
+        <option value="systeem">Standaard</option>
+        <option value="rond">Trebuchet</option>
+        <option value="verdana">Verdana</option>
+        <option value="georgia">Georgia</option>
+        <option value="mono">Courier</option>
+      </select>
+      <span class="scheidinkje"></span>
+      <button type="button" id="les-kleiner" title="Kleinere letters" aria-label="Kleinere letters">A&#8722;</button>
+      <span class="maatwaarde" id="les-maatwaarde">100%</span>
+      <button type="button" id="les-groter" title="Grotere letters" aria-label="Grotere letters">A+</button>
+    </div>
     <div class="les-inhoud" id="les-inhoud"></div>
-    <textarea class="les-invoer" id="les-invoer" hidden aria-label="Programma en doelen"
-      placeholder="Bijvoorbeeld:&#10;Doel:&#10;Je kunt een alinea samenvatten in twee zinnen.&#10;Programma:&#10;Terugblik op het huiswerk&#10;Uitleg samenvatten&#10;Zelf oefenen, blz. 42&#10;Nakijken en afsluiten"></textarea>
+    <div class="les-invoer" id="les-invoer" hidden contenteditable="true" role="textbox" aria-multiline="true" aria-label="Programma en doelen"></div>
   </div>
 
   <div class="timer" id="timer" role="dialog" aria-label="Timer" hidden>
@@ -1539,46 +1573,135 @@ document.getElementById("btn-toets").addEventListener("click", () => {
 });
 
 /* ---------- programma en doelen van de les ----------
-   Eén tekstvak per klas. Regels die op een dubbele punt eindigen worden een
-   kopje, de rest krijgt een bolletje. Staat ook op het bord. */
+   Eén tekstvak per klas, met opmaak: dikgedrukt, schuin, onderstreept en een
+   opsomming, plus lettertype en lettergrootte voor het hele vak. De tekst
+   wordt als eenvoudige HTML bewaard (alleen b, i, u, lijstjes en regels); al
+   het andere wordt er bij het inlezen uitgehaald. Staat ook op het bord. */
 var lesGroot = false, lesBewerkt = false;
-function lesTekstVan(kl){ return typeof kl.les === "string" ? kl.les : ""; }
+const LES_TAGS = { B:"B", STRONG:"B", I:"I", EM:"I", U:"U", UL:"UL", OL:"OL", LI:"LI", BR:"BR", DIV:"DIV", P:"DIV" };
+function schoonLes(html){
+  const bron = new DOMParser().parseFromString("<body>" + html + "</body>", "text/html").body;
+  const uit = document.createElement("div");
+  (function kopieer(van, naar){
+    van.childNodes.forEach(n => {
+      if (n.nodeType === 3){ naar.appendChild(document.createTextNode(n.nodeValue)); return; }
+      if (n.nodeType !== 1) return;
+      const tag = LES_TAGS[n.tagName];
+      if (n.tagName === "SCRIPT" || n.tagName === "STYLE") return;
+      if (tag){
+        const el = document.createElement(tag);
+        naar.appendChild(el);
+        if (tag !== "BR") kopieer(n, el);
+      } else kopieer(n, naar);      /* onbekende tag: alleen de inhoud houden */
+    });
+  })(bron, uit);
+  return uit.innerHTML;
+}
+/* oude notities stonden als platte tekst in het bestand */
+function lesNaarHtml(tekst){
+  if (/<[a-z]/i.test(tekst)) return schoonLes(tekst);
+  const ontsnap = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  let uit = "", inLijst = false;
+  tekst.split(/\r?\n/).forEach(ruw => {
+    const r = ruw.trim();
+    const punt = /^[-\u2022*]\s*/.test(r);
+    if (punt && !inLijst){ uit += "<ul>"; inLijst = true; }
+    if (!punt && inLijst){ uit += "</ul>"; inLijst = false; }
+    if (!r) uit += "<div><br></div>";
+    else if (punt) uit += "<li>" + ontsnap(r.replace(/^[-\u2022*]\s*/, "")) + "</li>";
+    else if (r.endsWith(":")) uit += "<div><b>" + ontsnap(r) + "</b></div>";
+    else uit += "<div>" + ontsnap(r) + "</div>";
+  });
+  if (inLijst) uit += "</ul>";
+  return uit;
+}
+function lesTekstVan(kl){ return typeof kl.les === "string" ? lesNaarHtml(kl.les) : ""; }
+function lesOpmaakVan(kl){
+  if (!kl.lesOpmaak || typeof kl.lesOpmaak !== "object") kl.lesOpmaak = {};
+  const o = kl.lesOpmaak;
+  if (!["systeem","rond","verdana","georgia","mono"].includes(o.lettertype)) o.lettertype = "systeem";
+  o.maat = Math.min(2, Math.max(.7, Number(o.maat) || 1));
+  return o;
+}
+function lesHeeftTekst(html){
+  const d = document.createElement("div");
+  d.innerHTML = html;
+  return !!(d.textContent.trim() || d.querySelector("li"));
+}
+function tekenLesOpmaak(){
+  const o = lesOpmaakVan(k()), vak = document.getElementById("lesvak");
+  vak.dataset.lettertype = o.lettertype;
+  vak.style.setProperty("--lesmaat", o.maat);
+  document.getElementById("les-lettertype").value = o.lettertype;
+  document.getElementById("les-maatwaarde").textContent = Math.round(o.maat * 100) + "%";
+}
 function tekenLes(){
   const kl = k(), vak = document.getElementById("les-inhoud"), invoer = document.getElementById("les-invoer");
+  const html = lesTekstVan(kl);
   document.getElementById("les-label").textContent = huidig + " \u00b7 deze les";
-  document.getElementById("btn-les").classList.toggle("aan", !!lesTekstVan(kl).trim());
+  document.getElementById("btn-les").classList.toggle("aan", lesHeeftTekst(html));
+  tekenLesOpmaak();
   if (lesBewerkt){
-    if (document.activeElement !== invoer) invoer.value = lesTekstVan(kl);
+    if (document.activeElement !== invoer) invoer.innerHTML = html;
     return;
   }
-  invoer.value = lesTekstVan(kl);
-  vak.innerHTML = "";
-  const regels = lesTekstVan(kl).split(/\r?\n/).map(r => r.trim()).filter(Boolean);
-  if (!regels.length){
-    const p = document.createElement("p");
-    p.className = "lesk leeg-tekst";
-    p.textContent = "Nog niets ingevuld. Klik op het potlood en zet hier het programma en de doelen van deze les.";
-    vak.appendChild(p);
-    return;
-  }
-  regels.forEach(r => {
-    const p = document.createElement("p");
-    if (r.endsWith(":")) p.className = "lesk";
-    p.appendChild(document.createTextNode(r));
-    vak.appendChild(p);
-  });
+  invoer.innerHTML = html;
+  if (lesHeeftTekst(html)) vak.innerHTML = html;
+  else vak.innerHTML = '<div class="leeg-tekst">Nog niets ingevuld. Klik op het potlood en zet hier het programma en de doelen van deze les.</div>';
+}
+function bewaarLes(){
+  k().les = schoonLes(document.getElementById("les-invoer").innerHTML);
+  markeer();
 }
 function zetLesBewerken(aan){
   lesBewerkt = aan;
   const invoer = document.getElementById("les-invoer"), vak = document.getElementById("les-inhoud");
   invoer.hidden = !aan;
   vak.hidden = aan;
+  document.getElementById("les-balk").hidden = !aan;
   const knop = document.getElementById("les-bewerk");
   knop.innerHTML = svg(aan ? "vink" : "pen", 15);
   knop.title = aan ? "Klaar met aanpassen" : "Tekst aanpassen";
-  if (aan){ invoer.focus(); invoer.setSelectionRange(invoer.value.length, invoer.value.length); }
-  else { k().les = invoer.value; markeer(); tekenLes(); }
+  if (aan){
+    invoer.focus();
+    const r = document.createRange();
+    r.selectNodeContents(invoer); r.collapse(false);
+    const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  } else { bewaarLes(); tekenLes(); }
 }
+/* opmaakknoppen: execCommand is oud maar werkt in alle browsers die de app aankan */
+document.getElementById("les-balk").addEventListener("mousedown", e => {
+  if (e.target.closest("button")) e.preventDefault();   /* selectie niet kwijtraken */
+});
+document.getElementById("les-balk").addEventListener("click", e => {
+  const knop = e.target.closest("button[data-opmaak]");
+  if (!knop) return;
+  document.getElementById("les-invoer").focus();
+  try { document.execCommand(knop.dataset.opmaak, false, null); } catch (err){}
+  bewaarLes();
+});
+document.getElementById("les-lettertype").addEventListener("change", e => {
+  lesOpmaakVan(k()).lettertype = e.target.value;
+  tekenLesOpmaak();
+  markeer();
+});
+function lesMaatBij(stap){
+  const o = lesOpmaakVan(k());
+  o.maat = Math.min(2, Math.max(.7, Math.round((o.maat + stap) * 10) / 10));
+  tekenLesOpmaak();
+  markeer();
+}
+document.getElementById("les-kleiner").addEventListener("click", () => lesMaatBij(-.1));
+document.getElementById("les-groter").addEventListener("click", () => lesMaatBij(.1));
+document.getElementById("les-invoer").addEventListener("input", bewaarLes);
+document.getElementById("les-invoer").addEventListener("paste", e => {
+  e.preventDefault();
+  const tekst = (e.clipboardData || window.clipboardData).getData("text/plain");
+  document.execCommand("insertText", false, tekst);
+});
+document.getElementById("les-invoer").addEventListener("keydown", e => {
+  if (e.key === "Escape"){ e.stopPropagation(); zetLesBewerken(false); }
+});
 function lesOpen(aan){
   const vak = document.getElementById("lesvak");
   vak.hidden = !aan;
@@ -1594,10 +1717,6 @@ function lesPlaats(){
 document.getElementById("btn-les").addEventListener("click", () => lesOpen(document.getElementById("lesvak").hidden));
 document.getElementById("les-dicht").addEventListener("click", () => lesOpen(false));
 document.getElementById("les-bewerk").addEventListener("click", () => zetLesBewerken(!lesBewerkt));
-document.getElementById("les-invoer").addEventListener("input", () => { k().les = document.getElementById("les-invoer").value; markeer(); });
-document.getElementById("les-invoer").addEventListener("keydown", e => {
-  if (e.key === "Escape"){ e.stopPropagation(); zetLesBewerken(false); }
-});
 document.getElementById("les-maat").addEventListener("click", () => {
   lesGroot = !lesGroot;
   const vak = document.getElementById("lesvak");
@@ -2213,7 +2332,7 @@ function bouwData(metFotos, metZorg){
     });
     if (naam === huidig) legActieveVersieVast(kl); else zorgVoorVersies(kl);
       uit.klassen[naam] = { rijen:kl.rijen, diep:kl.diep, leerlingen, plekken:kl.plekken, wachtrij:kl.wachtrij,
-                          les: kl.les || "", toets: !!kl.toets,
+                          les: kl.les || "", lesOpmaak: lesOpmaakVan(kl), toets: !!kl.toets,
                           versies:kl.versies, actief:kl.actief,
                           nietSamen: metZorg ? (kl.nietSamen || []) : [],
                           groepGeschiedenis: kl.groepGeschiedenis || [] };
@@ -2230,7 +2349,7 @@ function laadData(data){
       leerlingen:kl.leerlingen, plekken:kl.plekken, wachtrij:kl.wachtrij || [],
       beurt:null, gehad:[], nietSamen: Array.isArray(kl.nietSamen) ? kl.nietSamen : [],
       groepGeschiedenis: Array.isArray(kl.groepGeschiedenis) ? kl.groepGeschiedenis : [],
-      les: typeof kl.les === "string" ? kl.les : "", toets: !!kl.toets
+      les: typeof kl.les === "string" ? kl.les : "", lesOpmaak: kl.lesOpmaak, toets: !!kl.toets
     });
     if (Array.isArray(kl.versies) && kl.versies.length){
       klassen[naam].versies = kl.versies;
