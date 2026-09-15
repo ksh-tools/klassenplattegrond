@@ -405,7 +405,6 @@ body.presentatie{background:#0b1220;--foto:112px;--naam:25px}
 body.presentatie .wrap{max-width:none;padding:14px 18px;height:100vh;display:flex;flex-direction:column}
 body.presentatie .kop,body.presentatie .onder,body.presentatie .acties{display:none}
 body.presentatie .balk{margin:0 0 12px;justify-content:flex-end}
-body.presentatie .balk .knop:not(#btn-presentatie):not(#btn-beurt):not(#btn-timer){display:none}
 body.presentatie .lokaal{flex:1;aspect-ratio:auto;min-height:0}
 
 @media (max-width:1100px){
@@ -576,18 +575,94 @@ body.presentatie .balk .scheiding{display:none}
 .gsmerk[data-gs="j"]{background:#0f766e;color:#fff}
 .gsmerk[data-gs="m"]{background:var(--violet);color:#fff}
 .gsmerk[data-gs=""]{background:#fff;border:1.5px dashed var(--zacht);color:var(--zacht)}
-body.gs-modus .gsmerk{display:flex}
+body.gs-modus:not([data-tool="paar"]) .gsmerk{display:flex}
 body.gs-modus .stoel.bezet{cursor:pointer}
-body.gs-modus .stoel.bezet[data-gs="j"]{border:2px solid #14b8a6;background:#f0fdfa}
-body.gs-modus .stoel.bezet[data-gs="m"]{border:2px solid #a78bfa;background:#f5f3ff}
+body.gs-modus:not([data-tool="paar"]) .stoel.bezet[data-gs="j"]{border:2px solid #14b8a6;background:#f0fdfa}
+body.gs-modus:not([data-tool="paar"]) .stoel.bezet[data-gs="m"]{border:2px solid #a78bfa;background:#f5f3ff}
 body.gs-modus .chip{cursor:pointer;position:relative;padding-left:4px}
 body.gs-modus .chip .gsmerk{position:static;margin-right:2px}
-body.gs-modus .chip[data-gs="j"]{border-color:#14b8a6;background:#f0fdfa}
-body.gs-modus .chip[data-gs="m"]{border-color:#a78bfa;background:#f5f3ff}
+body.gs-modus:not([data-tool="paar"]) .chip[data-gs="j"]{border-color:#14b8a6;background:#f0fdfa}
+body.gs-modus:not([data-tool="paar"]) .chip[data-gs="m"]{border-color:#a78bfa;background:#f5f3ff}
 body.gs-modus .zorgmerken{display:none}
 .regel.driekeuze .gs-aanklik{flex-basis:100%;margin:8px 0 0 39px;justify-content:flex-start;width:max-content;padding:7px 12px;font-size:13px}
 @media (max-width:600px){.regel.driekeuze .gs-aanklik{margin-left:0}}
 @media print{.gsbalk{display:none!important} .gsmerk{display:none!important}}
+
+/* ---------- aanklikken: drie gereedschappen ---------- */
+.gsbalk .gs-tekst{flex:1 1 320px;min-width:0}
+.gsbalk{position:sticky;top:10px;z-index:35;box-shadow:0 10px 24px -14px rgba(76,29,149,.45)}
+.gsbalk .gs-tools{display:grid;grid-template-columns:repeat(3,auto);margin-top:7px;max-width:100%}
+.gsbalk .gs-tools button{padding:6px 12px;font-size:13px;white-space:nowrap}
+.gsbalk .gs-uitleg{display:block;margin-top:6px}
+.gsbalk .gs-tel span.let{background:#fff7ed;border-color:#fdba74;color:#9a3412}
+.klikmerk{display:none;position:absolute;top:5px;right:6px;height:22px;min-width:22px;border-radius:7px;font-size:11.5px;font-weight:800;align-items:center;justify-content:center;padding:0 6px;z-index:3;pointer-events:none;letter-spacing:.02em}
+.apartmerk{background:#ea580c;color:#fff}
+.paarmerk{background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5}
+body.gs-modus[data-tool="apart"] [data-apart="1"] .apartmerk{display:flex}
+body.gs-modus[data-tool="apart"] .stoel.bezet[data-apart="1"]{box-shadow:0 0 0 3px #fdba74}
+body.gs-modus[data-tool="paar"] .stoel.bezet{cursor:pointer}
+body.gs-modus[data-tool="paar"] [data-paren]:not([data-paren="0"]) .paarmerk{display:flex}
+body.gs-modus[data-tool="paar"] .stoel.bezet[data-paar="bron"]{border:3px solid var(--blauw);background:var(--blauw-zacht)}
+body.gs-modus[data-tool="paar"] .stoel.bezet[data-paar="blok"]{border:2px solid #ef4444;background:#fef2f2}
+body.gs-modus[data-tool="paar"] [data-paar="blok"] .paarmerk{display:flex;background:#ef4444;color:#fff;border-color:#ef4444}
+body.gs-modus[data-tool="paar"] [data-paar="bron"] .paarmerk{display:none}
+body.gs-modus .chip .klikmerk{position:static;margin-left:2px}
+body.gs-modus[data-tool="paar"] .chip{cursor:pointer}
+body.gs-modus[data-tool="paar"] .chip[data-paar="bron"]{border:2px solid var(--blauw);background:var(--blauw-zacht)}
+body.gs-modus[data-tool="paar"] .chip[data-paar="blok"]{border:2px solid #ef4444;background:#fef2f2}
+body.gs-modus[data-tool="apart"] .chip[data-apart="1"]{box-shadow:0 0 0 2px #fdba74}
+@media print{.klikmerk{display:none!important}}
+
+/* ---------- toetsopstelling ---------- */
+.toetsband{flex:none;align-self:center;margin-top:10px;padding:7px 26px;border-radius:999px;
+  background:#fff7ed;border:1.5px solid #fdba74;color:#9a3412;
+  font-size:clamp(13px,1.5vw,20px);letter-spacing:.3em;text-transform:uppercase;font-weight:800}
+.toetsband[hidden]{display:none}
+.lokaal[data-toets="aan"] .tafel{position:relative;gap:16px}
+.lokaal[data-toets="aan"] .tafel::before{content:"";position:absolute;left:50%;top:2px;bottom:2px;
+  border-left:2px dashed #fb923c;transform:translateX(-50%);pointer-events:none;z-index:1}
+.lokaal[data-toets="aan"] .tafel-groep{background:#fff7ed;border-color:#fed7aa}
+#btn-toets.aan{border-color:#fdba74;background:#fff7ed;color:#9a3412}
+#btn-toets.aan svg{color:#ea580c}
+body.presentatie .toetsband{margin-top:6px;font-size:clamp(17px,2.1vw,30px);padding:7px 34px;background:#ffedd5;border-color:#f97316;color:#9a3412}
+
+/* ---------- lesprogramma en doelen ---------- */
+.lesvak{position:fixed;z-index:65;top:110px;left:28px;width:330px;max-width:calc(100vw - 24px);
+  background:var(--kaart);border:1px solid var(--lijn-sterk);border-radius:18px;
+  box-shadow:0 22px 48px -22px rgba(15,23,42,.6);padding:10px 14px 14px;touch-action:none}
+.lesvak[hidden]{display:none}
+.les-kop{display:flex;align-items:center;gap:8px;margin:0 -4px 4px;padding:2px 4px;cursor:grab;user-select:none;-webkit-user-select:none}
+.lesvak.sleept .les-kop{cursor:grabbing}
+.les-titel{display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:var(--blauw)}
+.les-knopjes{margin-left:auto;display:flex;gap:5px}
+.lk{width:30px;height:30px;border-radius:9px;border:1px solid var(--lijn);background:#fbfdff;color:var(--grijs);display:flex;align-items:center;justify-content:center;padding:0}
+.lk:hover{background:var(--blauw-zacht);color:var(--blauw)}
+.les-inhoud{font-size:15px;line-height:1.5;color:var(--tekst);max-height:52vh;overflow:auto}
+.les-inhoud p{margin:0 0 5px;display:flex;gap:8px}
+.les-inhoud p::before{content:"";flex:none;width:7px;height:7px;border-radius:50%;background:var(--blauw);margin-top:.55em}
+.les-inhoud p.lesk{font-weight:800;color:var(--inkt);margin-top:9px}
+.les-inhoud p.lesk:first-child{margin-top:0}
+.les-inhoud p.lesk::before{display:none}
+.les-inhoud .leeg-tekst{font-style:italic}
+.les-invoer{width:100%;min-height:150px;border:1px solid var(--lijn-sterk);border-radius:12px;padding:9px 11px;
+  font:inherit;font-size:14px;line-height:1.5;color:var(--tekst);background:#fbfdff;resize:vertical}
+.les-invoer:focus{outline:2px solid var(--blauw);outline-offset:1px;background:#fff}
+.les-invoer[hidden]{display:none}
+.lesvak.groot{width:min(620px,calc(100vw - 24px));padding:14px 22px 20px}
+.lesvak.groot .les-inhoud{font-size:clamp(20px,2.4vw,30px);line-height:1.45;max-height:64vh}
+.lesvak.groot .les-inhoud p::before{width:10px;height:10px}
+body.presentatie .lesvak{background:#0f172a;border-color:rgba(255,255,255,.12);color:#e2e8f0}
+body.presentatie .les-inhoud{color:#e2e8f0}
+body.presentatie .les-inhoud p.lesk{color:#fff}
+body.presentatie .lk{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14);color:#cbd5e1}
+body.presentatie .les-invoer{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.18);color:#f1f5f9}
+body.presentatie .balk .knop:not(#btn-presentatie):not(#btn-beurt):not(#btn-timer):not(#btn-les):not(#btn-toets){display:none}
+#btn-les.aan{border-color:#93c5fd;background:var(--blauw-zacht)}
+@media print{
+  .lesvak{display:none!important}
+  .toetsband{-webkit-print-color-adjust:exact;print-color-adjust:exact;font-size:3.6mm;padding:1.6mm 8mm;margin-top:2mm}
+  .lokaal[data-toets="aan"] .tafel-groep{background:#fff5ea!important}
+}
 </style>
 </head>
 <body>
@@ -638,6 +713,8 @@ body.gs-modus .zorgmerken{display:none}
     <button class="knop primair" id="btn-beurt" data-icon="dice">Beurt trekken</button>
     <button class="knop donker" id="btn-presentatie" data-icon="monitor">Op het bord</button>
     <button class="knop" id="btn-timer" data-icon="klok">Timer</button>
+    <button class="knop" id="btn-les" data-icon="notitie">Lesprogramma</button>
+    <button class="knop" id="btn-toets" data-icon="boek">Toetsopstelling</button>
     <button class="knop" id="btn-shuffle" data-icon="shuffle">Willekeurig indelen</button>
     <button class="knop violet" id="btn-spiegel" data-icon="omdraaien">Docentweergave</button>
     <span class="scheiding"></span>
@@ -662,7 +739,7 @@ body.gs-modus .zorgmerken{display:none}
         <button class="meer-item" id="btn-groepjes" role="menuitem">Groepjes maken…</button>
         <button class="meer-item" id="btn-namen" role="menuitem">Namen leren</button>
         <button class="meer-item" id="btn-nietsamen" role="menuitem">Wie niet naast elkaar…</button>
-        <button class="meer-item" id="btn-jongensmeisjes" role="menuitem">Jongens en meisjes aanklikken</button>
+        <button class="meer-item" id="btn-jongensmeisjes" role="menuitem">Leerlingen aanklikken (jongen/meisje, wie niet naast wie)</button>
         <div class="meer-scheiding"></div>
         <button class="meer-item" id="btn-handleiding" role="menuitem">Handleiding openen (PDF)</button>
       </div>
@@ -675,9 +752,14 @@ body.gs-modus .zorgmerken{display:none}
 
   <div class="gsbalk" id="gsbalk" role="region" aria-label="Jongens en meisjes aanklikken" hidden>
     <span class="gs-icoon" data-icon="mensen" data-maat="24"></span>
-    <div>
-      <b>Jongens en meisjes aanklikken</b>
-      <span class="gs-uitleg">Klik op een leerling: 1 keer is jongen, 2 keer is meisje, 3 keer is weer leeg.</span>
+    <div class="gs-tekst">
+      <b>Leerlingen aanklikken</b>
+      <div class="wijzekiezer gs-tools" id="gs-tools" role="group" aria-label="Wat wil je aanklikken">
+        <button type="button" data-tool="gs" class="actief">Jongen of meisje</button>
+        <button type="button" data-tool="apart">Niet naast andere geslacht</button>
+        <button type="button" data-tool="paar">Wie niet naast wie</button>
+      </div>
+      <span class="gs-uitleg" id="gs-uitleg"></span>
     </div>
     <span class="gs-tel" id="gs-tel"></span>
     <button class="knop primair" id="gs-klaar" data-icon="vink">Klaar</button>
@@ -695,8 +777,23 @@ body.gs-modus .zorgmerken{display:none}
 
   <section class="lokaal" id="lokaal" data-stijl="kaart" aria-label="Plattegrond van het lokaal">
     <div class="bord"><span data-icon="monitor" data-maat="18"></span> Bord &middot; voorkant lokaal</div>
+    <div class="toetsband" id="toetsband" hidden>Toetsopstelling</div>
     <div class="rijen" id="rijen"></div>
   </section>
+
+  <div class="lesvak" id="lesvak" role="region" aria-label="Programma en doelen van deze les" hidden>
+    <div class="les-kop" id="les-kop">
+      <span class="les-titel"><span data-icon="notitie" data-maat="14"></span> <span id="les-label">Deze les</span></span>
+      <span class="les-knopjes">
+        <button type="button" class="lk" id="les-bewerk" data-icon="pen" title="Tekst aanpassen" aria-label="Tekst aanpassen"></button>
+        <button type="button" class="lk" id="les-maat" title="Groter of kleiner" aria-label="Groter of kleiner"></button>
+        <button type="button" class="lk" id="les-dicht" data-icon="kruis" title="Sluiten" aria-label="Sluiten"></button>
+      </span>
+    </div>
+    <div class="les-inhoud" id="les-inhoud"></div>
+    <textarea class="les-invoer" id="les-invoer" hidden aria-label="Programma en doelen"
+      placeholder="Bijvoorbeeld:&#10;Doel:&#10;Je kunt een alinea samenvatten in twee zinnen.&#10;Programma:&#10;Terugblik op het huiswerk&#10;Uitleg samenvatten&#10;Zelf oefenen, blz. 42&#10;Nakijken en afsluiten"></textarea>
+  </div>
 
   <div class="timer" id="timer" role="dialog" aria-label="Timer" hidden>
     <div class="timer-kop" id="timer-kop">
@@ -744,7 +841,7 @@ body.gs-modus .zorgmerken{display:none}
         <p class="veldhulp" id="indeel-hulp"></p>
       </div>
       <div class="venster-voet">
-        <button class="knop stil" id="indeel-nietsamen">Wie niet naast elkaar…</button>
+        <button class="knop stil" id="indeel-nietsamen">Wie niet naast wie aanklikken</button>
         <span class="rechts">
           <button class="knop stil" id="indeel-annuleer">Annuleren</button>
           <button class="knop primair" id="indeel-ok">Indelen</button>
@@ -1211,6 +1308,8 @@ function teken(){
   document.getElementById("btn-beurt-wis").hidden = !kl.beurt;
   document.getElementById("btn-ronde-nieuw").hidden = !kl.gehad.length;
   lokaalEl.dataset.weergave = kl.docent ? "docent" : "leerling";
+  zetToets(!!kl.toets, true);
+  tekenLes();
   lokaalEl.dataset.zorgmerken = (document.body.classList.contains("presentatie") && !toonZorgOpBord) ? "uit" : "aan";
   const spiegelKnop = document.getElementById("btn-spiegel");
   spiegelKnop.lastChild.textContent = kl.docent ? " Standaardweergave" : " Docentweergave";
@@ -1221,7 +1320,7 @@ function teken(){
   tekenWachtrij();
   tekenTellers();
   tekenActies();
-  if (gsModus) tekenGsTel();
+  if (gsModus) tekenKlikBalk();
 }
 
 /* ---------- naamkaartje: voornaam, achternaam of beide ----------
@@ -1281,6 +1380,7 @@ function maakStoel(i, toonFoto){
       (gsModus ? ", " + ({ j:"jongen", m:"meisje" }[l.geslacht] || "nog niet ingevuld") : ""));
     el.dataset.gs = l.geslacht || "";
     el.appendChild(gsMerk(l));
+    if (gsModus) zetKlikStaat(el, id);
     if (toonFoto) el.appendChild(fotoVak(l));
     const nm = document.createElement("div");
     nm.className = "naam";
@@ -1335,6 +1435,7 @@ function tekenWachtrij(){
     chip.appendChild(fotoVak(l));
     chip.dataset.gs = l.geslacht || "";
     chip.appendChild(gsMerk(l));
+    if (gsModus) zetKlikStaat(chip, id);
     chip.appendChild(document.createTextNode(l.naam));
     vak.appendChild(chip);
   });
@@ -1421,11 +1522,133 @@ keuze.addEventListener("change", () => {
   teken();
 });
 
-/* ---------- jongens en meisjes aanklikken ----------
-   Eén klik: jongen, twee: meisje, drie: weer leeg. Werkt op de tegels en op
-   de wachtrij. Buiten deze stand zie je niets van jongen/meisje, dus ook
-   niet op het bord. */
-var gsModus = false, gsTerug = null;
+/* ---------- toetsopstelling ----------
+   Alleen een andere weergave: een band boven de plattegrond en een streep
+   tussen de twee plekken van elke tafel. Wie waar zit verandert er niet van;
+   wil je een andere indeling voor de toets, maak dan een extra versie. */
+function zetToets(aan, alleenTonen){
+  const kl = k();
+  if (!alleenTonen) kl.toets = aan;
+  lokaalEl.dataset.toets = aan ? "aan" : "uit";
+  document.getElementById("toetsband").hidden = !aan;
+  document.getElementById("btn-toets").classList.toggle("aan", aan);
+}
+document.getElementById("btn-toets").addEventListener("click", () => {
+  zetToets(!k().toets);
+  markeer();
+});
+
+/* ---------- programma en doelen van de les ----------
+   Eén tekstvak per klas. Regels die op een dubbele punt eindigen worden een
+   kopje, de rest krijgt een bolletje. Staat ook op het bord. */
+var lesGroot = false, lesBewerkt = false;
+function lesTekstVan(kl){ return typeof kl.les === "string" ? kl.les : ""; }
+function tekenLes(){
+  const kl = k(), vak = document.getElementById("les-inhoud"), invoer = document.getElementById("les-invoer");
+  document.getElementById("les-label").textContent = huidig + " \u00b7 deze les";
+  document.getElementById("btn-les").classList.toggle("aan", !!lesTekstVan(kl).trim());
+  if (lesBewerkt){
+    if (document.activeElement !== invoer) invoer.value = lesTekstVan(kl);
+    return;
+  }
+  invoer.value = lesTekstVan(kl);
+  vak.innerHTML = "";
+  const regels = lesTekstVan(kl).split(/\r?\n/).map(r => r.trim()).filter(Boolean);
+  if (!regels.length){
+    const p = document.createElement("p");
+    p.className = "lesk leeg-tekst";
+    p.textContent = "Nog niets ingevuld. Klik op het potlood en zet hier het programma en de doelen van deze les.";
+    vak.appendChild(p);
+    return;
+  }
+  regels.forEach(r => {
+    const p = document.createElement("p");
+    if (r.endsWith(":")) p.className = "lesk";
+    p.appendChild(document.createTextNode(r));
+    vak.appendChild(p);
+  });
+}
+function zetLesBewerken(aan){
+  lesBewerkt = aan;
+  const invoer = document.getElementById("les-invoer"), vak = document.getElementById("les-inhoud");
+  invoer.hidden = !aan;
+  vak.hidden = aan;
+  const knop = document.getElementById("les-bewerk");
+  knop.innerHTML = svg(aan ? "vink" : "pen", 15);
+  knop.title = aan ? "Klaar met aanpassen" : "Tekst aanpassen";
+  if (aan){ invoer.focus(); invoer.setSelectionRange(invoer.value.length, invoer.value.length); }
+  else { k().les = invoer.value; markeer(); tekenLes(); }
+}
+function lesOpen(aan){
+  const vak = document.getElementById("lesvak");
+  vak.hidden = !aan;
+  if (!aan){ if (lesBewerkt) zetLesBewerken(false); return; }
+  if (!vak.dataset.geplaatst) lesPlaats();
+  tekenLes();
+}
+function lesPlaats(){
+  const vak = document.getElementById("lesvak"), lk = lokaalEl.getBoundingClientRect();
+  vak.style.left = Math.max(12, lk.left + 18) + "px";
+  vak.style.top = Math.max(12, lk.top + 14) + "px";
+}
+document.getElementById("btn-les").addEventListener("click", () => lesOpen(document.getElementById("lesvak").hidden));
+document.getElementById("les-dicht").addEventListener("click", () => lesOpen(false));
+document.getElementById("les-bewerk").addEventListener("click", () => zetLesBewerken(!lesBewerkt));
+document.getElementById("les-invoer").addEventListener("input", () => { k().les = document.getElementById("les-invoer").value; markeer(); });
+document.getElementById("les-invoer").addEventListener("keydown", e => {
+  if (e.key === "Escape"){ e.stopPropagation(); zetLesBewerken(false); }
+});
+document.getElementById("les-maat").addEventListener("click", () => {
+  lesGroot = !lesGroot;
+  const vak = document.getElementById("lesvak");
+  vak.classList.toggle("groot", lesGroot);
+  document.getElementById("les-maat").innerHTML = svg(lesGroot ? "kleiner" : "groter", 15);
+  houdBinnen(vak);
+});
+
+/* ---------- panelen verslepen ---------- */
+function houdBinnen(el){
+  if (el.hidden || !el.style.left) return;
+  const r = el.getBoundingClientRect();
+  el.style.left = Math.min(Math.max(r.left, 8), Math.max(8, window.innerWidth - r.width - 8)) + "px";
+  el.style.top = Math.min(Math.max(r.top, 8), Math.max(8, window.innerHeight - r.height - 8)) + "px";
+}
+function maakSleepbaar(paneel, kop, naSlepen){
+  let start = null;
+  kop.addEventListener("pointerdown", e => {
+    if (e.target.closest("button")) return;
+    const r = paneel.getBoundingClientRect();
+    start = { dx: e.clientX - r.left, dy: e.clientY - r.top, id: e.pointerId };
+    kop.setPointerCapture(e.pointerId);
+    paneel.classList.add("sleept");
+    e.preventDefault();
+  });
+  kop.addEventListener("pointermove", e => {
+    if (!start || e.pointerId !== start.id) return;
+    paneel.style.right = "auto";
+    paneel.style.left = (e.clientX - start.dx) + "px";
+    paneel.style.top = (e.clientY - start.dy) + "px";
+    paneel.dataset.geplaatst = "1";
+    houdBinnen(paneel);
+    if (naSlepen) naSlepen();
+  });
+  const los = () => { start = null; paneel.classList.remove("sleept"); };
+  kop.addEventListener("pointerup", los);
+  kop.addEventListener("pointercancel", los);
+}
+document.getElementById("les-maat").innerHTML = svg("groter", 15);
+maakSleepbaar(document.getElementById("lesvak"), document.getElementById("les-kop"));
+window.addEventListener("resize", () => houdBinnen(document.getElementById("lesvak")));
+
+/* ---------- leerlingen aanklikken ----------
+   Eén stand met drie gereedschappen:
+   - "gs": 1 klik jongen, 2 meisje, 3 weer leeg;
+   - "apart": deze leerling mag niet naast iemand van het andere geslacht;
+   - "paar": klik een leerling, daarna wie er niet naast mag (nog eens = weg).
+   Buiten deze stand is niets hiervan te zien, ook niet op het bord.
+   De reden van "apart" wordt nergens vastgelegd, en bij een reservekopie
+   valt het onder dezelfde vraag als de aandachtspunten. */
+var gsModus = false, gsTerug = null, klikTool = "gs", paarBron = null;
 function gsMerk(l){
   const m = document.createElement("span");
   m.className = "gsmerk";
@@ -1434,23 +1657,80 @@ function gsMerk(l){
   m.setAttribute("aria-hidden", "true");
   return m;
 }
+function partnersVan(id){
+  return nietSamenVan(k()).filter(p => p[0] === id || p[1] === id).map(p => p[0] === id ? p[1] : p[0]);
+}
+function zetKlikStaat(el, id){
+  const l = k().leerlingen[id];
+  el.dataset.apart = l.apartGs ? "1" : "";
+  const partners = partnersVan(id);
+  el.dataset.paren = partners.length;
+  el.dataset.paar = id === paarBron ? "bron" : (paarBron && partnersVan(paarBron).includes(id) ? "blok" : "");
+  const apart = document.createElement("span");
+  apart.className = "klikmerk apartmerk"; apart.textContent = "apart"; apart.setAttribute("aria-hidden", "true");
+  const paar = document.createElement("span");
+  paar.className = "klikmerk paarmerk"; paar.setAttribute("aria-hidden", "true");
+  paar.textContent = el.dataset.paar === "blok" ? "\u2715 niet naast" : "\u2715 " + partners.length;
+  if (el.classList.contains("chip")){ el.appendChild(apart); el.appendChild(paar); }
+  else { el.appendChild(apart); el.appendChild(paar); }
+  if (klikTool === "apart" && l.apartGs) el.setAttribute("aria-label", (el.getAttribute("aria-label") || l.naam) + ", niet naast andere geslacht");
+  if (klikTool === "paar" && el.dataset.paar === "blok") el.setAttribute("aria-label", (el.getAttribute("aria-label") || l.naam) + ", mag niet naast " + k().leerlingen[paarBron].naam);
+}
 function volgendGeslacht(l){
   l.geslacht = l.geslacht === "j" ? "m" : l.geslacht === "m" ? null : "j";
   markeer();
 }
-function tekenGsTel(){
-  const allen = Object.values(k().leerlingen);
-  const j = allen.filter(l => l.geslacht === "j").length, m = allen.filter(l => l.geslacht === "m").length;
-  const vak = document.getElementById("gs-tel");
-  vak.innerHTML = "";
-  [[j, j === 1 ? "jongen" : "jongens"], [m, m === 1 ? "meisje" : "meisjes"], [allen.length - j - m, "nog leeg"]].forEach(([n, t]) => {
-    const sp = document.createElement("span"); sp.textContent = n + " " + t; vak.appendChild(sp);
-  });
+function wisselPaar(a, b){
+  const kl = k(), lijst = nietSamenVan(kl);
+  const n = lijst.findIndex(p => (p[0] === a && p[1] === b) || (p[0] === b && p[1] === a));
+  if (n >= 0) lijst.splice(n, 1); else lijst.push([a, b]);
+  markeer();
 }
-function zetGsModus(aan, terug){
+function klikOpLeerling(id){
+  const l = k().leerlingen[id];
+  if (!l) return;
+  if (klikTool === "gs") volgendGeslacht(l);
+  else if (klikTool === "apart"){ if (l.apartGs) delete l.apartGs; else l.apartGs = true; markeer(); }
+  else if (!paarBron || paarBron === id) paarBron = paarBron === id ? null : id;
+  else wisselPaar(paarBron, id);
+  teken();
+}
+function tekenKlikBalk(){
+  const kl = k(), allen = Object.values(kl.leerlingen);
+  document.body.dataset.tool = klikTool;
+  document.querySelectorAll("#gs-tools button").forEach(b => {
+    b.classList.toggle("actief", b.dataset.tool === klikTool);
+    b.setAttribute("aria-pressed", b.dataset.tool === klikTool ? "true" : "false");
+  });
+  const uitleg = document.getElementById("gs-uitleg"), vak = document.getElementById("gs-tel");
+  const pillen = [];
+  if (klikTool === "gs"){
+    uitleg.textContent = "Klik op een leerling: 1 keer is jongen, 2 keer is meisje, 3 keer is weer leeg.";
+    const j = allen.filter(l => l.geslacht === "j").length, m = allen.filter(l => l.geslacht === "m").length;
+    pillen.push([j + (j === 1 ? " jongen" : " jongens")], [m + (m === 1 ? " meisje" : " meisjes")], [(allen.length - j - m) + " nog leeg"]);
+  } else if (klikTool === "apart"){
+    uitleg.textContent = "Klik op een leerling die niet naast iemand van het andere geslacht mag zitten. Nog eens klikken haalt het weg.";
+    const apart = allen.filter(l => l.apartGs), zonder = apart.filter(l => l.geslacht !== "j" && l.geslacht !== "m").length;
+    pillen.push([apart.length + (apart.length === 1 ? " leerling" : " leerlingen") + " apart"]);
+    if (zonder) pillen.push([zonder + " zonder jongen/meisje, telt niet", true]);
+  } else {
+    const bron = paarBron && kl.leerlingen[paarBron];
+    if (!bron){ paarBron = null; uitleg.textContent = "Klik op een leerling. Daarna klik je op wie er niet naast mag zitten."; }
+    else uitleg.textContent = "Wie mag niet naast " + bron.naam + "? Klik op die leerling; nog eens klikken haalt het weg. Klik op " +
+      bron.naam.split(/\s+/)[0] + " zelf om een ander te kiezen.";
+    const n = nietSamenVan(kl).length;
+    pillen.push([n + (n === 1 ? " tweetal" : " tweetallen")]);
+  }
+  vak.innerHTML = "";
+  pillen.forEach(([t, let_]) => { const sp = document.createElement("span"); sp.textContent = t; if (let_) sp.className = "let"; vak.appendChild(sp); });
+}
+function zetGsModus(aan, terug, tool){
   gsModus = aan;
   gsTerug = aan ? (terug || null) : null;
+  paarBron = null;
+  if (tool) klikTool = tool;
   document.body.classList.toggle("gs-modus", aan);
+  document.body.dataset.tool = aan ? klikTool : "";
   const balk = document.getElementById("gsbalk");
   balk.hidden = !aan;
   const klaar = document.getElementById("gs-klaar");
@@ -1463,14 +1743,21 @@ function zetGsModus(aan, terug){
   teken();
   if (aan) balk.scrollIntoView({ block:"nearest", behavior:"smooth" });
 }
+document.getElementById("gs-tools").addEventListener("click", e => {
+  const b = e.target.closest("button[data-tool]");
+  if (!b) return;
+  klikTool = b.dataset.tool;
+  paarBron = null;
+  teken();
+});
 rijenEl.addEventListener("click", e => {
   if (!gsModus) return;
   e.stopImmediatePropagation();
   const stoel = e.target.closest(".stoel.bezet");
   if (!stoel) return;
-  volgendGeslacht(k().leerlingen[k().plekken[Number(stoel.dataset.plek)]]);
-  teken();
-  const terugFocus = rijenEl.querySelector('.stoel[data-plek="' + stoel.dataset.plek + '"]');
+  const plek = stoel.dataset.plek;
+  klikOpLeerling(k().plekken[Number(plek)]);
+  const terugFocus = rijenEl.querySelector('.stoel[data-plek="' + plek + '"]');
   if (terugFocus && document.activeElement === document.body) terugFocus.focus({ preventScroll:true });
 }, true);
 document.getElementById("wacht").addEventListener("click", e => {
@@ -1478,8 +1765,7 @@ document.getElementById("wacht").addEventListener("click", e => {
   e.stopImmediatePropagation();
   const chip = e.target.closest(".chip");
   if (!chip) return;
-  volgendGeslacht(k().leerlingen[chip.dataset.wacht]);
-  teken();
+  klikOpLeerling(chip.dataset.wacht);
 }, true);
 document.addEventListener("dragstart", e => {
   if (!gsModus) return;
@@ -1922,11 +2208,12 @@ function bouwData(metFotos, metZorg){
     const leerlingen = {};
     Object.entries(kl.leerlingen).forEach(([id, l]) => {
       let uitL = metFotos ? Object.assign({}, l) : Object.assign({}, l, { foto:null });
-      if (!metZorg){ uitL.zorg = []; uitL.notitie = ""; uitL.niveau = null; }
+      if (!metZorg){ uitL.zorg = []; uitL.notitie = ""; uitL.niveau = null; delete uitL.apartGs; }
       leerlingen[id] = uitL;
     });
     if (naam === huidig) legActieveVersieVast(kl); else zorgVoorVersies(kl);
-    uit.klassen[naam] = { rijen:kl.rijen, diep:kl.diep, leerlingen, plekken:kl.plekken, wachtrij:kl.wachtrij,
+      uit.klassen[naam] = { rijen:kl.rijen, diep:kl.diep, leerlingen, plekken:kl.plekken, wachtrij:kl.wachtrij,
+                          les: kl.les || "", toets: !!kl.toets,
                           versies:kl.versies, actief:kl.actief,
                           nietSamen: metZorg ? (kl.nietSamen || []) : [],
                           groepGeschiedenis: kl.groepGeschiedenis || [] };
@@ -1942,7 +2229,8 @@ function laadData(data){
       rijen:kl.rijen || 3, diep:kl.diep || 5,
       leerlingen:kl.leerlingen, plekken:kl.plekken, wachtrij:kl.wachtrij || [],
       beurt:null, gehad:[], nietSamen: Array.isArray(kl.nietSamen) ? kl.nietSamen : [],
-      groepGeschiedenis: Array.isArray(kl.groepGeschiedenis) ? kl.groepGeschiedenis : []
+      groepGeschiedenis: Array.isArray(kl.groepGeschiedenis) ? kl.groepGeschiedenis : [],
+      les: typeof kl.les === "string" ? kl.les : "", toets: !!kl.toets
     });
     if (Array.isArray(kl.versies) && kl.versies.length){
       klassen[naam].versies = kl.versies;
@@ -3218,8 +3506,8 @@ const INDEELREGELS = [
     uitleg:"Wordt niet verplaatst, zodat de plek voorspelbaar blijft.",
     telt:(l) => heeftZorg(l,"autisme") },
   { id:"uitelkaar", icoon:"notitie", aan:true,
-    naam:"Bepaalde tweetallen uit elkaar",
-    uitleg:"Wie je hebt opgegeven komt niet naast elkaar te zitten.",
+    naam:"Wie niet naast wie",
+    uitleg:"Opgegeven tweetallen zitten niet naast elkaar. Wie apart moet, zit niet naast iemand van het andere geslacht.",
     telt:null }
 ];
 const indeelOverlay = document.getElementById("indeel-overlay");
@@ -3265,11 +3553,11 @@ function maakGeslachtRegel(onderdeel, bijKeuze){
   const aanklik = document.createElement("button");
   aanklik.type = "button";
   aanklik.className = "knop stil gs-aanklik";
-  aanklik.innerHTML = svg("pen", 14) + "<span>Jongens en meisjes aanklikken op de plattegrond</span>";
+  aanklik.innerHTML = svg("pen", 14) + "<span>Leerlingen aanklikken op de plattegrond</span>";
   aanklik.addEventListener("click", () => {
     indeelOverlay.hidden = true;
     document.getElementById("groep-overlay").hidden = true;
-    zetGsModus(true, onderdeel);
+    zetGsModus(true, onderdeel, "gs");
   });
   rij.appendChild(aanklik);
   const kiezer = rij.querySelector(".wijzekiezer");
@@ -3354,6 +3642,7 @@ function toonIndeelVenster(){
   vak.innerHTML = "";
   INDEELREGELS.forEach(r => {
     const n = r.telt ? allen.filter(r.telt).length : nietSamenVan(kl).length;
+    const apartN = allen.filter(l => l.apartGs).length;
     const b = document.createElement("button");
     b.type = "button";
     b.className = "regel" + (indeelAan[r.id] ? " aan" : "");
@@ -3361,7 +3650,7 @@ function toonIndeelVenster(){
     b.innerHTML = '<span class="vlak zorgmerk" data-z="' +
       ({vooraan:"dyslexie",bijdocent:"adhd",uitgang:"timeout",vast:"autisme",uitelkaar:"extratijd"}[r.id]) +
       '">' + svg(r.icoon, 16) + '</span><span><b></b><small></small></span>' +
-      '<span class="telt">' + (r.telt ? n + " leerling" + (n === 1 ? "" : "en") : n + " tweetal" + (n === 1 ? "" : "len")) + "</span>";
+      '<span class="telt">' + (r.telt ? n + " leerling" + (n === 1 ? "" : "en") : n + " tweetal" + (n === 1 ? "" : "len") + (apartN ? " \u00b7 " + apartN + " apart" : "")) + "</span>";
     b.querySelector("b").textContent = r.naam;
     b.querySelector("small").textContent = r.uitleg;
     b.addEventListener("click", () => {
@@ -3380,7 +3669,7 @@ function sluitIndeel(){ indeelOverlay.hidden = true; }
 document.getElementById("btn-shuffle").addEventListener("click", toonIndeelVenster);
 document.getElementById("indeel-annuleer").addEventListener("click", sluitIndeel);
 indeelOverlay.addEventListener("click", (e) => { if (e.target === indeelOverlay) sluitIndeel(); });
-document.getElementById("indeel-nietsamen").addEventListener("click", () => { sluitIndeel(); toonSamenVenster(); });
+document.getElementById("indeel-nietsamen").addEventListener("click", () => { sluitIndeel(); zetGsModus(true, "indeel", "paar"); });
 
 function schud(a){
   for (let i = a.length - 1; i > 0; i--){
@@ -3452,21 +3741,24 @@ document.getElementById("indeel-ok").addEventListener("click", () => {
   const paarSet = new Set(indeelAan.uitelkaar ? nietSamenVan(kl).map(p => paarSleutel(p[0], p[1])) : []);
   const gsWens = geslachtKeuze.indeel;
   const gsVan = id => id ? kl.leerlingen[id].geslacht : null;
+  const heeftApart = indeelAan.uitelkaar && Object.values(kl.leerlingen).some(l => l.apartGs);
   const tafelFout = (arr, t) => {
     const a = arr[t * 2], b = arr[t * 2 + 1];
-    if (!a || !b) return { paar:0, gs:0 };
+    if (!a || !b) return { paar:0, gs:0, apart:0 };
     const paar = paarSet.has(paarSleutel(a, b)) ? 1 : 0;
+    const la = kl.leerlingen[a], lb = kl.leerlingen[b];
+    const apart = (heeftApart && (la.apartGs || lb.apartGs) && la.geslacht && lb.geslacht && la.geslacht !== lb.geslacht) ? 1 : 0;
     let gs = 0;
     if (gsWens !== "vrij"){
       const ga = gsVan(a), gb = gsVan(b);
       if (ga && gb && ((gsWens === "gemengd" && ga === gb) || (gsWens === "apart" && ga !== gb))) gs = 1;
     }
-    return { paar, gs };
+    return { paar, gs, apart };
   };
-  const tafelScore = (arr, t) => { const f = tafelFout(arr, t); return 1000 * f.paar + 10 * f.gs; };
+  const tafelScore = (arr, t) => { const f = tafelFout(arr, t); return 1000 * (f.paar + f.apart) + 10 * f.gs; };
   const ruilbaar = [];
   for (let i = 0; i < totaal; i++) if (!vastePlek.has(i)) ruilbaar.push(i);
-  if ((paarSet.size || gsWens !== "vrij") && ruilbaar.length > 1){
+  if ((paarSet.size || heeftApart || gsWens !== "vrij") && ruilbaar.length > 1){
     let score = 0;
     for (let t = 0; t < totaal / 2; t++) score += tafelScore(nieuw, t);
     for (let stap = 0; stap < 8000 && score > 0; stap++){
@@ -3481,8 +3773,8 @@ document.getElementById("indeel-ok").addEventListener("click", () => {
       else [nieuw[a], nieuw[b]] = [nieuw[b], nieuw[a]];
     }
   }
-  let restConflict = 0, gsFout = 0;
-  for (let t = 0; t < totaal / 2; t++){ const f = tafelFout(nieuw, t); restConflict += f.paar; gsFout += f.gs; }
+  let restConflict = 0, gsFout = 0, apartFout = 0;
+  for (let t = 0; t < totaal / 2; t++){ const f = tafelFout(nieuw, t); restConflict += f.paar; gsFout += f.gs; apartFout += f.apart; }
 
   kl.plekken = nieuw;
   kl.wachtrij = wacht;
@@ -3491,6 +3783,7 @@ document.getElementById("indeel-ok").addEventListener("click", () => {
   teken(); schrijf();
   const kanttekening = [];
   if (restConflict) kanttekening.push(restConflict + " tweetal(len) konden niet uit elkaar");
+  if (apartFout) kanttekening.push(apartFout + " keer zit iemand die apart moet toch naast het andere geslacht");
   if (gsFout) kanttekening.push(gsFout + " tafel(s) " + (gsWens === "gemengd" ? "niet gemengd" : "wel gemengd") + ", de aantallen komen niet uit");
   zetStatus(kanttekening.length ? "Ingedeeld, maar " + kanttekening.join(" en ") : "Klas opnieuw ingedeeld", true);
 });
@@ -3586,12 +3879,16 @@ function herhalingKaart(kl){
   return m;
 }
 function beoordeelGroepen(groepen, o){
-  let verboden = 0, herhaling = 0, niveauStraf = 0, herhaaldeParen = 0;
+  let verboden = 0, herhaling = 0, niveauStraf = 0, herhaaldeParen = 0, apartBotsing = 0;
   for (const g of groepen){
     for (let i = 0; i < g.length; i++){
       for (let j = i + 1; j < g.length; j++){
         const sl = paarSleutel(g[i], g[j]);
         if (o.nietSamen.has(sl)) verboden++;
+        if (o.apart && (o.apart.has(g[i]) || o.apart.has(g[j]))){
+          const x = o.gs.get(g[i]), y = o.gs.get(g[j]);
+          if (x && y && x !== y) apartBotsing++;
+        }
         if (o.herhaling){ const w = o.herhaling.get(sl) || 0; herhaling += w; if (w) herhaaldeParen++; }
       }
     }
@@ -3625,7 +3922,7 @@ function beoordeelGroepen(groepen, o){
       }
     }
   }
-  return { score: 1000 * verboden + 12 * niveauStraf + 12 * gsStraf + herhaling, verboden, herhaling, herhaaldeParen, niveauStraf, gsStraf };
+  return { score: 1000 * (verboden + apartBotsing) + 12 * niveauStraf + 12 * gsStraf + herhaling, verboden, apartBotsing, herhaling, herhaaldeParen, niveauStraf, gsStraf };
 }
 function verbeterGroepen(groepen, o, stappen){
   const g = groepen.map(x => x.slice());
@@ -3673,6 +3970,8 @@ function maakGroepjes(){
   const gs = new Map(), gsTotaal = { j:0, m:0 };
   ids.forEach(id => { const x = kl.leerlingen[id].geslacht; if (x === "j" || x === "m"){ gs.set(id, x); gsTotaal[x]++; } });
   o.gs = gs; o.gsTotaal = gsTotaal;
+  const apartIds = groepAan.nietsamen ? ids.filter(id => kl.leerlingen[id].apartGs) : [];
+  o.apart = apartIds.length ? new Set(apartIds) : null;
   o.gsKeuze = gs.size ? geslachtKeuze.groep : "vrij";
   const { groepen, oordeel } = deelInGroepen(ids, maten, o);
   laatsteGroepen = groepen;
@@ -3719,6 +4018,15 @@ function maakGroepjes(){
       if (g.includes(p[0]) && g.includes(p[1])) namen.push(kl.leerlingen[p[0]].naam + " en " + kl.leerlingen[p[1]].naam);
     }));
     meld.push("Niet gelukt om uit elkaar te houden: " + namen.join("; ") + ". Probeer een andere groepsgrootte.");
+  }
+  if (oordeel.apartBotsing){
+    const wie = [];
+    groepen.forEach(g => g.forEach(id => {
+      if (!o.apart || !o.apart.has(id)) return;
+      const eigen = gs.get(id);
+      if (eigen && g.some(x => gs.get(x) && gs.get(x) !== eigen)) wie.push(kl.leerlingen[id].naam);
+    }));
+    meld.push("Niet gelukt: " + wie.join(", ") + (wie.length === 1 ? " zit" : " zitten") + " toch in een groepje met het andere geslacht. Probeer een andere groepsgrootte.");
   }
   if (groepAan.niveau){
     const zonder = ids.length - niveau.size;
@@ -3770,8 +4078,8 @@ function maakGroepjes(){
 
 /* ---- voorwaarden ---- */
 const GROEPREGELS = [
-  { id:"nietsamen", icoon:"mensen", naam:"Bepaalde tweetallen uit elkaar",
-    uitleg:"Wie je bij 'Wie niet naast elkaar' hebt opgegeven, komt niet in hetzelfde groepje." },
+  { id:"nietsamen", icoon:"mensen", naam:"Wie niet bij wie",
+    uitleg:"Opgegeven tweetallen komen niet in hetzelfde groepje. Wie apart moet, komt niet bij iemand van het andere geslacht." },
   { id:"niveau", icoon:"lagen", naam:"Niveaus spreiden",
     uitleg:"Elk groepje krijgt een vergelijkbare mix van niveau 1, 2 en 3." },
   { id:"herhaling", icoon:"herhaal", naam:"Nieuwe combinaties",
@@ -3779,7 +4087,10 @@ const GROEPREGELS = [
 ];
 function regelTelt(id){
   const kl = k();
-  if (id === "nietsamen"){ const n = nietSamenVan(kl).length; return n + " tweetal" + (n === 1 ? "" : "len"); }
+  if (id === "nietsamen"){
+    const n = nietSamenVan(kl).length, a = Object.values(kl.leerlingen).filter(l => l.apartGs).length;
+    return n + " tweetal" + (n === 1 ? "" : "len") + (a ? " \u00b7 " + a + " apart" : "");
+  }
   if (id === "niveau"){
     const allen = Object.values(kl.leerlingen);
     return allen.filter(l => l.niveau).length + " van " + allen.length;
