@@ -2669,7 +2669,19 @@ ontkoppelKnop.addEventListener("click", async () => {
   if (typeof waarschuwGeenKoppeling === "function") waarschuwGeenKoppeling();
 });
 
+/* Weggaan zonder te wachten op de opslagtimer van 600 ms: eerst een openstaand
+   tekstvak bewaren, dan meteen schrijven in plaats van over een halve seconde. */
+function bewaarNu(){
+  if (typeof lesBewerkt !== "undefined" && lesBewerkt) bewaarLes();
+  if (!gewijzigd || !bestandHandle) return;
+  clearTimeout(schrijfTimer);
+  schrijf();
+}
+document.addEventListener("visibilitychange", () => { if (document.hidden) bewaarNu(); });
+window.addEventListener("pagehide", bewaarNu);
+
 window.addEventListener("beforeunload", e => {
+  if (typeof lesBewerkt !== "undefined" && lesBewerkt) bewaarLes();
   if (gewijzigd && !bestandHandle){ e.preventDefault(); e.returnValue = ""; }
 });
 
