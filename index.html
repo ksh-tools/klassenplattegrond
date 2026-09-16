@@ -679,6 +679,24 @@ body.presentatie .balk .knop:not(#btn-presentatie):not(#btn-beurt):not(#btn-time
   .toetsband{-webkit-print-color-adjust:exact;print-color-adjust:exact;font-size:3.6mm;padding:1.6mm 8mm;margin-top:2mm}
   .lokaal[data-toets="aan"] .tafel-groep{background:#fff5ea!important}
 }
+
+/* ---------- twee vakken: programma en notities ---------- */
+.les-tabs{display:flex;gap:4px;background:#f1f5f9;border:1px solid var(--lijn);border-radius:11px;padding:3px;margin:0 0 9px}
+.les-tabs[hidden]{display:none}
+.les-tabs button{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  border:1px solid transparent;background:transparent;border-radius:8px;padding:6px 6px;font-size:12.5px;font-weight:700;color:var(--grijs);white-space:nowrap}
+.les-tabs button[hidden]{display:none}
+.les-tabs button:hover{color:var(--inkt)}
+.les-tabs button.actief{background:var(--kaart);border-color:var(--lijn);color:var(--blauw);box-shadow:0 1px 2px rgba(15,23,42,.08)}
+.les-tabs button svg{width:13px;height:13px}
+.les-tabs .stip{width:7px;height:7px;border-radius:50%;background:var(--oranje);display:none}
+.les-tabs button[data-gevuld="1"] .stip{display:block}
+.les-prive{display:flex;align-items:flex-start;gap:8px;margin:0 0 8px;padding:7px 10px;border-radius:10px;
+  background:#fffbeb;border-left:3px solid var(--oranje);font-size:12px;line-height:1.45;color:#92400e}
+.les-prive[hidden]{display:none}
+.les-prive svg{flex:none;margin-top:1px}
+body.presentatie .les-tabs{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14)}
+body.presentatie .les-tabs button.actief{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.18);color:#bfdbfe}
 </style>
 </head>
 <body>
@@ -806,6 +824,13 @@ body.presentatie .balk .knop:not(#btn-presentatie):not(#btn-beurt):not(#btn-time
         <button type="button" class="lk" id="les-dicht" data-icon="kruis" title="Sluiten" aria-label="Sluiten"></button>
       </span>
     </div>
+    <div class="les-tabs" id="les-tabs" role="group" aria-label="Programma of notities">
+      <button type="button" data-tab="les">Programma</button>
+      <button type="button" data-tab="notities">Notities <span class="stip"></span></button>
+      <button type="button" data-tab="prive"><span data-icon="schild" data-maat="13"></span> Privé <span class="stip"></span></button>
+    </div>
+    <p class="les-prive" id="les-prive" hidden><span data-icon="schild" data-maat="14"></span>
+      <span>Alleen voor jou. Dit vak komt nooit op het bord en gaat alleen mee in een reservekopie als je ja zegt op de vraag over aandachtspunten.</span></p>
     <div class="les-balk" id="les-balk" hidden role="toolbar" aria-label="Opmaak">
       <button type="button" data-opmaak="bold" title="Dikgedrukt (Ctrl/Cmd + B)" aria-label="Dikgedrukt"><b>B</b></button>
       <button type="button" data-opmaak="italic" title="Schuin (Ctrl/Cmd + I)" aria-label="Schuin">I</button>
@@ -1615,7 +1640,26 @@ function lesNaarHtml(tekst){
   if (inLijst) uit += "</ul>";
   return uit;
 }
-function lesTekstVan(kl){ return typeof kl.les === "string" ? lesNaarHtml(kl.les) : ""; }
+/* Drie vakken per klas: "les" (programma) en "notities" mogen op het bord,
+   "prive" blijft bij de docent. */
+var lesTab = "les";
+const LES_OPBORD = ["les", "notities"];
+function lesTekstVan(kl, veld){
+  const t = kl[veld || lesTab];
+  return typeof t === "string" ? lesNaarHtml(t) : "";
+}
+function opBord(){ return document.body.classList.contains("presentatie"); }
+function tekenLesTabs(){
+  const kl = k(), tabs = document.getElementById("les-tabs");
+  tabs.hidden = false;
+  tabs.querySelectorAll("button").forEach(b => {
+    b.hidden = opBord() && !LES_OPBORD.includes(b.dataset.tab);   /* privé nooit op het bord */
+    b.classList.toggle("actief", b.dataset.tab === lesTab);
+    b.setAttribute("aria-pressed", b.dataset.tab === lesTab ? "true" : "false");
+    b.dataset.gevuld = lesHeeftTekst(lesTekstVan(kl, b.dataset.tab)) ? "1" : "";
+  });
+  document.getElementById("les-prive").hidden = lesTab !== "prive";
+}
 function lesOpmaakVan(kl){
   if (!kl.lesOpmaak || typeof kl.lesOpmaak !== "object") kl.lesOpmaak = {};
   const o = kl.lesOpmaak;
@@ -1637,9 +1681,16 @@ function tekenLesOpmaak(){
 }
 function tekenLes(){
   const kl = k(), vak = document.getElementById("les-inhoud"), invoer = document.getElementById("les-invoer");
+  if (opBord() && !LES_OPBORD.includes(lesTab)){   /* privé hoort niet op het digibord */
+    if (lesBewerkt) zetLesBewerken(false);         /* bewaart eerst wat er staat */
+    lesTab = "les";
+  }
   const html = lesTekstVan(kl);
-  document.getElementById("les-label").textContent = huidig + " \u00b7 deze les";
-  document.getElementById("btn-les").classList.toggle("aan", lesHeeftTekst(html));
+  document.getElementById("les-label").textContent = huidig +
+    (lesTab === "notities" ? " \u00b7 notities" : lesTab === "prive" ? " \u00b7 priv\u00e9" : " \u00b7 deze les");
+  document.getElementById("btn-les").classList.toggle("aan",
+    ["les","notities","prive"].some(v => lesHeeftTekst(lesTekstVan(kl, v))));
+  tekenLesTabs();
   tekenLesOpmaak();
   if (lesBewerkt){
     if (document.activeElement !== invoer) invoer.innerHTML = html;
@@ -1647,12 +1698,24 @@ function tekenLes(){
   }
   invoer.innerHTML = html;
   if (lesHeeftTekst(html)) vak.innerHTML = html;
-  else vak.innerHTML = '<div class="leeg-tekst">Nog niets ingevuld. Klik op het potlood en zet hier het programma en de doelen van deze les.</div>';
+  else vak.innerHTML = '<div class="leeg-tekst">' + ({
+    notities: "Nog geen notities. Klik op het potlood; deze notities mogen op het bord.",
+    prive: "Nog geen aantekeningen. Klik op het potlood; dit vak blijft bij jou."
+  }[lesTab] || "Nog niets ingevuld. Klik op het potlood en zet hier het programma en de doelen van deze les.") + "</div>";
 }
 function bewaarLes(){
-  k().les = schoonLes(document.getElementById("les-invoer").innerHTML);
+  k()[lesTab] = schoonLes(document.getElementById("les-invoer").innerHTML);
   markeer();
 }
+document.getElementById("les-tabs").addEventListener("click", e => {
+  const knop = e.target.closest("button[data-tab]");
+  if (!knop || knop.dataset.tab === lesTab) return;
+  const bezig = lesBewerkt;
+  if (bezig) zetLesBewerken(false);          /* eerst het huidige vak bewaren */
+  lesTab = knop.dataset.tab;
+  tekenLes();
+  if (bezig) zetLesBewerken(true);
+});
 function zetLesBewerken(aan){
   lesBewerkt = aan;
   const invoer = document.getElementById("les-invoer"), vak = document.getElementById("les-inhoud");
@@ -2332,7 +2395,8 @@ function bouwData(metFotos, metZorg){
     });
     if (naam === huidig) legActieveVersieVast(kl); else zorgVoorVersies(kl);
       uit.klassen[naam] = { rijen:kl.rijen, diep:kl.diep, leerlingen, plekken:kl.plekken, wachtrij:kl.wachtrij,
-                          les: kl.les || "", lesOpmaak: lesOpmaakVan(kl), toets: !!kl.toets,
+                          les: kl.les || "", notities: kl.notities || "", prive: metZorg ? (kl.prive || "") : "",
+                          lesOpmaak: lesOpmaakVan(kl), toets: !!kl.toets,
                           versies:kl.versies, actief:kl.actief,
                           nietSamen: metZorg ? (kl.nietSamen || []) : [],
                           groepGeschiedenis: kl.groepGeschiedenis || [] };
@@ -2349,7 +2413,9 @@ function laadData(data){
       leerlingen:kl.leerlingen, plekken:kl.plekken, wachtrij:kl.wachtrij || [],
       beurt:null, gehad:[], nietSamen: Array.isArray(kl.nietSamen) ? kl.nietSamen : [],
       groepGeschiedenis: Array.isArray(kl.groepGeschiedenis) ? kl.groepGeschiedenis : [],
-      les: typeof kl.les === "string" ? kl.les : "", lesOpmaak: kl.lesOpmaak, toets: !!kl.toets
+      les: typeof kl.les === "string" ? kl.les : "", notities: typeof kl.notities === "string" ? kl.notities : "",
+      prive: typeof kl.prive === "string" ? kl.prive : "",
+      lesOpmaak: kl.lesOpmaak, toets: !!kl.toets
     });
     if (Array.isArray(kl.versies) && kl.versies.length){
       klassen[naam].versies = kl.versies;
@@ -2403,9 +2469,10 @@ document.getElementById("btn-opslaan").addEventListener("click", () => {
   const heeftFotos = Object.values(klassen).some(kl => Object.values(kl.leerlingen).some(l => l.foto));
   let metFotos = false;
   if (heeftFotos) metFotos = confirm("Foto's meenemen in het bestand?\n\nOK = met foto's, het bestand bevat dan herkenbare beelden van leerlingen.\nAnnuleren = alleen namen en plekken.");
-  const heeftZorg = Object.values(klassen).some(kl => Object.values(kl.leerlingen).some(l => (l.zorg && l.zorg.length) || l.notitie));
+  const heeftZorg = Object.values(klassen).some(kl => (kl.prive || "").trim() ||
+    Object.values(kl.leerlingen).some(l => (l.zorg && l.zorg.length) || l.notitie || l.apartGs));
   let metZorg = false;
-  if (heeftZorg) metZorg = confirm("Aandachtspunten en notities meenemen?\n\nDit zijn gevoelige gegevens over leerlingen.\n\nOK = meenemen, alleen doen als het bestand op een plek van school blijft.\nAnnuleren = weglaten (aanbevolen als je het bestand deelt).");
+  if (heeftZorg) metZorg = confirm("Aandachtspunten en je eigen notities meenemen?\n\nDit zijn gevoelige gegevens over leerlingen.\n\nOK = meenemen, alleen doen als het bestand op een plek van school blijft.\nAnnuleren = weglaten (aanbevolen als je het bestand deelt).");
   const uit = bouwData(metFotos, metZorg);
   gewijzigd = false;
   const blob = new Blob([JSON.stringify(uit)], { type:"application/json" });
